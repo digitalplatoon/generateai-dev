@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -151,11 +150,19 @@ export const useRagLab = () => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Fetch error:', error);
+        setDocuments([]);
+        return;
+      }
       
-      // Type assertion for the data from Supabase
-      const typedDocuments = (data || []) as RagDocument[];
-      setDocuments(typedDocuments);
+      // Safe type conversion - check if data exists and is an array before converting
+      if (data && Array.isArray(data)) {
+        const typedDocuments = data as unknown as RagDocument[];
+        setDocuments(typedDocuments);
+      } else {
+        setDocuments([]);
+      }
     } catch (error) {
       console.error('Fetch error:', error);
       setDocuments([]);
