@@ -72,6 +72,45 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_plans: {
+        Row: {
+          active: boolean
+          created_at: string
+          features: Json
+          id: string
+          limits: Json
+          name: string
+          price_monthly: number | null
+          price_yearly: number | null
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          features?: Json
+          id?: string
+          limits?: Json
+          name: string
+          price_monthly?: number | null
+          price_yearly?: number | null
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          features?: Json
+          id?: string
+          limits?: Json
+          name?: string
+          price_monthly?: number | null
+          price_yearly?: number | null
+          tier?: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_bookmarks: {
         Row: {
           created_at: string | null
@@ -216,11 +255,97 @@ export type Database = {
         }
         Relationships: []
       }
+      user_subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          plan_id: string
+          started_at: string
+          status: string
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan_id: string
+          started_at?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan_id?: string
+          started_at?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_usage: {
+        Row: {
+          created_at: string
+          date: string
+          feature_type: string
+          id: string
+          usage_count: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          feature_type: string
+          id?: string
+          usage_count?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          feature_type?: string
+          id?: string
+          usage_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      check_usage_limit: {
+        Args: { _user_id: string; _feature_type: string }
+        Returns: boolean
+      }
+      get_user_subscription: {
+        Args: { _user_id: string }
+        Returns: {
+          plan_name: string
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          status: string
+          limits: Json
+          features: Json
+          expires_at: string
+        }[]
+      }
       has_role: {
         Args: {
           _user_id: string
@@ -228,9 +353,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      record_usage: {
+        Args: { _user_id: string; _feature_type: string; _count?: number }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      subscription_tier: "free" | "basic" | "premium" | "enterprise"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -347,6 +477,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      subscription_tier: ["free", "basic", "premium", "enterprise"],
     },
   },
 } as const
