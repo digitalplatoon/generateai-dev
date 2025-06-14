@@ -1,0 +1,72 @@
+
+import React from 'react';
+
+export const OrganizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "GenerateAI.dev",
+  "url": "https://generateai.dev",
+  "logo": "https://generateai.dev/logo.png",
+  "description": "The world's leading platform for learning, building, and deploying generative AI applications",
+  "sameAs": [
+    "https://twitter.com/generateai_dev",
+    "https://github.com/generateai-dev",
+    "https://linkedin.com/company/generateai-dev"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service",
+    "url": "https://generateai.dev/contact"
+  }
+};
+
+export const WebsiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "GenerateAI.dev",
+  "url": "https://generateai.dev",
+  "description": "Master LLMs, RAG Systems & AI Agents with interactive learning paths and production-ready toolkits",
+  "publisher": {
+    "@type": "Organization",
+    "name": "GenerateAI.dev"
+  },
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://generateai.dev/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+};
+
+export const SoftwareApplicationSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "GenerateAI.dev Platform",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web Browser",
+  "description": "AI development platform with interactive learning paths, RAG lab, and agent playground",
+  "url": "https://generateai.dev",
+  "author": {
+    "@type": "Organization",
+    "name": "GenerateAI.dev"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  }
+};
+
+export const CourseSchema = {
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "AI Development Learning Paths",
+  "description": "Comprehensive learning paths for mastering LLMs, RAG systems, and AI agents",
+  "provider": {
+    "@type": "Organization",
+    "name": "GenerateAI.dev"
+  },
+  "url": "https://generateai.dev/paths",
+  "courseMode": "online",
+  "educationalLevel": "intermediate"
+};
