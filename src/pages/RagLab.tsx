@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -9,17 +9,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Upload, Database, Cpu, Search, Settings, Play, Download, FileText, Zap, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { Upload, Database, Cpu, Search, Settings, Play, Download, FileText, Zap, AlertCircle, CheckCircle, Clock, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useRagLab, QueryResult } from '@/hooks/useRagLab';
 
 const RagLab = () => {
   const [selectedEmbedding, setSelectedEmbedding] = useState("OpenAI");
-  const [selectedVectorDB, setSelectedVectorDB] = useState("Pinecone");
+  const [selectedVectorDB, setSelectedVectorDB] = useState("Supabase");
   const [queryText, setQueryText] = useState("");
   const [chunkSize, setChunkSize] = useState("1000");
   const [overlap, setOverlap] = useState("200");
-  const [processingProgress, setProcessingProgress] = useState(0);
+  const [numResults, setNumResults] = useState("5");
+  const [minScore, setMinScore] = useState("0.7");
+  const [queryResults, setQueryResults] = useState<QueryResult[]>([]);
   const { toast } = useToast();
+
+  const {
+    documents,
+    isLoading,
+    processingProgress,
+    uploadDocument,
+    processDocument,
+    queryDocuments,
+    fetchDocuments,
+    deleteDocument,
+  } = useRagLab();
+
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
 
   const embeddingModels = [
     { name: "OpenAI", description: "High-quality embeddings with 1536 dimensions", price: "$0.0001/1K tokens" },
@@ -29,65 +47,54 @@ const RagLab = () => {
   ];
 
   const vectorDatabases = [
+    { name: "Supabase", description: "Integrated PostgreSQL with pgvector", features: ["Built-in", "Scalable", "Real-time"] },
     { name: "Pinecone", description: "Managed vector database with excellent performance", features: ["Auto-scaling", "Real-time updates", "Metadata filtering"] },
     { name: "Weaviate", description: "Open-source with GraphQL API", features: ["Vector search", "Hybrid search", "Graph relations"] },
-    { name: "Chroma", description: "Simple and embeddable for Python", features: ["Local storage", "Memory efficient", "Easy integration"] },
-    { name: "Qdrant", description: "High-performance with advanced filtering", features: ["Fast queries", "Payload filtering", "Clustering"] }
+    { name: "Chroma", description: "Simple and embeddable for Python", features: ["Local storage", "Memory efficient", "Easy integration"] }
   ];
 
-  const [uploadedFiles, setUploadedFiles] = useState([
-    { name: "sample-document.pdf", status: "processed", size: "2.4 MB", chunks: 45 },
-    { name: "knowledge-base.txt", status: "processing", size: "1.8 MB", chunks: 0 },
-    { name: "technical-docs.md", status: "pending", size: "956 KB", chunks: 0 }
-  ]);
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
-  const queryResults = [
-    {
-      score: 0.95,
-      source: "sample-document.pdf",
-      chunk: 1,
-      content: "This section explains the fundamental concepts of retrieval-augmented generation systems and how they combine pre-trained language models with external knowledge bases..."
-    },
-    {
-      score: 0.87,
-      source: "knowledge-base.txt",
-      chunk: 5,
-      content: "Vector embeddings are dense numerical representations of text that capture semantic meaning. They enable efficient similarity search across large document collections..."
-    },
-    {
-      score: 0.82,
-      source: "technical-docs.md",
-      chunk: 12,
-      content: "Implementation best practices include proper chunking strategies, overlap management, and metadata filtering to improve retrieval accuracy and system performance..."
-    }
-  ];
-
-  const handleFileUpload = () => {
-    toast({
-      title: "Files uploaded successfully!",
-      description: "Your documents are being processed and will be ready shortly.",
-    });
-    setProcessingProgress(25);
-  };
-
-  const handleProcessDocuments = () => {
-    setProcessingProgress(0);
-    const interval = setInterval(() => {
-      setProcessingProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          toast({
-            title: "Processing complete!",
-            description: "All documents have been processed and are ready for querying.",
-          });
-          return 100;
-        }
-        return prev + 10;
+    const file = files[0];
+    
+    // Check file type
+    const allowedTypes = ['text/plain', 'text/markdown', 'application/pdf', 'text/csv'];
+    if (!allowedTypes.includes(file.type) && !file.name.endsWith('.md') && !file.name.endsWith('.txt')) {
+      toast({
+        title: "Unsupported file type",
+        description: "Please upload PDF, TXT, MD, or CSV files only.",
+        variant: "destructive"
       });
-    }, 300);
+      return;
+    }
+
+    try {
+      await uploadDocument(file, parseInt(chunkSize), parseInt(overlap), selectedEmbedding);
+    } catch (error) {
+      console.error('Upload failed:', error);
+    }
   };
 
-  const handleRunQuery = () => {
+  const handleProcessDocuments = async () => {
+    const pendingDocs = documents.filter(doc => doc.status === 'pending');
+    
+    if (pendingDocs.length === 0) {
+      toast({
+        title: "No documents to process",
+        description: "Upload some documents first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    for (const doc of pendingDocs) {
+      await processDocument(doc.id);
+    }
+  };
+
+  const handleRunQuery = async () => {
     if (!queryText.trim()) {
       toast({
         title: "Please enter a query",
@@ -96,11 +103,23 @@ const RagLab = () => {
       });
       return;
     }
-    
-    toast({
-      title: "Query executed!",
-      description: "Found relevant chunks from your knowledge base.",
-    });
+
+    const processedDocs = documents.filter(doc => doc.status === 'processed');
+    if (processedDocs.length === 0) {
+      toast({
+        title: "No processed documents",
+        description: "Process some documents first before querying.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const results = await queryDocuments(queryText, parseInt(numResults), parseFloat(minScore));
+      setQueryResults(results);
+    } catch (error) {
+      console.error('Query failed:', error);
+    }
   };
 
   const getStatusIcon = (status: string) => {
@@ -108,6 +127,7 @@ const RagLab = () => {
       case "processed": return <CheckCircle className="w-4 h-4 text-green-400" />;
       case "processing": return <Clock className="w-4 h-4 text-yellow-400" />;
       case "pending": return <AlertCircle className="w-4 h-4 text-gray-400" />;
+      case "error": return <AlertCircle className="w-4 h-4 text-red-400" />;
       default: return null;
     }
   };
@@ -117,8 +137,13 @@ const RagLab = () => {
       case "processed": return "bg-green-500/20 text-green-300 border-green-400/30";
       case "processing": return "bg-yellow-500/20 text-yellow-300 border-yellow-400/30";
       case "pending": return "bg-gray-500/20 text-gray-300 border-gray-400/30";
+      case "error": return "bg-red-500/20 text-red-300 border-red-400/30";
       default: return "bg-blue-500/20 text-blue-300 border-blue-400/30";
     }
+  };
+
+  const getTotalChunks = () => {
+    return documents.filter(doc => doc.status === 'processed').length;
   };
 
   return (
@@ -135,16 +160,16 @@ const RagLab = () => {
             </p>
             <div className="flex justify-center gap-6 mt-6">
               <div className="text-center">
-                <div className="text-2xl font-bold text-teal">10+</div>
+                <div className="text-2xl font-bold text-teal">4+</div>
                 <div className="text-sm text-light-gray">Vector DBs</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-teal">5+</div>
+                <div className="text-2xl font-bold text-teal">4+</div>
                 <div className="text-sm text-light-gray">Embedding Models</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-teal">100+</div>
-                <div className="text-sm text-light-gray">File Formats</div>
+                <div className="text-2xl font-bold text-teal">{documents.length}</div>
+                <div className="text-sm text-light-gray">Documents</div>
               </div>
             </div>
           </div>
@@ -262,23 +287,31 @@ const RagLab = () => {
                       <Upload className="w-12 h-12 text-teal mx-auto mb-4" />
                       <p className="text-white mb-2">Drop files here or click to upload</p>
                       <p className="text-sm text-light-gray mb-4">Supports PDF, TXT, DOCX, MD, CSV files</p>
-                      <Button 
-                        onClick={handleFileUpload}
-                        className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
-                      >
-                        Choose Files
-                      </Button>
+                      <label>
+                        <Button 
+                          disabled={isLoading}
+                          className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
+                        >
+                          Choose Files
+                        </Button>
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept=".pdf,.txt,.md,.csv"
+                          onChange={handleFileUpload}
+                        />
+                      </label>
                     </div>
                     
-                    <div className="space-y-2">
-                      {uploadedFiles.map((file, index) => (
+                    <div className="space-y-2 max-h-64 overflow-y-auto">
+                      {documents.map((file, index) => (
                         <div key={index} className="flex items-center justify-between p-3 bg-navy/50 rounded-lg border border-white/10">
                           <div className="flex items-center gap-3">
                             <FileText className="w-4 h-4 text-light-gray" />
                             <div>
                               <span className="text-sm text-white">{file.name}</span>
                               <p className="text-xs text-light-gray">
-                                {file.size} • {file.chunks > 0 ? `${file.chunks} chunks` : 'Not processed'}
+                                {(file.file_size / 1024).toFixed(1)} KB • {file.status === 'processed' ? 'Processed' : 'Not processed'}
                               </p>
                             </div>
                           </div>
@@ -287,6 +320,14 @@ const RagLab = () => {
                             <Badge className={getStatusColor(file.status)}>
                               {file.status}
                             </Badge>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => deleteDocument(file.id)}
+                              className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
                       ))}
@@ -335,6 +376,7 @@ const RagLab = () => {
                     
                     <Button 
                       onClick={handleProcessDocuments}
+                      disabled={isLoading}
                       className="w-full bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
                     >
                       <Zap className="w-4 h-4 mr-2" />
@@ -373,7 +415,8 @@ const RagLab = () => {
                         <label className="text-sm font-medium text-white mb-2 block">Number of Results</label>
                         <Input
                           type="number"
-                          defaultValue="5"
+                          value={numResults}
+                          onChange={(e) => setNumResults(e.target.value)}
                           className="bg-navy/50 border-white/20 text-white"
                         />
                       </div>
@@ -381,7 +424,8 @@ const RagLab = () => {
                         <label className="text-sm font-medium text-white mb-2 block">Min Score</label>
                         <Input
                           type="number"
-                          defaultValue="0.7"
+                          value={minScore}
+                          onChange={(e) => setMinScore(e.target.value)}
                           step="0.1"
                           min="0"
                           max="1"
@@ -391,6 +435,7 @@ const RagLab = () => {
                     </div>
                     <Button 
                       onClick={handleRunQuery}
+                      disabled={isLoading}
                       className="w-full bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
                     >
                       <Play className="w-4 h-4 mr-2" />
@@ -408,19 +453,26 @@ const RagLab = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3 max-h-96 overflow-y-auto">
-                      {queryResults.map((result, index) => (
-                        <div key={index} className="p-3 bg-navy/50 rounded-lg border border-white/10">
-                          <div className="flex items-center justify-between mb-2">
-                            <Badge className="bg-teal/20 text-teal border-teal/30">
-                              Score: {result.score}
-                            </Badge>
-                            <span className="text-xs text-light-gray">
-                              {result.source} - chunk {result.chunk}
-                            </span>
+                      {queryResults.length > 0 ? (
+                        queryResults.map((result, index) => (
+                          <div key={index} className="p-3 bg-navy/50 rounded-lg border border-white/10">
+                            <div className="flex items-center justify-between mb-2">
+                              <Badge className="bg-teal/20 text-teal border-teal/30">
+                                Score: {result.score.toFixed(3)}
+                              </Badge>
+                              <span className="text-xs text-light-gray">
+                                {result.source} - chunk {result.chunk}
+                              </span>
+                            </div>
+                            <p className="text-sm text-white leading-relaxed">{result.content}</p>
                           </div>
-                          <p className="text-sm text-white leading-relaxed">{result.content}</p>
+                        ))
+                      ) : (
+                        <div className="text-center py-8">
+                          <Search className="w-12 h-12 text-light-gray mx-auto mb-4" />
+                          <p className="text-light-gray">No results yet. Run a query to see results here.</p>
                         </div>
-                      ))}
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -491,12 +543,12 @@ const RagLab = () => {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm text-light-gray">Documents:</span>
-                        <span className="text-sm text-white">{uploadedFiles.length} processed</span>
+                        <span className="text-sm text-white">{documents.length} uploaded</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-sm text-light-gray">Total Chunks:</span>
+                        <span className="text-sm text-light-gray">Processed:</span>
                         <span className="text-sm text-white">
-                          {uploadedFiles.reduce((sum, file) => sum + file.chunks, 0)}
+                          {documents.filter(doc => doc.status === 'processed').length} ready
                         </span>
                       </div>
                       <div className="flex justify-between">

@@ -1,0 +1,177 @@
+
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+interface DocumentData {
+  id: string;
+  content: string;
+  chunk_size: number;
+  overlap: number;
+  embedding_model: string;
+}
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
+        },
+      }
+    );
+
+    const { documentId } = await req.json();
+    console.log('Processing document:', documentId);
+
+    // Get document data
+    const { data: document, error: docError } = await supabaseClient
+      .from('rag_documents')
+      .select('*')
+      .eq('id', documentId)
+      .single();
+
+    if (docError) {
+      throw new Error(`Failed to fetch document: ${docError.message}`);
+    }
+
+    // Update status to processing
+    await supabaseClient
+      .from('rag_documents')
+      .update({ status: 'processing' })
+      .eq('id', documentId);
+
+    // Chunk the document
+    const chunks = chunkText(document.content, document.chunk_size, document.overlap);
+    console.log(`Created ${chunks.length} chunks`);
+
+    // Generate embeddings for each chunk
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openaiApiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
+
+    const chunkData = [];
+    for (let i = 0; i < chunks.length; i++) {
+      console.log(`Processing chunk ${i + 1}/${chunks.length}`);
+      
+      const embedding = await generateEmbedding(chunks[i], openaiApiKey);
+      
+      chunkData.push({
+        document_id: documentId,
+        chunk_index: i,
+        content: chunks[i],
+        embedding: embedding,
+      });
+    }
+
+    // Store chunks and embeddings
+    const { error: chunksError } = await supabaseClient
+      .from('rag_chunks')
+      .insert(chunkData);
+
+    if (chunksError) {
+      throw new Error(`Failed to store chunks: ${chunksError.message}`);
+    }
+
+    // Update document status to processed
+    await supabaseClient
+      .from('rag_documents')
+      .update({ status: 'processed' })
+      .eq('id', documentId);
+
+    console.log(`Successfully processed document ${documentId}`);
+
+    return new Response(
+      JSON.stringify({ 
+        success: true, 
+        chunks_created: chunks.length,
+        message: 'Document processed successfully'
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    console.error('Error processing document:', error);
+
+    // Update document status to error if we have the documentId
+    try {
+      const { documentId } = await req.json();
+      if (documentId) {
+        const supabaseClient = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+          {
+            global: {
+              headers: { Authorization: req.headers.get('Authorization')! },
+            },
+          }
+        );
+        
+        await supabaseClient
+          .from('rag_documents')
+          .update({ status: 'error' })
+          .eq('id', documentId);
+      }
+    } catch (updateError) {
+      console.error('Failed to update document status to error:', updateError);
+    }
+
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    );
+  }
+});
+
+function chunkText(text: string, chunkSize: number, overlap: number): string[] {
+  const chunks: string[] = [];
+  let start = 0;
+
+  while (start < text.length) {
+    const end = Math.min(start + chunkSize, text.length);
+    const chunk = text.slice(start, end);
+    chunks.push(chunk);
+    
+    if (end === text.length) break;
+    start = end - overlap;
+  }
+
+  return chunks;
+}
+
+async function generateEmbedding(text: string, apiKey: string): Promise<number[]> {
+  const response = await fetch('https://api.openai.com/v1/embeddings', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'text-embedding-3-small',
+      input: text,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`OpenAI API error: ${error}`);
+  }
+
+  const data = await response.json();
+  return data.data[0].embedding;
+}
