@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { book-open, code, folder-open, chevron-down } from "lucide-react";
+import { BookOpen, Code, FolderOpen, ChevronDown } from "lucide-react";
 
 const LearningPathsSection = () => {
   const [selectedRole, setSelectedRole] = useState("Beginner");
@@ -112,7 +112,7 @@ const LearningPathsSection = () => {
             <Card key={index} className="glass border-white/20 hover-glow transition-all duration-300 hover:scale-105">
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
-                  <book-open className="w-8 h-8 text-teal" />
+                  <BookOpen className="w-8 h-8 text-teal" />
                   <Badge variant="secondary" className="bg-teal/20 text-teal border-teal/30">
                     {path.badge}
                   </Badge>
@@ -128,11 +128,11 @@ const LearningPathsSection = () => {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-4 text-sm text-light-gray">
                     <span className="flex items-center space-x-1">
-                      <code className="w-4 h-4" />
+                      <Code className="w-4 h-4" />
                       <span>Interactive Labs</span>
                     </span>
                     <span className="flex items-center space-x-1">
-                      <folder-open className="w-4 h-4" />
+                      <FolderOpen className="w-4 h-4" />
                       <span>Projects</span>
                     </span>
                   </div>
