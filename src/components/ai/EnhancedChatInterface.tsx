@@ -33,6 +33,7 @@ interface Message {
   model_used?: string;
   temperature?: number;
   isStreaming?: boolean;
+  created_at: string;
 }
 
 const EnhancedChatInterface = () => {
@@ -41,6 +42,7 @@ const EnhancedChatInterface = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [abortController, setAbortController] = useState<AbortController | null>(null);
+  const [streamingContent, setStreamingContent] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -61,7 +63,7 @@ const EnhancedChatInterface = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, streamingContent]);
 
   const stopStreaming = () => {
     if (abortController) {
@@ -70,6 +72,7 @@ const EnhancedChatInterface = () => {
     }
     setIsStreaming(false);
     setStreamingMessageId(null);
+    setStreamingContent('');
   };
 
   const handleSendMessage = async () => {
@@ -125,6 +128,7 @@ const EnhancedChatInterface = () => {
 
       // Start streaming response
       setIsStreaming(true);
+      setStreamingContent('');
       const controller = new AbortController();
       setAbortController(controller);
 
@@ -184,12 +188,8 @@ const EnhancedChatInterface = () => {
                   
                   if (parsed.type === 'chunk' && parsed.content) {
                     fullContent += parsed.content;
-                    
-                    // Update the streaming message in the UI
-                    // This would require updating the messages state with streaming content
-                    // For now, we'll accumulate and add the full message at the end
+                    setStreamingContent(fullContent);
                   } else if (parsed.type === 'done') {
-                    // Final message with metadata
                     fullContent = parsed.content || fullContent;
                     break;
                   }
@@ -205,6 +205,7 @@ const EnhancedChatInterface = () => {
       }
 
       setIsStreaming(false);
+      setStreamingContent('');
       setAbortController(null);
 
       const endTime = Date.now();
@@ -271,6 +272,7 @@ const EnhancedChatInterface = () => {
       setIsLoading(false);
       setIsStreaming(false);
       setAbortController(null);
+      setStreamingContent('');
     }
   };
 
@@ -373,12 +375,6 @@ const EnhancedChatInterface = () => {
                       }`}
                     >
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                      {message.isStreaming && (
-                        <div className="mt-2 flex items-center gap-1 text-xs opacity-70">
-                          <div className="animate-pulse">●</div>
-                          <span>AI is typing...</span>
-                        </div>
-                      )}
                     </div>
                     
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -411,8 +407,31 @@ const EnhancedChatInterface = () => {
                 </div>
               </div>
             ))}
+
+            {/* Show streaming message */}
+            {isStreaming && streamingContent && (
+              <div className="flex gap-3 justify-start">
+                <div className="flex gap-3 max-w-[80%]">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                      <Bot className="h-4 w-4 text-secondary-foreground" />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2 text-left">
+                    <div className="p-3 rounded-lg bg-muted">
+                      <p className="text-sm whitespace-pre-wrap">{streamingContent}</p>
+                      <div className="mt-2 flex items-center gap-1 text-xs opacity-70">
+                        <div className="animate-pulse">●</div>
+                        <span>AI is typing...</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             
-            {messages.length === 0 && (
+            {messages.length === 0 && !isStreaming && (
               <div className="text-center py-8 text-muted-foreground">
                 <Bot className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <h3 className="text-lg font-medium mb-2">Start a conversation</h3>

@@ -21,4 +21,5 @@ export interface ConversationMessage {
   model_used?: string;
   temperature?: number;
   created_at: string;
+  isStreaming?: boolean;
 }

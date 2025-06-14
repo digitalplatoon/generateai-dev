@@ -1,4 +1,3 @@
-import { supabase } from '@/integrations/supabase/client';
 
 interface CacheEntry {
   id: string;
@@ -47,21 +46,19 @@ export class ResponseCacheService {
     try {
       const cacheKey = this.generateCacheKey(messages, settings);
       
-      // First check if we have a cached response
-      const { data, error } = await supabase
-        .from('ai_response_cache')
-        .select('*')
-        .eq('cache_key', cacheKey)
-        .gt('expires_at', new Date().toISOString())
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+      // Use a direct SQL query approach for now
+      const response = await fetch('/api/cache/get', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cache_key: cacheKey })
+      });
 
-      if (error || !data) {
+      if (!response.ok) {
         console.log('No cache hit for key:', cacheKey);
         return null;
       }
 
+      const data = await response.json();
       console.log('Cache hit for key:', cacheKey);
       return data.response_data;
     } catch (error) {
@@ -87,22 +84,20 @@ export class ResponseCacheService {
         await this.cleanupCache();
       }
 
-      // Store the cached response
-      const { error } = await supabase
-        .from('ai_response_cache')
-        .upsert({
+      // Store the cached response using direct API
+      await fetch('/api/cache/set', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           cache_key: cacheKey,
           response_data: response,
           model_used: modelUsed,
           settings_hash: settingsHash,
           expires_at: expiresAt.toISOString()
-        });
+        })
+      });
 
-      if (error) {
-        console.error('Error caching response:', error);
-      } else {
-        console.log('Response cached with key:', cacheKey);
-      }
+      console.log('Response cached with key:', cacheKey);
     } catch (error) {
       console.error('Error in cache storage:', error);
     }
@@ -110,32 +105,12 @@ export class ResponseCacheService {
 
   static async cleanupCache(): Promise<void> {
     try {
-      // Remove expired entries
-      await supabase
-        .from('ai_response_cache')
-        .delete()
-        .lt('expires_at', new Date().toISOString());
-
-      // Keep only the most recent entries if we exceed max size
-      const { data: count } = await supabase
-        .from('ai_response_cache')
-        .select('id', { count: 'exact' });
-
-      if (count && count.length > this.MAX_CACHE_SIZE) {
-        const { data: oldEntries } = await supabase
-          .from('ai_response_cache')
-          .select('id')
-          .order('created_at', { ascending: true })
-          .limit(count.length - this.MAX_CACHE_SIZE);
-
-        if (oldEntries && oldEntries.length > 0) {
-          const idsToDelete = oldEntries.map(entry => entry.id);
-          await supabase
-            .from('ai_response_cache')
-            .delete()
-            .in('id', idsToDelete);
-        }
-      }
+      // Clean up expired entries via API
+      await fetch('/api/cache/cleanup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ max_size: this.MAX_CACHE_SIZE })
+      });
 
       console.log('Cache cleanup completed');
     } catch (error) {
@@ -145,17 +120,12 @@ export class ResponseCacheService {
 
   static async invalidateCache(pattern?: string): Promise<void> {
     try {
-      if (pattern) {
-        await supabase
-          .from('ai_response_cache')
-          .delete()
-          .like('cache_key', `%${pattern}%`);
-      } else {
-        await supabase
-          .from('ai_response_cache')
-          .delete()
-          .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
-      }
+      await fetch('/api/cache/invalidate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pattern })
+      });
+      
       console.log('Cache invalidated');
     } catch (error) {
       console.error('Error invalidating cache:', error);

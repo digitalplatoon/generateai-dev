@@ -62,6 +62,36 @@ export type Database = {
           },
         ]
       }
+      ai_response_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          expires_at: string
+          id: string
+          model_used: string
+          response_data: Json
+          settings_hash: string
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          model_used: string
+          response_data: Json
+          settings_hash: string
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          model_used?: string
+          response_data?: Json
+          settings_hash?: string
+        }
+        Relationships: []
+      }
       conversation_messages: {
         Row: {
           content: string
