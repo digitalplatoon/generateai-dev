@@ -9,16 +9,19 @@ import { useConversations } from '@/hooks/useConversations';
 import { useAISettings } from '@/hooks/useAISettings';
 import { useAuditLog } from '@/hooks/useAuditLog';
 import { useToast } from '@/hooks/use-toast';
+import { ContentFilterService } from '@/services/contentFilterService';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   Send, 
   Bot, 
   User, 
-  Settings, 
   Clock,
   Zap,
   Shield,
   Copy,
-  Download
+  Download,
+  StopCircle,
+  AlertTriangle
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -29,11 +32,15 @@ interface Message {
   tokens_used?: number;
   model_used?: string;
   temperature?: number;
+  isStreaming?: boolean;
 }
 
 const EnhancedChatInterface = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -56,11 +63,40 @@ const EnhancedChatInterface = () => {
     scrollToBottom();
   }, [messages]);
 
+  const stopStreaming = () => {
+    if (abortController) {
+      abortController.abort();
+      setAbortController(null);
+    }
+    setIsStreaming(false);
+    setStreamingMessageId(null);
+  };
+
   const handleSendMessage = async () => {
     if (!input.trim()) return;
 
     const userMessage = input.trim();
     setInput('');
+
+    // Content filtering
+    const filterResult = ContentFilterService.filterContent(userMessage, true);
+    if (!filterResult.allowed) {
+      toast({
+        title: "Content Filter",
+        description: filterResult.reason || "Your message contains inappropriate content.",
+        variant: "destructive"
+      });
+      
+      // Log the blocked attempt
+      await logAction(
+        'content_filter_block',
+        'blocked',
+        currentConversation?.id,
+        { message: userMessage, filter_result: filterResult }
+      );
+      
+      return;
+    }
 
     try {
       setIsLoading(true);
@@ -80,18 +116,110 @@ const EnhancedChatInterface = () => {
         metadata: {}
       });
 
-      // Simulate AI response (replace with actual AI service call)
-      const aiResponse = await simulateAIResponse(userMessage, settings);
-      
+      // Prepare messages for AI
+      const conversationMessages = [...messages, {
+        role: 'user' as const,
+        content: userMessage,
+        created_at: new Date().toISOString()
+      }];
+
+      // Start streaming response
+      setIsStreaming(true);
+      const controller = new AbortController();
+      setAbortController(controller);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('No active session');
+      }
+
+      const response = await fetch('https://zguwfogavvdsbujiakko.supabase.co/functions/v1/ai-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          messages: conversationMessages.map(msg => ({
+            role: msg.role,
+            content: msg.content
+          })),
+          settings: {
+            model: settings?.preferred_model || 'gpt-4o-mini',
+            temperature: settings?.temperature || 0.7,
+            max_tokens: settings?.max_tokens || 1000,
+            custom_instructions: settings?.custom_instructions || '',
+            do_not_train: settings?.do_not_train_consent || true
+          },
+          conversationId: conversation.id,
+          stream: true
+        }),
+        signal: controller.signal
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let fullContent = '';
+
+      if (reader) {
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n');
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                if (data === '[DONE]') continue;
+
+                try {
+                  const parsed = JSON.parse(data);
+                  
+                  if (parsed.type === 'chunk' && parsed.content) {
+                    fullContent += parsed.content;
+                    
+                    // Update the streaming message in the UI
+                    // This would require updating the messages state with streaming content
+                    // For now, we'll accumulate and add the full message at the end
+                  } else if (parsed.type === 'done') {
+                    // Final message with metadata
+                    fullContent = parsed.content || fullContent;
+                    break;
+                  }
+                } catch (e) {
+                  // Skip invalid JSON
+                }
+              }
+            }
+          }
+        } finally {
+          reader.releaseLock();
+        }
+      }
+
+      setIsStreaming(false);
+      setAbortController(null);
+
       const endTime = Date.now();
       const processingTime = endTime - startTime;
 
       // Add AI response
       await addMessage(conversation.id, {
         role: 'assistant',
-        content: aiResponse.content,
-        metadata: aiResponse.metadata,
-        tokens_used: aiResponse.tokens_used,
+        content: fullContent,
+        metadata: {
+          model: settings?.preferred_model || 'gpt-4o-mini',
+          temperature: settings?.temperature || 0.7,
+          timestamp: new Date().toISOString()
+        },
+        tokens_used: Math.floor(fullContent.length / 4), // Rough estimation
         model_used: settings?.preferred_model || 'gpt-4o-mini',
         temperature: settings?.temperature || 0.7
       });
@@ -104,19 +232,33 @@ const EnhancedChatInterface = () => {
         await updateConversation(conversation.id, { title });
       }
 
-      // Log the interaction
+      // Log the successful interaction
       await logAction(
         'chat_completion',
         'success',
         conversation.id,
         { message: userMessage, settings },
-        aiResponse,
+        { content: fullContent },
         undefined,
         processingTime
       );
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending message:', error);
+      
+      if (error.name === 'AbortError') {
+        toast({
+          title: "Cancelled",
+          description: "Message cancelled by user.",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to send message. Please try again.",
+          variant: "destructive"
+        });
+      }
+
       await logAction(
         'chat_completion',
         'error',
@@ -125,39 +267,11 @@ const EnhancedChatInterface = () => {
         undefined,
         error instanceof Error ? error.message : 'Unknown error'
       );
-      
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive"
-      });
     } finally {
       setIsLoading(false);
+      setIsStreaming(false);
+      setAbortController(null);
     }
-  };
-
-  const simulateAIResponse = async (message: string, settings: any) => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-    
-    const responses = [
-      "I understand your question about " + message.substring(0, 30) + "... Let me help you with that.",
-      "That's an interesting point. Based on your input, here's what I think...",
-      "I can help you with that. Let me break this down for you step by step.",
-      "Great question! Here's my analysis of what you've asked..."
-    ];
-    
-    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-    
-    return {
-      content: randomResponse + " (This is a simulated response for demonstration purposes.)",
-      metadata: {
-        model: settings?.preferred_model || 'gpt-4o-mini',
-        temperature: settings?.temperature || 0.7,
-        timestamp: new Date().toISOString()
-      },
-      tokens_used: Math.floor(50 + Math.random() * 200)
-    };
   };
 
   const copyMessage = (content: string) => {
@@ -210,6 +324,12 @@ const EnhancedChatInterface = () => {
                 Private
               </Badge>
             )}
+            {isStreaming && (
+              <Badge variant="outline" className="text-xs animate-pulse">
+                <div className="h-2 w-2 bg-green-500 rounded-full mr-1" />
+                Streaming
+              </Badge>
+            )}
             <Button size="sm" variant="ghost" onClick={exportConversation}>
               <Download className="h-4 w-4" />
             </Button>
@@ -253,6 +373,12 @@ const EnhancedChatInterface = () => {
                       }`}
                     >
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      {message.isStreaming && (
+                        <div className="mt-2 flex items-center gap-1 text-xs opacity-70">
+                          <div className="animate-pulse">●</div>
+                          <span>AI is typing...</span>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -293,6 +419,13 @@ const EnhancedChatInterface = () => {
                 <p className="text-sm">
                   Ask me anything! I'm here to help with your questions and tasks.
                 </p>
+                <div className="mt-4 p-3 bg-muted rounded-lg text-xs">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Shield className="h-4 w-4" />
+                    <span className="font-medium">Enhanced Security</span>
+                  </div>
+                  <p>All messages are filtered for malicious content and your privacy is protected.</p>
+                </div>
               </div>
             )}
             
@@ -310,27 +443,53 @@ const EnhancedChatInterface = () => {
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
-                  handleSendMessage();
+                  if (!isLoading && !isStreaming) {
+                    handleSendMessage();
+                  }
                 }
               }}
+              disabled={isLoading || isStreaming}
             />
-            <Button
-              onClick={handleSendMessage}
-              disabled={!input.trim() || isLoading}
-              className="self-end"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
+            <div className="flex flex-col gap-2">
+              {isStreaming ? (
+                <Button
+                  onClick={stopStreaming}
+                  variant="outline"
+                  className="self-end"
+                >
+                  <StopCircle className="h-4 w-4" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={!input.trim() || isLoading}
+                  className="self-end"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
           </div>
           
           {settings && (
             <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-              <span>
-                Model: {settings.preferred_model} • Temperature: {settings.temperature} • Max Tokens: {settings.max_tokens}
-              </span>
-              <span>
-                Press Enter to send, Shift+Enter for new line
-              </span>
+              <div className="flex items-center gap-2">
+                <span>Model: {settings.preferred_model}</span>
+                <span>•</span>
+                <span>T: {settings.temperature}</span>
+                <span>•</span>
+                <span>Max: {settings.max_tokens}</span>
+                {settings.do_not_train_consent && (
+                  <>
+                    <span>•</span>
+                    <div className="flex items-center gap-1">
+                      <Shield className="h-3 w-3" />
+                      <span>Private</span>
+                    </div>
+                  </>
+                )}
+              </div>
+              <span>Press Enter to send, Shift+Enter for new line</span>
             </div>
           )}
         </div>
