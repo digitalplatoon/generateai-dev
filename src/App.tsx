@@ -8,6 +8,10 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import LearningPaths from "./pages/LearningPaths";
+import PromptLibrary from "./pages/PromptLibrary";
+import RagLab from "./pages/RagLab";
+import AgentPlayground from "./pages/AgentPlayground";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +27,10 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/paths" element={<LearningPaths />} />
+            <Route path="/prompts" element={<PromptLibrary />} />
+            <Route path="/rag-lab" element={<RagLab />} />
+            <Route path="/agents" element={<AgentPlayground />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

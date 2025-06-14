@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Code, Search, BookOpen, Folder } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -41,14 +41,14 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navItems.map((item, index) => (
-              <a
+              <Link
                 key={index}
-                href={item.href}
+                to={item.href}
                 className="text-light-gray hover:text-teal transition-colors duration-300 flex items-center space-x-2"
               >
                 <item.icon className="w-4 h-4" />
                 <span>{item.label}</span>
-              </a>
+              </Link>
             ))}
           </nav>
 
@@ -100,14 +100,15 @@ const Header = () => {
           <div className="md:hidden mt-4 pb-4 border-t border-white/10">
             <nav className="flex flex-col space-y-4 mt-4">
               {navItems.map((item, index) => (
-                <a
+                <Link
                   key={index}
-                  href={item.href}
+                  to={item.href}
                   className="text-light-gray hover:text-teal transition-colors duration-300 flex items-center space-x-2 py-2"
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   <item.icon className="w-4 h-4" />
                   <span>{item.label}</span>
-                </a>
+                </Link>
               ))}
               <div className="flex flex-col space-y-2 pt-4 border-t border-white/10">
                 {!loading && (
