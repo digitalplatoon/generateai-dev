@@ -1,5 +1,4 @@
-
-import { code } from "lucide-react";
+import { Code } from "lucide-react";
 
 const Footer = () => {
   const footerLinks = {
@@ -52,7 +51,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a href="#" className="text-light-gray hover:text-teal transition-colors">
-                <code className="w-5 h-5" />
+                <Code className="w-5 h-5" />
               </a>
             </div>
           </div>
