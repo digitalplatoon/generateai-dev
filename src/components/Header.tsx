@@ -1,16 +1,15 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { code, search, book-open, folder } from "lucide-react";
+import { Code, Search, BookOpen, Folder } from "lucide-react";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems = [
-    { label: 'Learning Paths', href: '/paths', icon: book-open },
-    { label: 'Prompt Library', href: '/prompts', icon: search },
-    { label: 'RAG Lab', href: '/rag-lab', icon: folder },
-    { label: 'Agent Playground', href: '/agents', icon: code }
+    { label: 'Learning Paths', href: '/paths', icon: BookOpen },
+    { label: 'Prompt Library', href: '/prompts', icon: Search },
+    { label: 'RAG Lab', href: '/rag-lab', icon: Folder },
+    { label: 'Agent Playground', href: '/agents', icon: Code }
   ];
 
   return (

@@ -1,10 +1,9 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { search, chevron-up, chevron-down, code, book } from "lucide-react";
+import { Search, ChevronUp, ChevronDown, Code, BookOpen } from "lucide-react";
 
 const PromptLibrarySection = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -123,7 +122,7 @@ Creates a new user account
         {/* Search and Filter */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative flex-1">
-            <search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-gray w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-light-gray w-5 h-5" />
             <Input
               placeholder="Search prompts, tags, or authors..."
               value={searchTerm}
@@ -165,11 +164,11 @@ Creates a new user account
                   </div>
                   <div className="flex flex-col items-center space-y-1">
                     <Button variant="ghost" size="sm" className="p-1 h-8 w-8 text-teal hover:bg-teal/20">
-                      <chevron-up className="w-4 h-4" />
+                      <ChevronUp className="w-4 h-4" />
                     </Button>
                     <span className="text-sm font-semibold text-white">{prompt.votes}</span>
                     <Button variant="ghost" size="sm" className="p-1 h-8 w-8 text-gray-400 hover:bg-white/10">
-                      <chevron-down className="w-4 h-4" />
+                      <ChevronDown className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
@@ -188,7 +187,7 @@ Creates a new user account
                 {/* Prompt Preview */}
                 <div className="bg-navy/50 rounded-lg p-4 mb-4 border border-white/10">
                   <div className="flex items-center space-x-2 mb-2">
-                    <code className="w-4 h-4 text-teal" />
+                    <Code className="w-4 h-4 text-teal" />
                     <span className="text-sm font-semibold text-teal">Prompt Template</span>
                   </div>
                   <pre className="text-sm text-light-gray whitespace-pre-wrap font-mono overflow-x-auto">
@@ -199,7 +198,7 @@ Creates a new user account
                 {/* Sample Output */}
                 <div className="bg-navy/30 rounded-lg p-4 mb-4 border border-white/10">
                   <div className="flex items-center space-x-2 mb-2">
-                    <book className="w-4 h-4 text-blue-400" />
+                    <BookOpen className="w-4 h-4 text-blue-400" />
                     <span className="text-sm font-semibold text-blue-400">Sample Output</span>
                   </div>
                   <div className="text-sm text-light-gray">
