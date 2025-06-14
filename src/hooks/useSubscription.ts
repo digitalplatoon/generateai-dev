@@ -1,13 +1,14 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useStripeIntegration } from '@/hooks/useStripeIntegration';
 import { SubscriptionPlan, CurrentSubscription, UserUsage } from '@/types/subscription';
 
 export const useSubscription = () => {
   const { user } = useAuthContext();
   const { toast } = useToast();
+  const { checkSubscriptionStatus } = useStripeIntegration();
   const [currentSubscription, setCurrentSubscription] = useState<CurrentSubscription | null>(null);
   const [availablePlans, setAvailablePlans] = useState<SubscriptionPlan[]>([]);
   const [dailyUsage, setDailyUsage] = useState<Record<string, number>>({});
@@ -20,6 +21,22 @@ export const useSubscription = () => {
     }
 
     try {
+      // First try to get subscription from Stripe
+      const stripeData = await checkSubscriptionStatus();
+      
+      if (stripeData) {
+        setCurrentSubscription({
+          plan_name: stripeData.plan_name || 'Starter',
+          tier: stripeData.subscription_tier || 'free',
+          status: 'active',
+          limits: getDefaultLimits(stripeData.subscription_tier || 'free'),
+          features: getDefaultFeatures(stripeData.subscription_tier || 'free'),
+          expires_at: stripeData.subscription_end
+        });
+        return;
+      }
+
+      // Fallback to database lookup
       const { data, error } = await supabase.rpc('get_user_subscription', {
         _user_id: user.id
       });
@@ -31,29 +48,97 @@ export const useSubscription = () => {
       } else {
         // Default to free plan if no subscription found
         setCurrentSubscription({
-          plan_name: 'Free Plan',
+          plan_name: 'Starter',
           tier: 'free',
           status: 'active',
-          limits: {
-            rag_queries_per_day: 10,
-            documents_limit: 3,
-            chat_messages_per_day: 50
-          },
-          features: {
-            rag_lab: true,
-            basic_chat: true,
-            community_access: true
-          },
+          limits: getDefaultLimits('free'),
+          features: getDefaultFeatures('free'),
           expires_at: null
         });
       }
     } catch (error) {
       console.error('Error fetching subscription:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch subscription information",
-        variant: "destructive"
+      // Set free plan as fallback on error
+      setCurrentSubscription({
+        plan_name: 'Starter',
+        tier: 'free',
+        status: 'active',
+        limits: getDefaultLimits('free'),
+        features: getDefaultFeatures('free'),
+        expires_at: null
       });
+    }
+  };
+
+  const getDefaultLimits = (tier: string) => {
+    switch (tier) {
+      case 'basic':
+        return {
+          rag_queries_per_day: 200,
+          documents_limit: 25,
+          chat_messages_per_day: 1000
+        };
+      case 'premium':
+        return {
+          rag_queries_per_day: 1000,
+          documents_limit: 100,
+          chat_messages_per_day: 5000
+        };
+      case 'enterprise':
+        return {
+          rag_queries_per_day: -1,
+          documents_limit: -1,
+          chat_messages_per_day: -1
+        };
+      default: // free
+        return {
+          rag_queries_per_day: 10,
+          documents_limit: 3,
+          chat_messages_per_day: 50
+        };
+    }
+  };
+
+  const getDefaultFeatures = (tier: string) => {
+    const baseFeatures = {
+      rag_lab: true,
+      basic_chat: true,
+      community_access: true
+    };
+
+    switch (tier) {
+      case 'basic':
+        return {
+          ...baseFeatures,
+          advanced_chat: true,
+          email_support: true,
+          api_access: true
+        };
+      case 'premium':
+        return {
+          ...baseFeatures,
+          advanced_chat: true,
+          priority_support: true,
+          api_access: true,
+          custom_models: true,
+          team_collaboration: true,
+          priority_processing: true
+        };
+      case 'enterprise':
+        return {
+          ...baseFeatures,
+          advanced_chat: true,
+          dedicated_support: true,
+          api_access: true,
+          custom_models: true,
+          team_collaboration: true,
+          white_label: true,
+          sso: true,
+          priority_processing: true,
+          custom_integrations: true
+        };
+      default: // free
+        return baseFeatures;
     }
   };
 
@@ -67,7 +152,6 @@ export const useSubscription = () => {
 
       if (error) throw error;
       
-      // Type assertion since we know the structure matches
       setAvailablePlans((data || []) as SubscriptionPlan[]);
     } catch (error) {
       console.error('Error fetching plans:', error);
@@ -131,7 +215,6 @@ export const useSubscription = () => {
 
       if (error) throw error;
       
-      // Refresh usage data
       await fetchDailyUsage();
     } catch (error) {
       console.error('Error recording usage:', error);
@@ -166,7 +249,7 @@ export const useSubscription = () => {
     const limit = currentSubscription.limits[limitKey];
     const used = dailyUsage[featureType] || 0;
     
-    return limit === -1 || used < limit; // Unlimited or under limit
+    return limit === -1 || used < limit;
   };
 
   useEffect(() => {

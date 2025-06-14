@@ -3,8 +3,9 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Crown, Star, Zap } from 'lucide-react';
+import { Check, Crown, Star, Zap, Loader2 } from 'lucide-react';
 import { SubscriptionPlan } from '@/types/subscription';
+import { useStripeIntegration } from '@/hooks/useStripeIntegration';
 
 interface SubscriptionCardProps {
   plan: SubscriptionPlan;
@@ -19,6 +20,7 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
   onSelect,
   billingPeriod = 'monthly'
 }) => {
+  const { createCheckoutSession, isLoading } = useStripeIntegration();
   const price = billingPeriod === 'monthly' ? plan.price_monthly : plan.price_yearly;
   const period = billingPeriod === 'monthly' ? 'month' : 'year';
 
@@ -42,7 +44,6 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
     }
   };
 
-  // Safely handle the features Json type
   const features = React.useMemo(() => {
     if (typeof plan.features === 'object' && plan.features !== null) {
       return Object.entries(plan.features as Record<string, any>)
@@ -52,7 +53,6 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
     return [];
   }, [plan.features]);
 
-  // Safely handle the limits Json type
   const limits = React.useMemo(() => {
     if (typeof plan.limits === 'object' && plan.limits !== null) {
       return Object.entries(plan.limits as Record<string, any>)
@@ -63,6 +63,17 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
     }
     return [];
   }, [plan.limits]);
+
+  const handleSelectPlan = async () => {
+    if (plan.tier === 'free') {
+      // Free plan doesn't require payment
+      onSelect?.(plan.id);
+      return;
+    }
+
+    // For paid plans, create Stripe checkout session
+    await createCheckoutSession(plan.id, billingPeriod);
+  };
 
   return (
     <Card className={`relative ${isCurrentPlan ? 'ring-2 ring-primary' : ''} ${plan.tier === 'premium' ? 'border-purple-200' : ''}`}>
@@ -114,10 +125,19 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
         <Button
           className="w-full"
           variant={isCurrentPlan ? "outline" : "default"}
-          disabled={isCurrentPlan}
-          onClick={() => onSelect?.(plan.id)}
+          disabled={isCurrentPlan || isLoading}
+          onClick={handleSelectPlan}
         >
-          {isCurrentPlan ? 'Current Plan' : 'Select Plan'}
+          {isLoading ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Processing...
+            </>
+          ) : isCurrentPlan ? (
+            'Current Plan'
+          ) : (
+            'Select Plan'
+          )}
         </Button>
       </CardContent>
     </Card>
