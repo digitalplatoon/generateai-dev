@@ -4,14 +4,14 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { HelmetProvider } from "react-helmet-async";
-import { AuthProvider } from "./contexts/AuthContext";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import Breadcrumbs from "./components/seo/Breadcrumbs";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { HelmetProvider } from 'react-helmet-async';
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import EnhancedAI from "./pages/EnhancedAI";
 import LearningPaths from "./pages/LearningPaths";
 import PromptLibrary from "./pages/PromptLibrary";
 import RagLab from "./pages/RagLab";
@@ -23,30 +23,31 @@ import Blog from "./pages/Blog";
 import About from "./pages/About";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
+import Subscription from "./pages/Subscription";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Cookies from "./pages/Cookies";
-import Subscription from "./pages/Subscription";
 import NotFound from "./pages/NotFound";
+import "./App.css";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-            <div className="min-h-screen bg-gradient-to-br from-navy via-navy/95 to-blue-900 text-white flex flex-col">
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <div className="min-h-screen flex flex-col bg-dark">
               <Header />
-              <Breadcrumbs />
               <main className="flex-1">
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/enhanced-ai" element={<EnhancedAI />} />
                   <Route path="/paths" element={<LearningPaths />} />
                   <Route path="/prompts" element={<PromptLibrary />} />
                   <Route path="/rag-lab" element={<RagLab />} />
@@ -67,9 +68,9 @@ const App = () => (
               </main>
               <Footer />
             </div>
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   </HelmetProvider>
 );

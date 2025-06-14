@@ -10,6 +10,7 @@ export const siteMapRoutes: SiteMapRoute[] = [
   { path: '/', priority: 1.0, changefreq: 'weekly' },
   { path: '/auth', priority: 0.8, changefreq: 'monthly' },
   { path: '/dashboard', priority: 0.9, changefreq: 'daily' },
+  { path: '/enhanced-ai', priority: 0.9, changefreq: 'daily' },
   { path: '/paths', priority: 0.9, changefreq: 'weekly' },
   { path: '/prompts', priority: 0.8, changefreq: 'weekly' },
   { path: '/rag-lab', priority: 0.8, changefreq: 'weekly' },

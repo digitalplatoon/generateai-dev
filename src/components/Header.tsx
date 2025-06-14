@@ -1,213 +1,147 @@
-
-import { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Code, Search, BookOpen, Folder, ChevronDown, FileText, Users, Github, Newspaper } from "lucide-react";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { Badge } from "@/components/ui/badge"
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Menu, X } from 'lucide-react';
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
-
-  const navItems = [
-    { label: 'Learning Paths', href: '/paths', icon: BookOpen },
-    { label: 'Prompt Library', href: '/prompts', icon: Search },
-    { label: 'RAG Lab', href: '/rag-lab', icon: Folder },
-    { label: 'Agent Playground', href: '/agents', icon: Code }
-  ];
-
-  const resourceItems = [
-    { label: 'Documentation', href: '/docs', icon: FileText, description: 'Complete guides and tutorials' },
-    { label: 'API Reference', href: '/api', icon: Code, description: 'RESTful API endpoints' },
-    { label: 'Community', href: '/community', icon: Users, description: 'Join our developer community' },
-    { label: 'Blog', href: '/blog', icon: Newspaper, description: 'Latest updates and insights' }
-  ];
-
-  const handleAuthClick = () => {
-    if (user) {
-      navigate('/dashboard');
-    } else {
-      navigate('/auth');
-    }
-  };
+  const { user, signOut } = useAuthContext();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 w-full z-50 glass border-b border-white/10">
-      <div className="container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navigate('/')}>
+    <header className="bg-dark-blue border-b border-gray-800 sticky top-0 z-50">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          <Link to="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-to-br from-teal to-blue-400 rounded-lg flex items-center justify-center">
-              <span className="text-navy font-bold text-sm">G</span>
+              <span className="text-white font-bold text-sm">AI</span>
             </div>
-            <span className="text-xl font-display font-bold text-gradient">
-              GenerateAI.dev
-            </span>
-          </div>
+            <span className="text-white font-bold text-xl">GenerateAI.dev</span>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <NavigationMenu>
-              <NavigationMenuList>
-                {navItems.map((item, index) => (
-                  <NavigationMenuItem key={index}>
-                    <Link
-                      to={item.href}
-                      className="text-light-gray hover:text-teal transition-colors duration-300 flex items-center space-x-2 px-3 py-2"
-                    >
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.label}</span>
-                    </Link>
-                  </NavigationMenuItem>
-                ))}
-                
-                {/* Resources Dropdown */}
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-light-gray hover:text-teal transition-colors duration-300 bg-transparent">
-                    Resources
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="grid gap-3 p-6 w-[400px] bg-navy/95 backdrop-blur-sm border border-white/10">
-                      {resourceItems.map((item, index) => (
-                        <Link
-                          key={index}
-                          to={item.href}
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-white/10 hover:text-teal focus:bg-white/10 focus:text-teal"
-                        >
-                          <div className="flex items-center space-x-2 mb-1">
-                            <item.icon className="w-4 h-4 text-teal" />
-                            <div className="text-sm font-medium leading-none text-white">
-                              {item.label}
-                            </div>
-                          </div>
-                          <p className="line-clamp-2 text-sm leading-snug text-light-gray">
-                            {item.description}
-                          </p>
-                        </Link>
-                      ))}
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
+            <Link to="/paths" className="text-light-gray hover:text-teal transition-colors">
+              Learning Paths
+            </Link>
+            <Link to="/prompts" className="text-light-gray hover:text-teal transition-colors">
+              Prompts
+            </Link>
+            <Link to="/rag-lab" className="text-light-gray hover:text-teal transition-colors">
+              RAG Lab
+            </Link>
+            <Link to="/agents" className="text-light-gray hover:text-teal transition-colors">
+              Agents
+            </Link>
+            <Link to="/enhanced-ai" className="text-light-gray hover:text-teal transition-colors flex items-center gap-1">
+              Enhanced AI
+              <Badge variant="secondary" className="text-xs">New</Badge>
+            </Link>
+            <Link to="/docs" className="text-light-gray hover:text-teal transition-colors">
+              Docs
+            </Link>
           </nav>
 
-          {/* CTA Buttons */}
+          {/* User Menu / Auth Controls */}
           <div className="hidden md:flex items-center space-x-4">
-            {!loading && (
-              <>
-                {user ? (
-                  <Button 
-                    onClick={handleAuthClick}
-                    className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
-                  >
-                    Dashboard
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name} />
+                      <AvatarFallback>{user.user_metadata?.full_name?.charAt(0)}</AvatarFallback>
+                    </Avatar>
                   </Button>
-                ) : (
-                  <>
-                    <Button 
-                      onClick={handleAuthClick}
-                      variant="outline" 
-                      className="border-teal/30 text-teal hover:bg-teal/10"
-                    >
-                      Sign In
-                    </Button>
-                    <Button 
-                      onClick={handleAuthClick}
-                      className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
-                    >
-                      Start Building
-                    </Button>
-                  </>
-                )}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuItem>
+                    <Link to="/dashboard" className="w-full block">Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => signOut()}>Sign Out</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Link to="/auth" className="text-light-gray hover:text-teal transition-colors">
+                  Sign In
+                </Link>
+                <Link
+                  to="/auth"
+                  className="bg-teal text-dark-blue rounded-md px-4 py-2 hover:bg-teal-600 transition-colors"
+                >
+                  Sign Up
+                </Link>
               </>
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-text-light"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
+          {/* Mobile Navigation */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-light-gray focus:outline-none"
+            >
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-white/10">
-            <nav className="flex flex-col space-y-4 mt-4">
-              {navItems.map((item, index) => (
-                <Link
-                  key={index}
-                  to={item.href}
-                  className="text-light-gray hover:text-teal transition-colors duration-300 flex items-center space-x-2 py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <item.icon className="w-4 h-4" />
-                  <span>{item.label}</span>
+            {/* Mobile Menu */}
+            {isMobileMenuOpen && (
+              <div className="absolute top-full right-0 bg-dark-blue border border-gray-800 rounded-md shadow-lg mt-2 py-2 w-48 z-50">
+                <Link to="/paths" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                  Learning Paths
                 </Link>
-              ))}
-              
-              {/* Mobile Resources Section */}
-              <div className="pt-2 border-t border-white/10">
-                <div className="text-white font-semibold mb-2">Resources</div>
-                {resourceItems.map((item, index) => (
-                  <Link
-                    key={index}
-                    to={item.href}
-                    className="text-light-gray hover:text-teal transition-colors duration-300 flex items-center space-x-2 py-2 pl-4"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </Link>
-                ))}
-              </div>
-              
-              <div className="flex flex-col space-y-2 pt-4 border-t border-white/10">
-                {!loading && (
+                <Link to="/prompts" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                  Prompts
+                </Link>
+                <Link to="/rag-lab" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                  RAG Lab
+                </Link>
+                <Link to="/agents" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                  Agents
+                </Link>
+                 <Link to="/enhanced-ai" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors flex items-center gap-1">
+                  Enhanced AI
+                  <Badge variant="secondary" className="text-xs">New</Badge>
+                </Link>
+                <Link to="/docs" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                  Docs
+                </Link>
+                {user ? (
                   <>
-                    {user ? (
-                      <Button 
-                        onClick={handleAuthClick}
-                        className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
-                      >
-                        Dashboard
-                      </Button>
-                    ) : (
-                      <>
-                        <Button 
-                          onClick={handleAuthClick}
-                          variant="outline" 
-                          className="border-teal/30 text-teal hover:bg-teal/10"
-                        >
-                          Sign In
-                        </Button>
-                        <Button 
-                          onClick={handleAuthClick}
-                          className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
-                        >
-                          Start Building
-                        </Button>
-                      </>
-                    )}
+                    <Link to="/dashboard" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                      Dashboard
+                    </Link>
+                    <button onClick={() => signOut()} className="block px-4 py-2 text-light-gray hover:text-teal transition-colors w-full text-left">
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/auth" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                      Sign In
+                    </Link>
+                    <Link to="/auth" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                      Sign Up
+                    </Link>
                   </>
                 )}
               </div>
-            </nav>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </header>
   );

@@ -9,6 +9,177 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_audit_logs: {
+        Row: {
+          action_type: string
+          conversation_id: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          ip_address: unknown | null
+          processing_time_ms: number | null
+          request_data: Json | null
+          response_data: Json | null
+          status: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          conversation_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          ip_address?: unknown | null
+          processing_time_ms?: number | null
+          request_data?: Json | null
+          response_data?: Json | null
+          status: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          conversation_id?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          ip_address?: unknown | null
+          processing_time_ms?: number | null
+          request_data?: Json | null
+          response_data?: Json | null
+          status?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_audit_logs_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_messages: {
+        Row: {
+          content: string
+          conversation_id: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          model_used: string | null
+          role: string
+          temperature: number | null
+          tokens_used: number | null
+        }
+        Insert: {
+          content: string
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          model_used?: string | null
+          role: string
+          temperature?: number | null
+          tokens_used?: number | null
+        }
+        Update: {
+          content?: string
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          model_used?: string | null
+          role?: string
+          temperature?: number | null
+          tokens_used?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_shares: {
+        Row: {
+          conversation_id: string | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          permission_level: string | null
+          shared_by: string | null
+          shared_with: string | null
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          permission_level?: string | null
+          shared_by?: string | null
+          shared_with?: string | null
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          permission_level?: string | null
+          shared_by?: string | null
+          shared_with?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_shares_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          context_data: Json | null
+          created_at: string | null
+          do_not_train: boolean | null
+          id: string
+          is_shared: boolean | null
+          share_token: string | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          context_data?: Json | null
+          created_at?: string | null
+          do_not_train?: boolean | null
+          id?: string
+          is_shared?: boolean | null
+          share_token?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          context_data?: Json | null
+          created_at?: string | null
+          do_not_train?: boolean | null
+          id?: string
+          is_shared?: boolean | null
+          share_token?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           content: string | null
@@ -72,6 +243,42 @@ export type Database = {
         }
         Relationships: []
       }
+      project_contexts: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          file_structure: Json | null
+          id: string
+          last_accessed: string | null
+          project_name: string
+          technologies_used: string[] | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          file_structure?: Json | null
+          id?: string
+          last_accessed?: string | null
+          project_name: string
+          technologies_used?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          file_structure?: Json | null
+          id?: string
+          last_accessed?: string | null
+          project_name?: string
+          technologies_used?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       subscription_plans: {
         Row: {
           active: boolean
@@ -108,6 +315,51 @@ export type Database = {
           price_yearly?: number | null
           tier?: Database["public"]["Enums"]["subscription_tier"]
           updated_at?: string
+        }
+        Relationships: []
+      }
+      user_ai_settings: {
+        Row: {
+          created_at: string | null
+          custom_instructions: string | null
+          data_retention_days: number | null
+          do_not_train_consent: boolean | null
+          id: string
+          max_tokens: number | null
+          preferred_model: string | null
+          stop_sequences: string[] | null
+          streaming_enabled: boolean | null
+          temperature: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          custom_instructions?: string | null
+          data_retention_days?: number | null
+          do_not_train_consent?: boolean | null
+          id?: string
+          max_tokens?: number | null
+          preferred_model?: string | null
+          stop_sequences?: string[] | null
+          streaming_enabled?: boolean | null
+          temperature?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          custom_instructions?: string | null
+          data_retention_days?: number | null
+          do_not_train_consent?: boolean | null
+          id?: string
+          max_tokens?: number | null
+          preferred_model?: string | null
+          stop_sequences?: string[] | null
+          streaming_enabled?: boolean | null
+          temperature?: number | null
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
