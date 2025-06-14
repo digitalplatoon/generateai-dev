@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 export interface OnboardingStep {
   id: string;
@@ -10,62 +10,62 @@ export interface OnboardingStep {
   created_at: string;
 }
 
-export const ONBOARDING_STEPS = [
-  'welcome',
-  'profile-setup',
-  'learning-preferences',
-  'first-prompt',
-  'rag-introduction',
-  'agent-playground',
-  'complete'
-] as const;
-
-export type OnboardingStepId = typeof ONBOARDING_STEPS[number];
+export type OnboardingStepId = 
+  | 'welcome'
+  | 'profile-setup'
+  | 'learning-preferences'
+  | 'first-prompt'
+  | 'rag-introduction'
+  | 'agent-playground'
+  | 'complete';
 
 export const useOnboarding = () => {
+  const { user } = useAuthContext();
   const [completedSteps, setCompletedSteps] = useState<OnboardingStep[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchCompletedSteps = async () => {
+    if (!user) {
+      setCompletedSteps([]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      setIsLoading(true);
       const { data, error } = await supabase
-        .from('user_onboarding' as any)
+        .from('user_onboarding')
         .select('*')
-        .order('created_at', { ascending: true });
+        .eq('user_id', user.id);
 
       if (error) throw error;
       setCompletedSteps(data || []);
     } catch (error) {
-      console.error('Fetch onboarding error:', error);
+      console.error('Error fetching onboarding progress:', error);
+      setCompletedSteps([]);
     } finally {
       setIsLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchCompletedSteps();
+  }, [user]);
+
   const completeStep = async (stepId: OnboardingStepId) => {
+    if (!user) return;
+
     try {
-      const { data, error } = await supabase
-        .from('user_onboarding' as any)
-        .insert({
+      const { error } = await supabase
+        .from('user_onboarding')
+        .upsert({
+          user_id: user.id,
           step_id: stepId,
-        })
-        .select()
-        .single();
+        });
 
       if (error) throw error;
-
-      toast({
-        title: "Step completed!",
-        description: `You've completed the ${stepId} step.`,
-      });
-
-      await fetchCompletedSteps();
-      return data;
+      await fetchCompletedSteps(); // Refresh steps
     } catch (error) {
-      console.error('Complete step error:', error);
-      // Don't show error toast for onboarding steps
+      console.error('Error completing onboarding step:', error);
     }
   };
 
@@ -74,23 +74,29 @@ export const useOnboarding = () => {
   };
 
   const getCurrentStep = (): OnboardingStepId => {
-    for (const stepId of ONBOARDING_STEPS) {
-      if (!isStepCompleted(stepId)) {
-        return stepId;
+    const steps: OnboardingStepId[] = [
+      'welcome',
+      'profile-setup',
+      'learning-preferences',
+      'first-prompt',
+      'rag-introduction',
+      'agent-playground',
+      'complete'
+    ];
+
+    for (const step of steps) {
+      if (!isStepCompleted(step)) {
+        return step;
       }
     }
     return 'complete';
   };
 
   const getProgress = () => {
+    const totalSteps = 7;
     const completed = completedSteps.length;
-    const total = ONBOARDING_STEPS.length;
-    return Math.round((completed / total) * 100);
+    return Math.round((completed / totalSteps) * 100);
   };
-
-  useEffect(() => {
-    fetchCompletedSteps();
-  }, []);
 
   return {
     completedSteps,
@@ -99,6 +105,6 @@ export const useOnboarding = () => {
     isStepCompleted,
     getCurrentStep,
     getProgress,
-    fetchCompletedSteps,
+    refetch: fetchCompletedSteps,
   };
 };

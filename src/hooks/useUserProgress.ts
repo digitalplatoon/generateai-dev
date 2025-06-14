@@ -1,69 +1,72 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 export interface UserProgress {
   id: string;
   learning_path_id: string;
   module_id: string;
   progress_percentage: number;
-  completed_at: string | null;
+  completed_at: string;
   created_at: string;
   updated_at: string;
 }
 
 export const useUserProgress = () => {
+  const { user } = useAuthContext();
   const [progress, setProgress] = useState<UserProgress[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchProgress = async () => {
+    if (!user) {
+      setProgress([]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      setIsLoading(true);
       const { data, error } = await supabase
-        .from('user_progress' as any)
+        .from('user_progress')
         .select('*')
+        .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
       setProgress(data || []);
     } catch (error) {
-      console.error('Fetch progress error:', error);
+      console.error('Error fetching user progress:', error);
+      setProgress([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const updateProgress = async (learningPathId: string, moduleId: string, progressPercentage: number) => {
+  useEffect(() => {
+    fetchProgress();
+  }, [user]);
+
+  const updateProgress = async (
+    learningPathId: string,
+    moduleId: string,
+    progressPercentage: number
+  ) => {
+    if (!user) return;
+
     try {
-      const { data, error } = await supabase
-        .from('user_progress' as any)
+      const { error } = await supabase
+        .from('user_progress')
         .upsert({
+          user_id: user.id,
           learning_path_id: learningPathId,
           module_id: moduleId,
           progress_percentage: progressPercentage,
-          completed_at: progressPercentage === 100 ? new Date().toISOString() : null,
-        })
-        .select()
-        .single();
+        });
 
       if (error) throw error;
-
-      toast({
-        title: "Progress updated!",
-        description: `${progressPercentage}% completed for ${moduleId}`,
-      });
-
-      await fetchProgress();
-      return data;
+      await fetchProgress(); // Refresh progress
     } catch (error) {
-      console.error('Update progress error:', error);
-      toast({
-        title: "Failed to update progress",
-        description: error instanceof Error ? error.message : 'Unknown error',
-        variant: "destructive"
-      });
+      console.error('Error updating user progress:', error);
     }
   };
 
@@ -71,19 +74,23 @@ export const useUserProgress = () => {
     const pathProgress = progress.filter(p => p.learning_path_id === learningPathId);
     if (pathProgress.length === 0) return 0;
     
-    const totalProgress = pathProgress.reduce((sum, p) => sum + p.progress_percentage, 0);
-    return Math.round(totalProgress / pathProgress.length);
+    const averageProgress = pathProgress.reduce((sum, p) => sum + p.progress_percentage, 0) / pathProgress.length;
+    return Math.round(averageProgress);
   };
 
-  useEffect(() => {
-    fetchProgress();
-  }, []);
+  const getModuleProgress = (learningPathId: string, moduleId: string) => {
+    const moduleProgress = progress.find(
+      p => p.learning_path_id === learningPathId && p.module_id === moduleId
+    );
+    return moduleProgress?.progress_percentage || 0;
+  };
 
   return {
     progress,
     isLoading,
     updateProgress,
     getPathProgress,
-    fetchProgress,
+    getModuleProgress,
+    refetch: fetchProgress,
   };
 };

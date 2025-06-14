@@ -1,104 +1,99 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 export interface Bookmark {
   id: string;
   item_type: 'learning_path' | 'prompt' | 'document' | 'agent';
   item_id: string;
   item_title: string;
-  item_description: string | null;
+  item_description?: string;
   created_at: string;
 }
 
 export const useBookmarks = () => {
+  const { user } = useAuthContext();
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchBookmarks = async () => {
+    if (!user) {
+      setBookmarks([]);
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      setIsLoading(true);
       const { data, error } = await supabase
-        .from('user_bookmarks' as any)
+        .from('user_bookmarks')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       setBookmarks(data || []);
     } catch (error) {
-      console.error('Fetch bookmarks error:', error);
+      console.error('Error fetching bookmarks:', error);
+      setBookmarks([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const addBookmark = async (itemType: Bookmark['item_type'], itemId: string, itemTitle: string, itemDescription?: string) => {
+  useEffect(() => {
+    fetchBookmarks();
+  }, [user]);
+
+  const addBookmark = async (
+    itemType: Bookmark['item_type'],
+    itemId: string,
+    itemTitle: string,
+    itemDescription?: string
+  ) => {
+    if (!user) return;
+
     try {
-      const { data, error } = await supabase
-        .from('user_bookmarks' as any)
+      const { error } = await supabase
+        .from('user_bookmarks')
         .insert({
+          user_id: user.id,
           item_type: itemType,
           item_id: itemId,
           item_title: itemTitle,
-          item_description: itemDescription || null,
-        })
-        .select()
-        .single();
+          item_description: itemDescription,
+        });
 
       if (error) throw error;
-
-      toast({
-        title: "Bookmark added!",
-        description: `${itemTitle} has been bookmarked.`,
-      });
-
-      await fetchBookmarks();
-      return data;
+      await fetchBookmarks(); // Refresh bookmarks
     } catch (error) {
-      console.error('Add bookmark error:', error);
-      toast({
-        title: "Failed to add bookmark",
-        description: error instanceof Error ? error.message : 'Unknown error',
-        variant: "destructive"
-      });
+      console.error('Error adding bookmark:', error);
     }
   };
 
   const removeBookmark = async (itemType: Bookmark['item_type'], itemId: string) => {
+    if (!user) return;
+
     try {
       const { error } = await supabase
-        .from('user_bookmarks' as any)
+        .from('user_bookmarks')
         .delete()
+        .eq('user_id', user.id)
         .eq('item_type', itemType)
         .eq('item_id', itemId);
 
       if (error) throw error;
-
-      toast({
-        title: "Bookmark removed",
-        description: "Item has been removed from bookmarks.",
-      });
-
-      await fetchBookmarks();
+      await fetchBookmarks(); // Refresh bookmarks
     } catch (error) {
-      console.error('Remove bookmark error:', error);
-      toast({
-        title: "Failed to remove bookmark",
-        description: error instanceof Error ? error.message : 'Unknown error',
-        variant: "destructive"
-      });
+      console.error('Error removing bookmark:', error);
     }
   };
 
   const isBookmarked = (itemType: Bookmark['item_type'], itemId: string) => {
-    return bookmarks.some(b => b.item_type === itemType && b.item_id === itemId);
+    return bookmarks.some(bookmark => 
+      bookmark.item_type === itemType && bookmark.item_id === itemId
+    );
   };
-
-  useEffect(() => {
-    fetchBookmarks();
-  }, []);
 
   return {
     bookmarks,
@@ -106,6 +101,6 @@ export const useBookmarks = () => {
     addBookmark,
     removeBookmark,
     isBookmarked,
-    fetchBookmarks,
+    refetch: fetchBookmarks,
   };
 };

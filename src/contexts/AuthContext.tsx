@@ -22,6 +22,9 @@ export const useAuth = () => {
   return context;
 };
 
+// Export useAuthContext as an alias for backward compatibility
+export const useAuthContext = useAuth;
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);

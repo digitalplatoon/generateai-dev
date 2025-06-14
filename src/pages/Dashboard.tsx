@@ -5,9 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
-import { ChatTab } from "@/components/dashboard/ChatTab";
-import { PostsTab } from "@/components/dashboard/PostsTab";
-import { ProfileTab } from "@/components/dashboard/ProfileTab";
+import ChatTab from "@/components/dashboard/ChatTab";
+import PostsTab from "@/components/dashboard/PostsTab";
+import ProfileTab from "@/components/dashboard/ProfileTab";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { UserProfile } from "@/components/profile/UserProfile";
 import { useOnboarding } from '@/hooks/useOnboarding';

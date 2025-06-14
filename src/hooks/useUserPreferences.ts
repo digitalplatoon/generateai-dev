@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 export interface UserPreferences {
   id: string;
@@ -16,52 +16,29 @@ export interface UserPreferences {
 }
 
 export const useUserPreferences = () => {
+  const { user } = useAuthContext();
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchPreferences = async () => {
-    try {
-      setIsLoading(true);
-      const { data, error } = await supabase
-        .from('user_preferences' as any)
-        .select('*')
-        .single();
-
-      if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows found
-      setPreferences(data);
-    } catch (error) {
-      console.error('Fetch preferences error:', error);
-    } finally {
+    if (!user) {
+      setPreferences(null);
       setIsLoading(false);
+      return;
     }
-  };
 
-  const updatePreferences = async (updates: Partial<Omit<UserPreferences, 'id' | 'created_at' | 'updated_at'>>) => {
     try {
-      setIsLoading(true);
       const { data, error } = await supabase
-        .from('user_preferences' as any)
-        .upsert(updates)
-        .select()
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', user.id)
         .single();
 
-      if (error) throw error;
-
-      toast({
-        title: "Preferences updated!",
-        description: "Your preferences have been saved.",
-      });
-
+      if (error && error.code !== 'PGRST116') throw error;
       setPreferences(data);
-      return data;
     } catch (error) {
-      console.error('Update preferences error:', error);
-      toast({
-        title: "Failed to update preferences",
-        description: error instanceof Error ? error.message : 'Unknown error',
-        variant: "destructive"
-      });
+      console.error('Error fetching user preferences:', error);
+      setPreferences(null);
     } finally {
       setIsLoading(false);
     }
@@ -69,12 +46,32 @@ export const useUserPreferences = () => {
 
   useEffect(() => {
     fetchPreferences();
-  }, []);
+  }, [user]);
+
+  const updatePreferences = async (updates: Partial<Omit<UserPreferences, 'id' | 'created_at' | 'updated_at'>>) => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .upsert({
+          user_id: user.id,
+          ...updates,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      setPreferences(data);
+    } catch (error) {
+      console.error('Error updating user preferences:', error);
+    }
+  };
 
   return {
     preferences,
     isLoading,
     updatePreferences,
-    fetchPreferences,
+    refetch: fetchPreferences,
   };
 };
