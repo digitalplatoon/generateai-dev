@@ -72,6 +72,132 @@ export type Database = {
         }
         Relationships: []
       }
+      user_bookmarks: {
+        Row: {
+          created_at: string | null
+          id: string
+          item_description: string | null
+          item_id: string
+          item_title: string
+          item_type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          item_description?: string | null
+          item_id: string
+          item_title: string
+          item_type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          item_description?: string | null
+          item_id?: string
+          item_title?: string
+          item_type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_onboarding: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          step_id: string
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          step_id: string
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          step_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          created_at: string | null
+          id: string
+          learning_pace: string | null
+          notifications_enabled: boolean | null
+          preferred_role: string | null
+          preferred_tech_stack: string | null
+          profile_visibility: string | null
+          theme: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          learning_pace?: string | null
+          notifications_enabled?: boolean | null
+          preferred_role?: string | null
+          preferred_tech_stack?: string | null
+          profile_visibility?: string | null
+          theme?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          learning_pace?: string | null
+          notifications_enabled?: boolean | null
+          preferred_role?: string | null
+          preferred_tech_stack?: string | null
+          profile_visibility?: string | null
+          theme?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          learning_path_id: string
+          module_id: string
+          progress_percentage: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          learning_path_id: string
+          module_id: string
+          progress_percentage?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          learning_path_id?: string
+          module_id?: string
+          progress_percentage?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

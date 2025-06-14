@@ -35,9 +35,9 @@ export const useRagLab = () => {
       // Read file content
       const content = await file.text();
       
-      // Insert document record
+      // Insert document record using type assertion for now
       const { data: document, error } = await supabase
-        .from('rag_documents')
+        .from('rag_documents' as any)
         .insert({
           name: file.name,
           content,
@@ -66,7 +66,7 @@ export const useRagLab = () => {
       console.error('Upload error:', error);
       toast({
         title: "Upload failed",
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Unknown error',
         variant: "destructive"
       });
       throw error;
@@ -107,7 +107,7 @@ export const useRagLab = () => {
       console.error('Processing error:', error);
       toast({
         title: "Processing failed",
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Unknown error',
         variant: "destructive"
       });
     } finally {
@@ -135,7 +135,7 @@ export const useRagLab = () => {
       console.error('Query error:', error);
       toast({
         title: "Query failed",
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Unknown error',
         variant: "destructive"
       });
       throw error;
@@ -147,7 +147,7 @@ export const useRagLab = () => {
   const fetchDocuments = async () => {
     try {
       const { data, error } = await supabase
-        .from('rag_documents')
+        .from('rag_documents' as any)
         .select('*')
         .order('created_at', { ascending: false });
 
@@ -161,7 +161,7 @@ export const useRagLab = () => {
   const deleteDocument = async (documentId: string) => {
     try {
       const { error } = await supabase
-        .from('rag_documents')
+        .from('rag_documents' as any)
         .delete()
         .eq('id', documentId);
 
@@ -177,7 +177,7 @@ export const useRagLab = () => {
       console.error('Delete error:', error);
       toast({
         title: "Delete failed",
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Unknown error',
         variant: "destructive"
       });
     }
