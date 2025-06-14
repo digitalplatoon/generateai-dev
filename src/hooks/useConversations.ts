@@ -4,7 +4,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { useConversationState } from './useConversationState';
 import { useConversationOperations } from './useConversationOperations';
 
-export { Conversation, ConversationMessage } from '@/types/conversation';
+export type { Conversation, ConversationMessage } from '@/types/conversation';
 
 export const useConversations = () => {
   const { user } = useAuthContext();
