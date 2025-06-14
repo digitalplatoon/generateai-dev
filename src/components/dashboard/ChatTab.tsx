@@ -6,10 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { chatMessageSchema, sanitizeHtml, checkRateLimit } from '@/lib/security';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  timestamp: number;
 }
 
 const ChatTab = () => {
@@ -22,7 +24,43 @@ const ChatTab = () => {
     e.preventDefault();
     if (!chatInput.trim() || chatLoading) return;
 
-    const userMessage: ChatMessage = { role: 'user', content: chatInput };
+    // Rate limiting check (5 messages per minute)
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to use the chat feature.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!checkRateLimit(`chat_${userId}`, 5, 60000)) {
+      toast({
+        title: "Rate Limit Exceeded",
+        description: "Please wait before sending another message.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate message
+    try {
+      chatMessageSchema.parse({ message: chatInput });
+    } catch (err: any) {
+      toast({
+        title: "Invalid Message",
+        description: err.errors?.[0]?.message || "Please check your message and try again.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const userMessage: ChatMessage = { 
+      role: 'user', 
+      content: sanitizeHtml(chatInput),
+      timestamp: Date.now()
+    };
     setChatMessages(prev => [...prev, userMessage]);
     setChatInput('');
     setChatLoading(true);
@@ -30,22 +68,37 @@ const ChatTab = () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
+      if (!session) {
+        throw new Error('No active session');
+      }
+      
       const response = await fetch('https://zguwfogavvdsbujiakko.supabase.co/functions/v1/ai-chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`
+          'Authorization': `Bearer ${session.access_token}`
         },
         body: JSON.stringify({
           message: chatInput,
-          history: chatMessages.slice(-10)
+          history: chatMessages.slice(-5).map(msg => ({ // Limit history to last 5 messages
+            role: msg.role,
+            content: msg.content
+          }))
         })
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
       
       if (data.success) {
-        const assistantMessage: ChatMessage = { role: 'assistant', content: data.message };
+        const assistantMessage: ChatMessage = { 
+          role: 'assistant', 
+          content: sanitizeHtml(data.message),
+          timestamp: Date.now()
+        };
         setChatMessages(prev => [...prev, assistantMessage]);
       } else {
         throw new Error(data.error || 'Failed to get AI response');
@@ -53,13 +106,20 @@ const ChatTab = () => {
     } catch (error) {
       console.error('Error in chat:', error);
       toast({
-        title: "Error",
-        description: "Failed to get AI response. Make sure OpenAI API key is configured.",
+        title: "Chat Error",
+        description: "Failed to get AI response. Please try again later.",
         variant: "destructive"
       });
+      
+      // Remove the user message if the AI response failed
+      setChatMessages(prev => prev.filter(msg => msg.timestamp !== userMessage.timestamp));
     } finally {
       setChatLoading(false);
     }
+  };
+
+  const formatTimestamp = (timestamp: number) => {
+    return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
@@ -80,7 +140,15 @@ const ChatTab = () => {
                       ? 'bg-teal text-navy' 
                       : 'bg-white/10 text-white'
                   }`}>
-                    {msg.content}
+                    <div 
+                      className="break-words"
+                      dangerouslySetInnerHTML={{ __html: msg.content }}
+                    />
+                    <div className={`text-xs mt-1 opacity-70 ${
+                      msg.role === 'user' ? 'text-navy/70' : 'text-white/70'
+                    }`}>
+                      {formatTimestamp(msg.timestamp)}
+                    </div>
                   </div>
                 </div>
               ))
@@ -100,6 +168,7 @@ const ChatTab = () => {
               placeholder="Ask me anything about AI development..."
               className="flex-1 bg-navy border-white/20 text-white"
               disabled={chatLoading}
+              maxLength={1000}
             />
             <Button 
               type="submit" 
@@ -109,6 +178,9 @@ const ChatTab = () => {
               Send
             </Button>
           </form>
+          <p className="text-xs text-light-gray">
+            Messages are limited to 1000 characters. Rate limited to 5 messages per minute.
+          </p>
         </div>
       </CardContent>
     </Card>

@@ -1,12 +1,14 @@
-
 import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, MessageSquare, Users, Headphones, MapPin, Clock, Phone, Send } from 'lucide-react';
+import { contactFormSchema, sanitizeText, checkRateLimit } from '@/lib/security';
+import { useToast } from '@/hooks/use-toast';
 
 const Contact = () => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,19 +17,88 @@ const Contact = () => {
     subject: '',
     message: ''
   });
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted:', formData);
-    // You would typically send this to your backend
+    setIsSubmitting(true);
+    setValidationErrors({});
+
+    // Rate limiting check
+    const clientId = `${formData.email}_${Date.now()}`;
+    if (!checkRateLimit(clientId, 3, 300000)) { // 3 submissions per 5 minutes
+      toast({
+        title: "Rate Limit Exceeded",
+        description: "Please wait before submitting another message.",
+        variant: "destructive"
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Sanitize input data
+    const sanitizedData = {
+      ...formData,
+      name: sanitizeText(formData.name),
+      email: sanitizeText(formData.email),
+      company: sanitizeText(formData.company),
+      subject: sanitizeText(formData.subject),
+      message: sanitizeText(formData.message),
+    };
+
+    // Validate form data
+    try {
+      contactFormSchema.parse(sanitizedData);
+      
+      // Simulate form submission
+      console.log('Form submitted:', sanitizedData);
+      
+      toast({
+        title: "Message Sent",
+        description: "Thank you for your message. We'll get back to you soon!",
+      });
+
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        company: '',
+        inquiryType: 'general',
+        subject: '',
+        message: ''
+      });
+    } catch (err: any) {
+      const errors: Record<string, string> = {};
+      err.errors?.forEach((error: any) => {
+        errors[error.path[0]] = error.message;
+      });
+      setValidationErrors(errors);
+      
+      toast({
+        title: "Validation Error",
+        description: "Please check your input and try again.",
+        variant: "destructive"
+      });
+    }
+    
+    setIsSubmitting(false);
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+    
+    // Clear validation error when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors({
+        ...validationErrors,
+        [name]: ''
+      });
+    }
   };
 
   const contactMethods = [
@@ -138,7 +209,11 @@ const Contact = () => {
                           onChange={handleChange}
                           className="w-full px-4 py-3 bg-navy/50 border border-white/20 rounded-lg text-white placeholder-light-gray focus:border-teal focus:outline-none focus:ring-1 focus:ring-teal"
                           placeholder="Your full name"
+                          disabled={isSubmitting}
                         />
+                        {validationErrors.name && (
+                          <p className="text-red-400 text-sm mt-1">{validationErrors.name}</p>
+                        )}
                       </div>
                       <div>
                         <label htmlFor="email" className="block text-white font-semibold mb-2">
@@ -153,7 +228,11 @@ const Contact = () => {
                           onChange={handleChange}
                           className="w-full px-4 py-3 bg-navy/50 border border-white/20 rounded-lg text-white placeholder-light-gray focus:border-teal focus:outline-none focus:ring-1 focus:ring-teal"
                           placeholder="your@email.com"
+                          disabled={isSubmitting}
                         />
+                        {validationErrors.email && (
+                          <p className="text-red-400 text-sm mt-1">{validationErrors.email}</p>
+                        )}
                       </div>
                     </div>
 
@@ -170,7 +249,11 @@ const Contact = () => {
                           onChange={handleChange}
                           className="w-full px-4 py-3 bg-navy/50 border border-white/20 rounded-lg text-white placeholder-light-gray focus:border-teal focus:outline-none focus:ring-1 focus:ring-teal"
                           placeholder="Your company name"
+                          disabled={isSubmitting}
                         />
+                        {validationErrors.company && (
+                          <p className="text-red-400 text-sm mt-1">{validationErrors.company}</p>
+                        )}
                       </div>
                       <div>
                         <label htmlFor="inquiryType" className="block text-white font-semibold mb-2">
@@ -183,6 +266,7 @@ const Contact = () => {
                           value={formData.inquiryType}
                           onChange={handleChange}
                           className="w-full px-4 py-3 bg-navy/50 border border-white/20 rounded-lg text-white focus:border-teal focus:outline-none focus:ring-1 focus:ring-teal"
+                          disabled={isSubmitting}
                         >
                           <option value="general">General Inquiry</option>
                           <option value="support">Technical Support</option>
@@ -190,6 +274,9 @@ const Contact = () => {
                           <option value="enterprise">Enterprise Sales</option>
                           <option value="press">Press & Media</option>
                         </select>
+                        {validationErrors.inquiryType && (
+                          <p className="text-red-400 text-sm mt-1">{validationErrors.inquiryType}</p>
+                        )}
                       </div>
                     </div>
 
@@ -206,7 +293,11 @@ const Contact = () => {
                         onChange={handleChange}
                         className="w-full px-4 py-3 bg-navy/50 border border-white/20 rounded-lg text-white placeholder-light-gray focus:border-teal focus:outline-none focus:ring-1 focus:ring-teal"
                         placeholder="Brief subject of your inquiry"
+                        disabled={isSubmitting}
                       />
+                      {validationErrors.subject && (
+                        <p className="text-red-400 text-sm mt-1">{validationErrors.subject}</p>
+                      )}
                     </div>
 
                     <div>
@@ -222,14 +313,19 @@ const Contact = () => {
                         onChange={handleChange}
                         className="w-full px-4 py-3 bg-navy/50 border border-white/20 rounded-lg text-white placeholder-light-gray focus:border-teal focus:outline-none focus:ring-1 focus:ring-teal resize-vertical"
                         placeholder="Tell us more about your inquiry..."
+                        disabled={isSubmitting}
                       />
+                      {validationErrors.message && (
+                        <p className="text-red-400 text-sm mt-1">{validationErrors.message}</p>
+                      )}
                     </div>
 
                     <Button 
                       type="submit"
                       className="w-full bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold py-3"
+                      disabled={isSubmitting}
                     >
-                      Send Message
+                      {isSubmitting ? 'Sending...' : 'Send Message'}
                     </Button>
                   </form>
                 </CardContent>

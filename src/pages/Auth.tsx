@@ -9,12 +9,16 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
+import { authSchema, sanitizeText } from '@/lib/security';
+import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
   const { signIn, signUp, user, loading } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   // Redirect if user is already authenticated
   useEffect(() => {
@@ -23,19 +27,58 @@ const Auth = () => {
     }
   }, [user, loading, navigate]);
 
+  const validateForm = (formData: FormData, isSignUp: boolean) => {
+    const data = {
+      email: sanitizeText(formData.get('email') as string),
+      password: formData.get('password') as string,
+      ...(isSignUp && { fullName: sanitizeText(formData.get('fullName') as string) }),
+    };
+
+    try {
+      authSchema.parse(data);
+      setValidationErrors({});
+      return data;
+    } catch (err: any) {
+      const errors: Record<string, string> = {};
+      err.errors?.forEach((error: any) => {
+        errors[error.path[0]] = error.message;
+      });
+      setValidationErrors(errors);
+      return null;
+    }
+  };
+
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
+    const validatedData = validateForm(formData, false);
 
-    const { error } = await signIn(email, password);
-    
-    if (error) {
-      setError(error.message);
+    if (!validatedData) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { error } = await signIn(validatedData.email, validatedData.password);
+      
+      if (error) {
+        setError(error.message);
+        toast({
+          title: "Sign In Failed",
+          description: "Please check your credentials and try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
     }
     
     setIsLoading(false);
@@ -47,18 +90,39 @@ const Auth = () => {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const fullName = formData.get('fullName') as string;
+    const validatedData = validateForm(formData, true);
 
-    const { error } = await signUp(email, password, {
-      full_name: fullName
-    });
-    
-    if (error) {
-      setError(error.message);
-    } else {
-      setError('Please check your email to confirm your account!');
+    if (!validatedData) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const { error } = await signUp(validatedData.email, validatedData.password, {
+        full_name: validatedData.fullName
+      });
+      
+      if (error) {
+        setError(error.message);
+        toast({
+          title: "Sign Up Failed",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Account Created",
+          description: "Please check your email to confirm your account!",
+        });
+        setError('Please check your email to confirm your account!');
+      }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.');
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
     }
     
     setIsLoading(false);
@@ -113,6 +177,9 @@ const Auth = () => {
                       className="bg-navy border-white/20 text-white"
                       placeholder="your@email.com"
                     />
+                    {validationErrors.email && (
+                      <p className="text-red-400 text-sm">{validationErrors.email}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signin-password" className="text-white">Password</Label>
@@ -124,6 +191,9 @@ const Auth = () => {
                       className="bg-navy border-white/20 text-white"
                       placeholder="••••••••"
                     />
+                    {validationErrors.password && (
+                      <p className="text-red-400 text-sm">{validationErrors.password}</p>
+                    )}
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -160,6 +230,9 @@ const Auth = () => {
                       className="bg-navy border-white/20 text-white"
                       placeholder="John Doe"
                     />
+                    {validationErrors.fullName && (
+                      <p className="text-red-400 text-sm">{validationErrors.fullName}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email" className="text-white">Email</Label>
@@ -171,6 +244,9 @@ const Auth = () => {
                       className="bg-navy border-white/20 text-white"
                       placeholder="your@email.com"
                     />
+                    {validationErrors.email && (
+                      <p className="text-red-400 text-sm">{validationErrors.email}</p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password" className="text-white">Password</Label>
@@ -183,6 +259,9 @@ const Auth = () => {
                       placeholder="••••••••"
                       minLength={6}
                     />
+                    {validationErrors.password && (
+                      <p className="text-red-400 text-sm">{validationErrors.password}</p>
+                    )}
                   </div>
                 </CardContent>
                 <CardFooter>
