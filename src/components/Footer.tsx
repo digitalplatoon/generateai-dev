@@ -1,4 +1,6 @@
+
 import { Code } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const footerLinks = {
@@ -28,14 +30,14 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8 mb-12">
           {/* Brand */}
           <div className="col-span-1">
-            <div className="flex items-center space-x-2 mb-4">
+            <Link to="/" className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-gradient-to-br from-teal to-blue-400 rounded-lg flex items-center justify-center">
                 <span className="text-navy font-bold text-sm">G</span>
               </div>
               <span className="text-xl font-display font-bold text-gradient">
                 GenerateAI.dev
               </span>
-            </div>
+            </Link>
             <p className="text-light-gray text-sm mb-4">
               Your AI copilot for mastering generative AI development with interactive learning and production-ready tools.
             </p>
@@ -63,12 +65,12 @@ const Footer = () => {
               <ul className="space-y-2">
                 {links.map((link, index) => (
                   <li key={index}>
-                    <a
-                      href={link.href}
+                    <Link
+                      to={link.href}
                       className="text-light-gray hover:text-teal transition-colors text-sm"
                     >
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -82,15 +84,15 @@ const Footer = () => {
             © 2024 GenerateAI.dev. All rights reserved.
           </div>
           <div className="flex space-x-6 text-sm">
-            <a href="/terms" className="text-light-gray hover:text-teal transition-colors">
+            <Link to="/terms" className="text-light-gray hover:text-teal transition-colors">
               Terms of Service
-            </a>
-            <a href="/privacy" className="text-light-gray hover:text-teal transition-colors">
+            </Link>
+            <Link to="/privacy" className="text-light-gray hover:text-teal transition-colors">
               Privacy Policy
-            </a>
-            <a href="/cookies" className="text-light-gray hover:text-teal transition-colors">
+            </Link>
+            <Link to="/cookies" className="text-light-gray hover:text-teal transition-colors">
               Cookie Policy
-            </a>
+            </Link>
           </div>
         </div>
       </div>

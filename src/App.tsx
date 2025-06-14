@@ -12,6 +12,10 @@ import LearningPaths from "./pages/LearningPaths";
 import PromptLibrary from "./pages/PromptLibrary";
 import RagLab from "./pages/RagLab";
 import AgentPlayground from "./pages/AgentPlayground";
+import About from "./pages/About";
+import Careers from "./pages/Careers";
+import Contact from "./pages/Contact";
+import Privacy from "./pages/Privacy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +35,10 @@ const App = () => (
             <Route path="/prompts" element={<PromptLibrary />} />
             <Route path="/rag-lab" element={<RagLab />} />
             <Route path="/agents" element={<AgentPlayground />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/careers" element={<Careers />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<Privacy />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
