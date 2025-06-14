@@ -42,15 +42,27 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
     }
   };
 
-  const features = Object.entries(plan.features)
-    .filter(([_, enabled]) => enabled)
-    .map(([feature, _]) => feature.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+  // Safely handle the features Json type
+  const features = React.useMemo(() => {
+    if (typeof plan.features === 'object' && plan.features !== null) {
+      return Object.entries(plan.features as Record<string, any>)
+        .filter(([_, enabled]) => enabled)
+        .map(([feature, _]) => feature.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+    }
+    return [];
+  }, [plan.features]);
 
-  const limits = Object.entries(plan.limits)
-    .map(([key, value]) => ({
-      feature: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-      limit: value === -1 ? 'Unlimited' : value.toString()
-    }));
+  // Safely handle the limits Json type
+  const limits = React.useMemo(() => {
+    if (typeof plan.limits === 'object' && plan.limits !== null) {
+      return Object.entries(plan.limits as Record<string, any>)
+        .map(([key, value]) => ({
+          feature: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          limit: value === -1 ? 'Unlimited' : value.toString()
+        }));
+    }
+    return [];
+  }, [plan.limits]);
 
   return (
     <Card className={`relative ${isCurrentPlan ? 'ring-2 ring-primary' : ''} ${plan.tier === 'premium' ? 'border-purple-200' : ''}`}>

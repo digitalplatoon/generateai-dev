@@ -10,7 +10,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import SubscriptionCard from '@/components/subscription/SubscriptionCard';
 import UsageDisplay from '@/components/subscription/UsageDisplay';
 import { Badge } from '@/components/ui/badge';
-import { CreditCard, Settings, TrendingUp } from 'lucide-react';
+import { CreditCard, Settings, TrendingUp, Search, MessageSquare } from 'lucide-react';
 
 const Subscription: React.FC = () => {
   const { user, loading } = useAuthContext();

@@ -66,7 +66,9 @@ export const useSubscription = () => {
         .order('price_monthly', { ascending: true });
 
       if (error) throw error;
-      setAvailablePlans(data || []);
+      
+      // Type assertion since we know the structure matches
+      setAvailablePlans((data || []) as SubscriptionPlan[]);
     } catch (error) {
       console.error('Error fetching plans:', error);
       toast({

@@ -1,12 +1,14 @@
 
+import { Json } from '@/integrations/supabase/types';
+
 export interface SubscriptionPlan {
   id: string;
   name: string;
   tier: 'free' | 'basic' | 'premium' | 'enterprise';
   price_monthly: number | null;
   price_yearly: number | null;
-  features: Record<string, boolean>;
-  limits: Record<string, number>;
+  features: Json;
+  limits: Json;
   active: boolean;
   created_at: string;
   updated_at: string;
@@ -16,7 +18,7 @@ export interface UserSubscription {
   id: string;
   user_id: string;
   plan_id: string;
-  status: 'active' | 'cancelled' | 'expired' | 'pending';
+  status: string;
   started_at: string;
   expires_at: string | null;
   stripe_subscription_id: string | null;

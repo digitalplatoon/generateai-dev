@@ -43,11 +43,7 @@ export const useAdminDashboard = () => {
         .from('profiles')
         .select(`
           *,
-          user_roles(role),
-          user_subscriptions(
-            *,
-            subscription_plans(name, tier)
-          )
+          user_roles(role)
         `)
         .order('created_at', { ascending: false });
 
@@ -71,13 +67,14 @@ export const useAdminDashboard = () => {
         .from('user_subscriptions')
         .select(`
           *,
-          profiles(full_name, username),
           subscription_plans(name, tier, price_monthly)
         `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setSubscriptions(data || []);
+      
+      // Type assertion since we're handling the conversion
+      setSubscriptions((data || []) as UserSubscription[]);
     } catch (error) {
       console.error('Error fetching subscriptions:', error);
       toast({
@@ -98,8 +95,7 @@ export const useAdminDashboard = () => {
           feature_type,
           date,
           user_id,
-          usage_count,
-          profiles(full_name, username)
+          usage_count
         `)
         .gte('date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
         .order('date', { ascending: false });
@@ -126,7 +122,9 @@ export const useAdminDashboard = () => {
         .order('price_monthly', { ascending: true });
 
       if (error) throw error;
-      setPlans(data || []);
+      
+      // Type assertion since we know the structure matches
+      setPlans((data || []) as SubscriptionPlan[]);
     } catch (error) {
       console.error('Error fetching plans:', error);
       toast({
