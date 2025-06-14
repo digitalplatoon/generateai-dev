@@ -67,7 +67,20 @@ export const useAuditLog = () => {
         .limit(limit);
 
       if (error) throw error;
-      setLogs(data || []);
+      
+      // Type cast the data to ensure proper types
+      const typedLogs: AuditLogEntry[] = (data || []).map(log => ({
+        ...log,
+        ip_address: log.ip_address as string | undefined,
+        conversation_id: log.conversation_id || undefined,
+        request_data: log.request_data || undefined,
+        response_data: log.response_data || undefined,
+        error_message: log.error_message || undefined,
+        processing_time_ms: log.processing_time_ms || undefined,
+        user_agent: log.user_agent || undefined
+      }));
+      
+      setLogs(typedLogs);
     } catch (error) {
       console.error('Error fetching audit logs:', error);
       setLogs([]);

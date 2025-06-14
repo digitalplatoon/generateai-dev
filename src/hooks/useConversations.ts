@@ -141,7 +141,17 @@ export const useConversations = () => {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages(data || []);
+      
+      // Type cast the messages to ensure proper role types
+      const typedMessages: ConversationMessage[] = (data || []).map(message => ({
+        ...message,
+        role: message.role as 'user' | 'assistant' | 'system',
+        tokens_used: message.tokens_used || undefined,
+        model_used: message.model_used || undefined,
+        temperature: message.temperature || undefined
+      }));
+      
+      setMessages(typedMessages);
     } catch (error) {
       console.error('Error fetching messages:', error);
       setMessages([]);
@@ -163,8 +173,17 @@ export const useConversations = () => {
 
       if (error) throw error;
       
-      setMessages(prev => [...prev, data]);
-      return data;
+      // Type cast the returned data
+      const typedMessage: ConversationMessage = {
+        ...data,
+        role: data.role as 'user' | 'assistant' | 'system',
+        tokens_used: data.tokens_used || undefined,
+        model_used: data.model_used || undefined,
+        temperature: data.temperature || undefined
+      };
+      
+      setMessages(prev => [...prev, typedMessage]);
+      return typedMessage;
     } catch (error) {
       console.error('Error adding message:', error);
       throw error;
