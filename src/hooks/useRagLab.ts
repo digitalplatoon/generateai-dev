@@ -1,25 +1,8 @@
+
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
-export interface RagDocument {
-  id: string;
-  name: string;
-  file_type: string;
-  file_size: number;
-  status: 'pending' | 'processing' | 'processed' | 'error';
-  created_at: string;
-  chunk_size: number;
-  overlap: number;
-  embedding_model: string;
-}
-
-export interface QueryResult {
-  score: number;
-  source: string;
-  chunk: number;
-  content: string;
-}
+import { ragService } from '@/services/ragService';
+import { RagDocument, QueryResult } from '@/types/rag';
 
 export const useRagLab = () => {
   const [documents, setDocuments] = useState<RagDocument[]>([]);
@@ -31,35 +14,14 @@ export const useRagLab = () => {
     try {
       setIsLoading(true);
       
-      // Read file content
-      const content = await file.text();
-      
-      // Insert document record
-      const { data: document, error } = await supabase
-        .from('rag_documents' as any)
-        .insert({
-          name: file.name,
-          content,
-          file_type: file.type || 'text/plain',
-          file_size: file.size,
-          chunk_size: chunkSize,
-          overlap,
-          embedding_model: embeddingModel,
-          status: 'pending'
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
+      const document = await ragService.uploadDocument(file, chunkSize, overlap, embeddingModel);
 
       toast({
         title: "Document uploaded!",
         description: "Processing will begin shortly.",
       });
 
-      // Refresh documents list
       await fetchDocuments();
-      
       return document;
     } catch (error) {
       console.error('Upload error:', error);
@@ -79,28 +41,21 @@ export const useRagLab = () => {
       setIsLoading(true);
       setProcessingProgress(0);
 
-      // Start processing progress animation
       const progressInterval = setInterval(() => {
         setProcessingProgress(prev => Math.min(prev + 10, 90));
       }, 500);
 
-      const { data, error } = await supabase.functions.invoke('rag-process-document', {
-        body: { documentId }
-      });
+      const data = await ragService.processDocument(documentId);
 
       clearInterval(progressInterval);
       setProcessingProgress(100);
-
-      if (error) throw error;
 
       toast({
         title: "Processing complete!",
         description: `Created ${data.chunks_created} chunks successfully.`,
       });
 
-      // Refresh documents list
       await fetchDocuments();
-
       setTimeout(() => setProcessingProgress(0), 1000);
     } catch (error) {
       console.error('Processing error:', error);
@@ -118,18 +73,14 @@ export const useRagLab = () => {
     try {
       setIsLoading(true);
 
-      const { data, error } = await supabase.functions.invoke('rag-query', {
-        body: { query, numResults, minScore }
-      });
-
-      if (error) throw error;
+      const results = await ragService.queryDocuments(query, numResults, minScore);
 
       toast({
         title: "Query executed!",
-        description: `Found ${data.results.length} relevant chunks.`,
+        description: `Found ${results.length} relevant chunks.`,
       });
 
-      return data.results;
+      return results;
     } catch (error) {
       console.error('Query error:', error);
       toast({
@@ -145,24 +96,8 @@ export const useRagLab = () => {
 
   const fetchDocuments = async () => {
     try {
-      const { data, error } = await supabase
-        .from('rag_documents' as any)
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Fetch error:', error);
-        setDocuments([]);
-        return;
-      }
-      
-      // Safe type conversion - check if data exists and is an array before converting
-      if (data && Array.isArray(data)) {
-        const typedDocuments = data as unknown as RagDocument[];
-        setDocuments(typedDocuments);
-      } else {
-        setDocuments([]);
-      }
+      const documents = await ragService.fetchDocuments();
+      setDocuments(documents);
     } catch (error) {
       console.error('Fetch error:', error);
       setDocuments([]);
@@ -171,12 +106,7 @@ export const useRagLab = () => {
 
   const deleteDocument = async (documentId: string) => {
     try {
-      const { error } = await supabase
-        .from('rag_documents' as any)
-        .delete()
-        .eq('id', documentId);
-
-      if (error) throw error;
+      await ragService.deleteDocument(documentId);
 
       toast({
         title: "Document deleted",
