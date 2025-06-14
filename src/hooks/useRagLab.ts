@@ -1,8 +1,10 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ragService } from '@/services/ragService';
 import { RagDocument, QueryResult } from '@/types/rag';
+
+// Re-export QueryResult so it can be imported by components
+export { QueryResult } from '@/types/rag';
 
 export const useRagLab = () => {
   const [documents, setDocuments] = useState<RagDocument[]>([]);
