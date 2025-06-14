@@ -35,7 +35,10 @@ export const useUserPreferences = () => {
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
-      setPreferences(data);
+      
+      // Type assertion for the data from Supabase
+      const typedPreferences = data as UserPreferences;
+      setPreferences(typedPreferences);
     } catch (error) {
       console.error('Error fetching user preferences:', error);
       setPreferences(null);
@@ -62,7 +65,10 @@ export const useUserPreferences = () => {
         .single();
 
       if (error) throw error;
-      setPreferences(data);
+      
+      // Type assertion for the data from Supabase
+      const typedPreferences = data as UserPreferences;
+      setPreferences(typedPreferences);
     } catch (error) {
       console.error('Error updating user preferences:', error);
     }

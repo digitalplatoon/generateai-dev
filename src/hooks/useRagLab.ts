@@ -35,7 +35,7 @@ export const useRagLab = () => {
       // Read file content
       const content = await file.text();
       
-      // Insert document record using type assertion for now
+      // Insert document record
       const { data: document, error } = await supabase
         .from('rag_documents' as any)
         .insert({
@@ -152,9 +152,13 @@ export const useRagLab = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setDocuments(data || []);
+      
+      // Type assertion for the data from Supabase
+      const typedDocuments = (data || []) as RagDocument[];
+      setDocuments(typedDocuments);
     } catch (error) {
       console.error('Fetch error:', error);
+      setDocuments([]);
     }
   };
 

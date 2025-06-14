@@ -32,7 +32,10 @@ export const useBookmarks = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setBookmarks(data || []);
+      
+      // Type assertion for the data from Supabase
+      const typedBookmarks = (data || []) as Bookmark[];
+      setBookmarks(typedBookmarks);
     } catch (error) {
       console.error('Error fetching bookmarks:', error);
       setBookmarks([]);
