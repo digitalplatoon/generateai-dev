@@ -1,6 +1,5 @@
+
 import SEOHead from "@/components/seo/SEOHead";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Code, Terminal, Key, Database } from "lucide-react";
 
 const ApiReference = () => {
@@ -86,8 +85,6 @@ const ApiReference = () => {
         canonical="https://generateai.dev/api"
       />
       <div className="min-h-screen bg-navy">
-        <Header />
-        
         {/* Hero Section */}
         <section className="pt-24 pb-16 px-6">
           <div className="container mx-auto text-center">
@@ -163,8 +160,6 @@ const ApiReference = () => {
             </div>
           </div>
         </section>
-
-        <Footer />
       </div>
     </>
   );

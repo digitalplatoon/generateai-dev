@@ -1,5 +1,5 @@
+
 import SEOHead from "@/components/seo/SEOHead";
-import Footer from "@/components/Footer";
 import { Users, MessageCircle, Github, Twitter, Linkedin, Calendar } from "lucide-react";
 
 const Community = () => {
@@ -191,8 +191,6 @@ const Community = () => {
             </div>
           </div>
         </section>
-
-        <Footer />
       </div>
     </>
   );

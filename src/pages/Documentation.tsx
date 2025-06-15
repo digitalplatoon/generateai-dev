@@ -1,6 +1,4 @@
 
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { Book, Search, Code, FileText, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -43,8 +41,6 @@ const Documentation = () => {
 
   return (
     <div className="min-h-screen bg-navy">
-      <Header />
-      
       {/* Hero Section */}
       <section className="pt-24 pb-16 px-6">
         <div className="container mx-auto text-center">
@@ -124,8 +120,6 @@ const Documentation = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 };

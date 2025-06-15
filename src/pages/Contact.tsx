@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, MessageSquare, Users, Headphones, MapPin, Clock, Phone, Send } from 'lucide-react';
@@ -168,8 +166,6 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-navy via-navy/95 to-navy/90">
-      <Header />
-      
       <main className="pt-24 pb-16">
         {/* Hero Section */}
         <section className="container mx-auto px-6 text-center mb-20">
@@ -392,8 +388,6 @@ const Contact = () => {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 };

@@ -1,6 +1,4 @@
 
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Shield, User, Globe, AlertTriangle, Scale, Calendar, Mail } from 'lucide-react';
 
@@ -120,8 +118,6 @@ const Terms = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-navy via-navy/95 to-navy/90">
-      <Header />
-      
       <main className="pt-24 pb-16">
         {/* Hero Section */}
         <section className="container mx-auto px-6 text-center mb-16">
@@ -203,8 +199,6 @@ const Terms = () => {
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 };

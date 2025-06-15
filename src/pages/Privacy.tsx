@@ -1,5 +1,4 @@
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+
 import PrivacyHero from '@/components/privacy/PrivacyHero';
 import PrivacyIntroduction from '@/components/privacy/PrivacyIntroduction';
 import PrivacySection from '@/components/privacy/PrivacySection';
@@ -19,8 +18,6 @@ const Privacy = () => {
         canonical="https://generateai.dev/privacy"
       />
       <div className="bg-gradient-to-br from-navy via-navy/95 to-navy/90">
-        <Header />
-      
         <main className="pt-24 pb-16">
           <PrivacyHero />
 
@@ -43,8 +40,6 @@ const Privacy = () => {
             </div>
           </section>
         </main>
-
-        <Footer />
       </div>
     </>
   );
