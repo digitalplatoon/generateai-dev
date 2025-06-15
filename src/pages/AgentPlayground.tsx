@@ -426,109 +426,109 @@ const AgentPlayground = () => {
                         <span className="text-sm text-white">{performanceMetrics.activeUsers}</span>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
-            <TabsContent value="deploy">
-              <div className="grid lg:grid-cols-2 gap-6">
-                <Card className="glass border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Zap className="w-5 h-5 text-teal" />
-                      Deploy Your Agent
-                    </CardTitle>
-                    <CardDescription className="text-light-gray">
-                      Choose how you want to deploy your agent
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-3">
-                      <Button 
-                        onClick={() => handleDeploy("API")}
-                        className="w-full bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
-                      >
-                        <Zap className="w-4 h-4 mr-2" />
-                        Deploy as API
-                      </Button>
-                      <Button 
-                        onClick={() => handleDeploy("Slack")}
-                        variant="outline" 
-                        className="w-full border-white/20 text-white hover:bg-white/10"
-                      >
-                        Deploy to Slack
-                      </Button>
-                      <Button 
-                        onClick={() => handleDeploy("Discord")}
-                        variant="outline" 
-                        className="w-full border-white/20 text-white hover:bg-white/10"
-                      >
-                        Deploy to Discord
-                      </Button>
-                      <Button 
-                        onClick={() => handleDeploy("Web Widget")}
-                        variant="outline" 
-                        className="w-full border-white/20 text-white hover:bg-white/10"
-                      >
-                        Deploy as Web Widget
-                      </Button>
-                    </div>
-                    <div className="bg-navy/50 rounded-lg p-4 border border-white/10">
-                      <h4 className="text-sm font-semibold text-white mb-2">Deployment Features</h4>
-                      <ul className="text-xs text-light-gray space-y-1">
-                        <li>• Auto-scaling infrastructure</li>
-                        <li>• Real-time monitoring</li>
-                        <li>• Usage analytics</li>
-                        <li>• Custom domains</li>
-                        <li>• SSL certificates</li>
-                        <li>• Load balancing</li>
-                      </ul>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="glass border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white">Integrations</CardTitle>
-                    <CardDescription className="text-light-gray">
-                      Connect your agent to external services
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {integrations.map((integration, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-navy/50 rounded-lg border border-white/10">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-sm font-medium text-white">{integration.name}</span>
-                              <Badge variant="outline" className="text-xs">
-                                {integration.type}
-                              </Badge>
-                            </div>
-                            <p className="text-xs text-light-gray">{integration.description}</p>
-                          </div>
-                          <Badge 
-                            className={
-                              integration.status === 'connected' 
-                                ? 'bg-green-500/20 text-green-300 border-green-400/30'
-                                : 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30'
-                            }
-                          >
-                            {integration.status}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
-                    <Button className="w-full mt-4 border-white/20 text-white hover:bg-white/10" variant="outline">
-                      Browse More Integrations
+          <TabsContent value="deploy">
+            <div className="grid lg:grid-cols-2 gap-6">
+              <Card className="glass border-white/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-teal" />
+                    Deploy Your Agent
+                  </CardTitle>
+                  <CardDescription className="text-light-gray">
+                    Choose how you want to deploy your agent
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <Button 
+                      onClick={() => handleDeploy("API")}
+                      className="w-full bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
+                    >
+                      <Zap className="w-4 h-4 mr-2" />
+                      Deploy as API
                     </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
+                    <Button 
+                      onClick={() => handleDeploy("Slack")}
+                      variant="outline" 
+                      className="w-full border-white/20 text-white hover:bg-white/10"
+                    >
+                      Deploy to Slack
+                    </Button>
+                    <Button 
+                      onClick={() => handleDeploy("Discord")}
+                      variant="outline" 
+                      className="w-full border-white/20 text-white hover:bg-white/10"
+                    >
+                      Deploy to Discord
+                    </Button>
+                    <Button 
+                      onClick={() => handleDeploy("Web Widget")}
+                      variant="outline" 
+                      className="w-full border-white/20 text-white hover:bg-white/10"
+                    >
+                      Deploy as Web Widget
+                    </Button>
+                  </div>
+                  <div className="bg-navy/50 rounded-lg p-4 border border-white/10">
+                    <h4 className="text-sm font-semibold text-white mb-2">Deployment Features</h4>
+                    <ul className="text-xs text-light-gray space-y-1">
+                      <li>• Auto-scaling infrastructure</li>
+                      <li>• Real-time monitoring</li>
+                      <li>• Usage analytics</li>
+                      <li>• Custom domains</li>
+                      <li>• SSL certificates</li>
+                      <li>• Load balancing</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass border-white/20">
+                <CardHeader>
+                  <CardTitle className="text-white">Integrations</CardTitle>
+                  <CardDescription className="text-light-gray">
+                    Connect your agent to external services
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {integrations.map((integration, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-navy/50 rounded-lg border border-white/10">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-sm font-medium text-white">{integration.name}</span>
+                            <Badge variant="outline" className="text-xs">
+                              {integration.type}
+                            </Badge>
+                          </div>
+                          <p className="text-xs text-light-gray">{integration.description}</p>
+                        </div>
+                        <Badge 
+                          className={
+                            integration.status === 'connected' 
+                              ? 'bg-green-500/20 text-green-300 border-green-400/30'
+                              : 'bg-yellow-500/20 text-yellow-300 border-yellow-400/30'
+                          }
+                        >
+                          {integration.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                  <Button className="w-full mt-4 border-white/20 text-white hover:bg-white/10" variant="outline">
+                    Browse More Integrations
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
