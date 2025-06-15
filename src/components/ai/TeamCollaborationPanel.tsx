@@ -8,6 +8,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuthContext } from '@/contexts/AuthContext';
+import RealTimePresence from './RealTimePresence';
 import { 
   Users, 
   UserPlus, 
@@ -34,6 +36,7 @@ interface TeamCollaborationPanelProps {
 }
 
 const TeamCollaborationPanel = ({ conversationId }: TeamCollaborationPanelProps) => {
+  const { user } = useAuthContext();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [inviteEmail, setInviteEmail] = useState('');
   const [selectedRole, setSelectedRole] = useState<'member' | 'viewer'>('member');
@@ -50,46 +53,61 @@ const TeamCollaborationPanel = ({ conversationId }: TeamCollaborationPanelProps)
     if (!conversationId) return;
 
     try {
-      const { data, error } = await supabase
+      // First get the conversation shares
+      const { data: shares, error: sharesError } = await supabase
         .from('conversation_shares')
-        .select(`
-          *,
-          shared_with_profile:profiles!shared_with(full_name, avatar_url),
-          shared_by_profile:profiles!shared_by(full_name, avatar_url)
-        `)
+        .select('*')
         .eq('conversation_id', conversationId);
 
-      if (error) throw error;
+      if (sharesError) throw sharesError;
 
-      // Transform data to TeamMember format
-      const members: TeamMember[] = data.map(share => ({
-        id: share.shared_with,
-        email: share.shared_with_profile?.full_name || 'Unknown User',
-        role: share.permission_level as 'owner' | 'admin' | 'member' | 'viewer',
-        joinedAt: share.created_at,
-        avatar: share.shared_with_profile?.avatar_url,
-        name: share.shared_with_profile?.full_name
-      }));
+      if (!shares || shares.length === 0) {
+        setTeamMembers([]);
+        return;
+      }
+
+      // Get user profiles for the shared users
+      const userIds = shares.map(share => share.shared_with);
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Combine the data
+      const members: TeamMember[] = shares.map(share => {
+        const profile = profiles?.find(p => p.id === share.shared_with);
+        return {
+          id: share.shared_with,
+          email: profile?.full_name || 'Unknown User',
+          role: share.permission_level as 'owner' | 'admin' | 'member' | 'viewer',
+          joinedAt: share.created_at,
+          avatar: profile?.avatar_url,
+          name: profile?.full_name
+        };
+      });
 
       setTeamMembers(members);
     } catch (error) {
       console.error('Error fetching team members:', error);
+      setTeamMembers([]);
     }
   };
 
   const handleInviteUser = async () => {
-    if (!inviteEmail.trim() || !conversationId) return;
+    if (!inviteEmail.trim() || !conversationId || !user) return;
 
     setIsInviting(true);
     try {
-      // First, check if user exists
+      // First, check if user exists by email
       const { data: userData, error: userError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('username', inviteEmail) // Assuming email is stored in username field
+        .eq('full_name', inviteEmail) // Using full_name as proxy for email search
         .single();
 
-      if (userError) {
+      if (userError || !userData) {
         toast({
           title: "User not found",
           description: "No user found with that email address.",
@@ -104,6 +122,7 @@ const TeamCollaborationPanel = ({ conversationId }: TeamCollaborationPanelProps)
         .insert({
           conversation_id: conversationId,
           shared_with: userData.id,
+          shared_by: user.id,
           permission_level: selectedRole,
           expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
         });
@@ -168,6 +187,11 @@ const TeamCollaborationPanel = ({ conversationId }: TeamCollaborationPanelProps)
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Real-time presence indicator */}
+        {conversationId && (
+          <RealTimePresence conversationId={conversationId} />
+        )}
+
         {/* Invite Section */}
         <div className="space-y-3">
           <h3 className="text-sm font-medium">Invite Team Members</h3>
@@ -175,7 +199,7 @@ const TeamCollaborationPanel = ({ conversationId }: TeamCollaborationPanelProps)
             <Input
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
-              placeholder="Enter email address"
+              placeholder="Enter user name or email"
               className="flex-1"
             />
             <select
@@ -201,7 +225,7 @@ const TeamCollaborationPanel = ({ conversationId }: TeamCollaborationPanelProps)
         {/* Team Members List */}
         <div className="space-y-3">
           <h3 className="text-sm font-medium">Team Members ({teamMembers.length})</h3>
-          <ScrollArea className="h-[300px]">
+          <ScrollArea className="h-[200px]">
             <div className="space-y-2">
               {teamMembers.map((member) => (
                 <div
@@ -251,9 +275,9 @@ const TeamCollaborationPanel = ({ conversationId }: TeamCollaborationPanelProps)
             Recent Activity
           </h3>
           <div className="space-y-1 text-xs text-muted-foreground">
-            <p>• New conversation started 2 hours ago</p>
-            <p>• Member joined the team yesterday</p>
-            <p>• Settings updated 3 days ago</p>
+            <p>• Team collaboration active</p>
+            <p>• Real-time presence enabled</p>
+            <p>• Secure conversation sharing</p>
           </div>
         </div>
       </CardContent>
