@@ -18,7 +18,7 @@ const PrivacyContact = () => {
         <div className="space-y-2 text-light-gray">
           <p>Email: privacy@generateai.dev</p>
           <p>Address: 123 Innovation Street, Suite 100, San Francisco, CA 94105</p>
-          <p>Phone: +1 (555) 123-4567</p>
+          <p>Phone: +1 (307) 400-1973</p>
         </div>
         <p className="text-light-gray leading-relaxed mt-4">
           We will respond to your inquiry within 5 business days and work with you to resolve any privacy concerns.

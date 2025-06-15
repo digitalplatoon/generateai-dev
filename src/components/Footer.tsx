@@ -81,7 +81,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="text-light-gray text-sm mb-4 md:mb-0">
-            © 2024 GenerateAI.dev. All rights reserved.
+            © 2025 Available View. All rights reserved.
           </div>
           <div className="flex space-x-6 text-sm">
             <Link to="/terms" className="text-light-gray hover:text-teal transition-colors">
