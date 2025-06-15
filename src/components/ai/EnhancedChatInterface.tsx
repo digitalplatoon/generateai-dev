@@ -1,31 +1,19 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
 import { useConversations } from '@/hooks/useConversations';
 import { useAISettings } from '@/hooks/useAISettings';
 import { useAuditLog } from '@/hooks/useAuditLog';
 import { useToast } from '@/hooks/use-toast';
 import { ContentFilterService } from '@/services/contentFilter';
 import { supabase } from '@/integrations/supabase/client';
-import RealTimePresence, { usePresenceStatus } from './RealTimePresence';
-import { 
-  Send, 
-  Bot, 
-  User, 
-  Clock,
-  Zap,
-  Shield,
-  Copy,
-  Download,
-  StopCircle,
-  AlertTriangle,
-  Users
-} from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { usePresenceStatus } from './RealTimePresence';
+import ChatHeader from './ChatHeader';
+import ChatMessage from './ChatMessage';
+import StreamingMessage from './StreamingMessage';
+import ChatInput from './ChatInput';
+import EmptyChatState from './EmptyChatState';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -346,213 +334,48 @@ const EnhancedChatInterface = () => {
 
   return (
     <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center justify-between">
-          <span>{currentConversation?.title || 'New Conversation'}</span>
-          <div className="flex items-center gap-2">
-            {settings && (
-              <Badge variant="outline" className="text-xs">
-                <Zap className="h-3 w-3 mr-1" />
-                T: {settings.temperature.toFixed(1)}
-              </Badge>
-            )}
-            {currentConversation?.do_not_train && (
-              <Badge variant="secondary" className="text-xs">
-                <Shield className="h-3 w-3 mr-1" />
-                Private
-              </Badge>
-            )}
-            {isStreaming && (
-              <Badge variant="outline" className="text-xs animate-pulse">
-                <div className="h-2 w-2 bg-green-500 rounded-full mr-1" />
-                Streaming
-              </Badge>
-            )}
-            <Button size="sm" variant="ghost" onClick={exportConversation}>
-              <Download className="h-4 w-4" />
-            </Button>
-          </div>
+      <CardHeader>
+        <CardTitle>
+          <ChatHeader
+            currentConversation={currentConversation}
+            settings={settings}
+            isStreaming={isStreaming}
+            onExport={exportConversation}
+          />
         </CardTitle>
-        
-        {/* Real-time Presence */}
-        {currentConversation && (
-          <RealTimePresence conversationId={currentConversation.id} />
-        )}
       </CardHeader>
       
       <CardContent className="flex-1 flex flex-col p-0">
         <ScrollArea className="flex-1 p-4">
           <div className="space-y-4">
             {messages.map((message, index) => (
-              <div
+              <ChatMessage
                 key={index}
-                className={`flex gap-3 ${
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
-                }`}
-              >
-                <div
-                  className={`flex gap-3 max-w-[80%] ${
-                    message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
-                  }`}
-                >
-                  <div className="flex-shrink-0">
-                    {message.role === 'user' ? (
-                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
-                        <User className="h-4 w-4 text-primary-foreground" />
-                      </div>
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-                        <Bot className="h-4 w-4 text-secondary-foreground" />
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className={`space-y-2 ${message.role === 'user' ? 'text-right' : 'text-left'}`}>
-                    <div
-                      className={`p-3 rounded-lg ${
-                        message.role === 'user'
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted'
-                      }`}
-                    >
-                      <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      <span>
-                        {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
-                      </span>
-                      {message.tokens_used && (
-                        <>
-                          <span>•</span>
-                          <span>{message.tokens_used} tokens</span>
-                        </>
-                      )}
-                      {message.model_used && (
-                        <>
-                          <span>•</span>
-                          <span>{message.model_used}</span>
-                        </>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => copyMessage(message.content)}
-                        className="h-4 w-4 p-0 ml-2"
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                message={message}
+                onCopy={copyMessage}
+              />
             ))}
 
             {/* Show streaming message */}
             {isStreaming && streamingContent && (
-              <div className="flex gap-3 justify-start">
-                <div className="flex gap-3 max-w-[80%]">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
-                      <Bot className="h-4 w-4 text-secondary-foreground" />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2 text-left">
-                    <div className="p-3 rounded-lg bg-muted">
-                      <p className="text-sm whitespace-pre-wrap">{streamingContent}</p>
-                      <div className="mt-2 flex items-center gap-1 text-xs opacity-70">
-                        <div className="animate-pulse">●</div>
-                        <span>AI is typing...</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <StreamingMessage content={streamingContent} />
             )}
             
-            {messages.length === 0 && !isStreaming && (
-              <div className="text-center py-8 text-muted-foreground">
-                <Bot className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <h3 className="text-lg font-medium mb-2">Start a conversation</h3>
-                <p className="text-sm">
-                  Ask me anything! I'm here to help with your questions and tasks.
-                </p>
-                <div className="mt-4 p-3 bg-muted rounded-lg text-xs">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Shield className="h-4 w-4" />
-                    <span className="font-medium">Enhanced Security & Collaboration</span>
-                  </div>
-                  <p>All messages are filtered for malicious content, and you can collaborate with your team in real-time.</p>
-                </div>
-              </div>
-            )}
+            {messages.length === 0 && !isStreaming && <EmptyChatState />}
             
             <div ref={scrollRef} />
           </div>
         </ScrollArea>
         
-        <div className="border-t p-4">
-          <div className="flex gap-2">
-            <Textarea
-              value={input}
-              onChange={handleInputChange}
-              placeholder="Type your message..."
-              className="min-h-[60px] max-h-[120px]"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  if (!isLoading && !isStreaming) {
-                    handleSendMessage();
-                  }
-                }
-              }}
-              disabled={isLoading || isStreaming}
-            />
-            <div className="flex flex-col gap-2">
-              {isStreaming ? (
-                <Button
-                  onClick={stopStreaming}
-                  variant="outline"
-                  className="self-end"
-                >
-                  <StopCircle className="h-4 w-4" />
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={!input.trim() || isLoading}
-                  className="self-end"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          </div>
-          
-          {settings && (
-            <div className="flex items-center justify-between mt-2 text-xs text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <span>Model: {settings.preferred_model}</span>
-                <span>•</span>
-                <span>T: {settings.temperature}</span>
-                <span>•</span>
-                <span>Max: {settings.max_tokens}</span>
-                {settings.do_not_train_consent && (
-                  <>
-                    <span>•</span>
-                    <div className="flex items-center gap-1">
-                      <Shield className="h-3 w-3" />
-                      <span>Private</span>
-                    </div>
-                  </>
-                )}
-              </div>
-              <span>Press Enter to send, Shift+Enter for new line</span>
-            </div>
-          )}
-        </div>
+        <ChatInput
+          input={input}
+          isLoading={isLoading}
+          isStreaming={isStreaming}
+          settings={settings}
+          onInputChange={handleInputChange}
+          onSendMessage={handleSendMessage}
+          onStopStreaming={stopStreaming}
+        />
       </CardContent>
     </Card>
   );
