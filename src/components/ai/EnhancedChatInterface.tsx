@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,7 @@ import { useAuditLog } from '@/hooks/useAuditLog';
 import { useToast } from '@/hooks/use-toast';
 import { ContentFilterService } from '@/services/contentFilter';
 import { supabase } from '@/integrations/supabase/client';
+import RealTimePresence, { usePresenceStatus } from './RealTimePresence';
 import { 
   Send, 
   Bot, 
@@ -20,7 +22,8 @@ import {
   Copy,
   Download,
   StopCircle,
-  AlertTriangle
+  AlertTriangle,
+  Users
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -42,7 +45,9 @@ const EnhancedChatInterface = () => {
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null);
   const [abortController, setAbortController] = useState<AbortController | null>(null);
   const [streamingContent, setStreamingContent] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout>();
   const { toast } = useToast();
 
   const { 
@@ -55,6 +60,7 @@ const EnhancedChatInterface = () => {
   
   const { settings } = useAISettings();
   const { logAction } = useAuditLog();
+  const { updateStatus } = usePresenceStatus(currentConversation?.id || '');
 
   const scrollToBottom = () => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -63,6 +69,36 @@ const EnhancedChatInterface = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, streamingContent]);
+
+  // Handle typing status for real-time presence
+  useEffect(() => {
+    if (currentConversation?.id) {
+      if (isTyping) {
+        updateStatus('typing');
+      } else {
+        updateStatus('online');
+      }
+    }
+  }, [isTyping, currentConversation?.id, updateStatus]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // Set typing status
+    if (!isTyping) {
+      setIsTyping(true);
+    }
+
+    // Set timeout to stop typing status
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false);
+    }, 1000);
+  };
 
   const stopStreaming = () => {
     if (abortController) {
@@ -79,6 +115,7 @@ const EnhancedChatInterface = () => {
 
     const userMessage = input.trim();
     setInput('');
+    setIsTyping(false);
 
     // Content filtering
     const filterResult = ContentFilterService.filterContent(userMessage, true);
@@ -336,6 +373,11 @@ const EnhancedChatInterface = () => {
             </Button>
           </div>
         </CardTitle>
+        
+        {/* Real-time Presence */}
+        {currentConversation && (
+          <RealTimePresence conversationId={currentConversation.id} />
+        )}
       </CardHeader>
       
       <CardContent className="flex-1 flex flex-col p-0">
@@ -440,9 +482,9 @@ const EnhancedChatInterface = () => {
                 <div className="mt-4 p-3 bg-muted rounded-lg text-xs">
                   <div className="flex items-center gap-2 mb-2">
                     <Shield className="h-4 w-4" />
-                    <span className="font-medium">Enhanced Security</span>
+                    <span className="font-medium">Enhanced Security & Collaboration</span>
                   </div>
-                  <p>All messages are filtered for malicious content and your privacy is protected.</p>
+                  <p>All messages are filtered for malicious content, and you can collaborate with your team in real-time.</p>
                 </div>
               </div>
             )}
@@ -455,7 +497,7 @@ const EnhancedChatInterface = () => {
           <div className="flex gap-2">
             <Textarea
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={handleInputChange}
               placeholder="Type your message..."
               className="min-h-[60px] max-h-[120px]"
               onKeyDown={(e) => {

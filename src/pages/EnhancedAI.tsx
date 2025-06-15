@@ -5,9 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ConversationSidebar from '@/components/ai/ConversationSidebar';
 import EnhancedChatInterface from '@/components/ai/EnhancedChatInterface';
+import TeamCollaborationPanel from '@/components/ai/TeamCollaborationPanel';
 import AISettingsPanel from '@/components/ai/AISettingsPanel';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useAuditLog } from '@/hooks/useAuditLog';
+import { useConversations } from '@/hooks/useConversations';
 import { 
   MessageSquare, 
   Settings, 
@@ -22,6 +24,7 @@ import {
 const EnhancedAI = () => {
   const { user } = useAuthContext();
   const { logs } = useAuditLog();
+  const { currentConversation } = useConversations();
   const [activeTab, setActiveTab] = useState('chat');
 
   if (!user) {
@@ -47,7 +50,7 @@ const EnhancedAI = () => {
               Enhanced AI Platform
             </h1>
             <p className="text-muted-foreground mt-2">
-              Advanced AI with context awareness, enhanced security, and collaboration features
+              Advanced AI with context awareness, enhanced security, and real-time collaboration
             </p>
           </div>
           
@@ -89,12 +92,15 @@ const EnhancedAI = () => {
         </TabsList>
 
         <TabsContent value="chat" className="mt-4 h-[calc(100%-60px)]">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-full">
+          <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 h-full">
             <div className="lg:col-span-1">
               <ConversationSidebar />
             </div>
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-4">
               <EnhancedChatInterface />
+            </div>
+            <div className="lg:col-span-1">
+              <TeamCollaborationPanel conversationId={currentConversation?.id} />
             </div>
           </div>
         </TabsContent>
