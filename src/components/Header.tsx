@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from 'lucide-react';
+import EnhancedLogo from '@/components/ui/EnhancedLogo';
 
 const Header = () => {
   const { user, signOut } = useAuthContext();
@@ -23,10 +24,7 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-teal to-blue-400 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">AI</span>
-            </div>
-            <span className="text-white font-bold text-xl">GenerateAI.dev</span>
+            <EnhancedLogo size="md" showText={true} />
           </Link>
 
           {/* Desktop Navigation */}
