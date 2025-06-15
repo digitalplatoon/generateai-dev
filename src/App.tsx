@@ -30,6 +30,7 @@ import Privacy from "./pages/Privacy";
 import Cookies from "./pages/Cookies";
 import NotFound from "./pages/NotFound";
 import SitemapXml from "./pages/SitemapXml";
+import GoogleAnalytics from "@/components/seo/GoogleAnalytics";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>
+          <GoogleAnalytics />
           <Toaster />
           <Sonner />
           <BrowserRouter>
