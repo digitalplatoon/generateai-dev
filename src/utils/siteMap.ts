@@ -1,4 +1,6 @@
 
+import { featuredPost, blogPosts } from '@/data/blogPosts';
+
 export interface SiteMapRoute {
   path: string;
   priority: number;
@@ -28,15 +30,30 @@ export const siteMapRoutes: SiteMapRoute[] = [
   { path: '/cookies', priority: 0.3, changefreq: 'yearly' }
 ];
 
+const allBlogPosts = [featuredPost, ...blogPosts];
+
 export const generateSitemap = (baseUrl: string = 'https://generateai.dev'): string => {
-  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${siteMapRoutes.map(route => `  <url>
+  const staticUrls = siteMapRoutes.map(route => `  <url>
     <loc>${baseUrl}${route.path}</loc>
     <lastmod>${route.lastmod || new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>${route.changefreq}</changefreq>
     <priority>${route.priority}</priority>
-  </url>`).join('\n')}
+  </url>`).join('\n');
+
+  const blogPostUrls = allBlogPosts.map(post => {
+    const postDate = new Date(post.date).toISOString().split('T')[0];
+    return `  <url>
+    <loc>${baseUrl}/blog/${post.slug}</loc>
+    <lastmod>${postDate}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>`;
+  }).join('\n');
+
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${staticUrls}
+${blogPostUrls}
 </urlset>`;
 
   return sitemap;

@@ -9,7 +9,7 @@ interface SEOHeadProps {
   image?: string;
   url?: string;
   type?: string;
-  schema?: object;
+  schema?: object | object[];
   canonical?: string;
 }
 
@@ -24,7 +24,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   canonical
 }) => {
   const fullTitle = title.includes('GenerateAI.dev') ? title : `${title} | GenerateAI.dev`;
-  const currentUrl = canonical || `${url}${window.location.pathname}`;
+  const currentUrl = canonical || (typeof window !== 'undefined' ? `${url}${window.location.pathname}` : url);
 
   return (
     <Helmet>
@@ -65,10 +65,17 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       <meta name="apple-mobile-web-app-title" content="GenerateAI.dev" />
 
       {/* Schema.org JSON-LD */}
-      {schema && (
-        <script type="application/ld+json">
-          {JSON.stringify(schema)}
-        </script>
+      {schema && (Array.isArray(schema) ? (
+          schema.map((s, i) => (
+            <script key={`schema-${i}`} type="application/ld+json">
+              {JSON.stringify(s)}
+            </script>
+          ))
+        ) : (
+          <script type="application/ld+json">
+            {JSON.stringify(schema)}
+          </script>
+        )
       )}
     </Helmet>
   );

@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { featuredPost } from '@/data/blogPosts';
 
 export const OrganizationSchema = {
   "@context": "https://schema.org",
@@ -70,3 +70,32 @@ export const CourseSchema = {
   "courseMode": "online",
   "educationalLevel": "intermediate"
 };
+
+type Post = typeof featuredPost;
+
+export const createBlogPostingSchema = (post: Post, url: string) => ({
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": post.title,
+  "description": post.excerpt,
+  "image": post.image,
+  "url": url,
+  "datePublished": new Date(post.date).toISOString(),
+  "dateModified": new Date(post.date).toISOString(), // Assuming no modified date is available
+  "author": {
+    "@type": "Person",
+    "name": post.author
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "GenerateAI.dev",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://generateai.dev/logo.png"
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": url
+  }
+});

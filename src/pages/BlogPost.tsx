@@ -4,6 +4,7 @@ import { featuredPost, blogPosts as allPosts } from '@/data/blogPosts';
 import SEOHead from '@/components/seo/SEOHead';
 import { Calendar, User, ArrowRight, Tag } from "lucide-react";
 import NotFound from './NotFound';
+import { createBlogPostingSchema } from '@/components/seo/StructuredData';
 
 const BlogPost = () => {
   const { slug } = useParams();
@@ -14,6 +15,8 @@ const BlogPost = () => {
     return <NotFound />;
   }
 
+  const postUrl = `https://generateai.dev/blog/${post.slug}`;
+  const articleSchema = createBlogPostingSchema(post, postUrl);
   const relatedPosts = allPosts.filter(p => p.category === post.category && p.slug !== post.slug).slice(0, 3);
 
   return (
@@ -24,7 +27,8 @@ const BlogPost = () => {
         keywords={post.tags?.join(', ')}
         image={post.image}
         type="article"
-        canonical={`https://generateai.dev/blog/${post.slug}`}
+        canonical={postUrl}
+        schema={articleSchema}
       />
       <div className="bg-navy text-white">
         <article>
