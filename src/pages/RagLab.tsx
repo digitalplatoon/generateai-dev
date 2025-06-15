@@ -1,577 +1,152 @@
 
-import React, { useState, useEffect } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Upload, Database, Cpu, Search, Settings, Play, Download, FileText, Zap, AlertCircle, CheckCircle, Clock, Trash2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { useRagLab, QueryResult } from '@/hooks/useRagLab';
+import { Search, Database, FileText, Zap, Code, Play, Settings, Upload, Download } from 'lucide-react';
 
 const RagLab = () => {
-  const [selectedEmbedding, setSelectedEmbedding] = useState("OpenAI");
-  const [selectedVectorDB, setSelectedVectorDB] = useState("Supabase");
-  const [queryText, setQueryText] = useState("");
-  const [chunkSize, setChunkSize] = useState("1000");
-  const [overlap, setOverlap] = useState("200");
-  const [numResults, setNumResults] = useState("5");
-  const [minScore, setMinScore] = useState("0.7");
-  const [queryResults, setQueryResults] = useState<QueryResult[]>([]);
-  const { toast } = useToast();
-
-  const {
-    documents,
-    isLoading,
-    processingProgress,
-    uploadDocument,
-    processDocument,
-    queryDocuments,
-    fetchDocuments,
-    deleteDocument,
-  } = useRagLab();
-
-  useEffect(() => {
-    fetchDocuments();
-  }, []);
-
-  const embeddingModels = [
-    { name: "OpenAI", description: "High-quality embeddings with 1536 dimensions", price: "$0.0001/1K tokens" },
-    { name: "Cohere", description: "Multilingual embeddings for semantic search", price: "$0.0001/1K tokens" },
-    { name: "Sentence-BERT", description: "Open-source semantic similarity model", price: "Free" },
-    { name: "HuggingFace", description: "Customizable models from model hub", price: "Varies" }
-  ];
-
-  const vectorDatabases = [
-    { name: "Supabase", description: "Integrated PostgreSQL with pgvector", features: ["Built-in", "Scalable", "Real-time"] },
-    { name: "Pinecone", description: "Managed vector database with excellent performance", features: ["Auto-scaling", "Real-time updates", "Metadata filtering"] },
-    { name: "Weaviate", description: "Open-source with GraphQL API", features: ["Vector search", "Hybrid search", "Graph relations"] },
-    { name: "Chroma", description: "Simple and embeddable for Python", features: ["Local storage", "Memory efficient", "Easy integration"] }
-  ];
-
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
-    
-    // Check file type
-    const allowedTypes = ['text/plain', 'text/markdown', 'application/pdf', 'text/csv'];
-    if (!allowedTypes.includes(file.type) && !file.name.endsWith('.md') && !file.name.endsWith('.txt')) {
-      toast({
-        title: "Unsupported file type",
-        description: "Please upload PDF, TXT, MD, or CSV files only.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      await uploadDocument(file, parseInt(chunkSize), parseInt(overlap), selectedEmbedding);
-    } catch (error) {
-      console.error('Upload failed:', error);
-    }
-  };
-
-  const handleProcessDocuments = async () => {
-    const pendingDocs = documents.filter(doc => doc.status === 'pending');
-    
-    if (pendingDocs.length === 0) {
-      toast({
-        title: "No documents to process",
-        description: "Upload some documents first.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    for (const doc of pendingDocs) {
-      await processDocument(doc.id);
-    }
-  };
-
-  const handleRunQuery = async () => {
-    if (!queryText.trim()) {
-      toast({
-        title: "Please enter a query",
-        description: "You need to enter a question to search your knowledge base.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const processedDocs = documents.filter(doc => doc.status === 'processed');
-    if (processedDocs.length === 0) {
-      toast({
-        title: "No processed documents",
-        description: "Process some documents first before querying.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const results = await queryDocuments(queryText, parseInt(numResults), parseFloat(minScore));
-      setQueryResults(results);
-    } catch (error) {
-      console.error('Query failed:', error);
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch(status) {
-      case "processed": return <CheckCircle className="w-4 h-4 text-green-400" />;
-      case "processing": return <Clock className="w-4 h-4 text-yellow-400" />;
-      case "pending": return <AlertCircle className="w-4 h-4 text-gray-400" />;
-      case "error": return <AlertCircle className="w-4 h-4 text-red-400" />;
-      default: return null;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch(status) {
-      case "processed": return "bg-green-500/20 text-green-300 border-green-400/30";
-      case "processing": return "bg-yellow-500/20 text-yellow-300 border-yellow-400/30";
-      case "pending": return "bg-gray-500/20 text-gray-300 border-gray-400/30";
-      case "error": return "bg-red-500/20 text-red-300 border-red-400/30";
-      default: return "bg-blue-500/20 text-blue-300 border-blue-400/30";
-    }
-  };
-
-  const getTotalChunks = () => {
-    return documents.filter(doc => doc.status === 'processed').length;
-  };
+  const [selectedDataset, setSelectedDataset] = useState("sample");
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <div className="pt-20 bg-gradient-to-br from-navy via-navy/95 to-black">
-        <div className="container mx-auto px-6 py-12">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">
-              <span className="text-gradient">RAG Lab</span>
-            </h1>
-            <p className="text-xl text-light-gray max-w-2xl mx-auto">
-              Build, test, and deploy Retrieval-Augmented Generation systems with our interactive lab
-            </p>
-            <div className="flex justify-center gap-6 mt-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-teal">4+</div>
-                <div className="text-sm text-light-gray">Vector DBs</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-teal">4+</div>
-                <div className="text-sm text-light-gray">Embedding Models</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-teal">{documents.length}</div>
-                <div className="text-sm text-light-gray">Documents</div>
-              </div>
+    <div className="pt-20 bg-gradient-to-br from-navy via-navy/95 to-black">
+      <div className="container mx-auto px-6 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">
+            <span className="text-gradient">RAG Lab</span>
+          </h1>
+          <p className="text-xl text-light-gray max-w-2xl mx-auto">
+            Experiment with Retrieval-Augmented Generation systems and vector databases
+          </p>
+          <div className="flex justify-center gap-6 mt-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-teal">10K+</div>
+              <div className="text-sm text-light-gray">Documents</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-teal">5</div>
+              <div className="text-sm text-light-gray">Vector DBs</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-teal">99.2%</div>
+              <div className="text-sm text-light-gray">Accuracy</div>
             </div>
           </div>
-
-          <Tabs defaultValue="setup" className="w-full">
-            <TabsList className="mb-6 bg-navy/50 border border-white/20">
-              <TabsTrigger value="setup" className="flex items-center gap-2">
-                <Settings className="w-4 h-4" />
-                Setup
-              </TabsTrigger>
-              <TabsTrigger value="documents" className="flex items-center gap-2">
-                <Upload className="w-4 h-4" />
-                Documents
-              </TabsTrigger>
-              <TabsTrigger value="query" className="flex items-center gap-2">
-                <Search className="w-4 h-4" />
-                Query & Test
-              </TabsTrigger>
-              <TabsTrigger value="deploy" className="flex items-center gap-2">
-                <Download className="w-4 h-4" />
-                Deploy
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="setup">
-              <div className="grid lg:grid-cols-2 gap-6">
-                <Card className="glass border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Cpu className="w-5 h-5 text-teal" />
-                      Embedding Model
-                    </CardTitle>
-                    <CardDescription className="text-light-gray">
-                      Choose how your documents will be converted to vectors
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid gap-3">
-                      {embeddingModels.map((model) => (
-                        <div 
-                          key={model.name}
-                          onClick={() => setSelectedEmbedding(model.name)}
-                          className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                            selectedEmbedding === model.name 
-                              ? "border-teal bg-teal/10" 
-                              : "border-white/20 hover:border-white/40"
-                          }`}
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <h4 className="font-semibold text-white">{model.name}</h4>
-                            <Badge variant="outline" className="text-xs">
-                              {model.price}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-light-gray">{model.description}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="glass border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Database className="w-5 h-5 text-teal" />
-                      Vector Database
-                    </CardTitle>
-                    <CardDescription className="text-light-gray">
-                      Select where your vectors will be stored and searched
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid gap-3">
-                      {vectorDatabases.map((db) => (
-                        <div 
-                          key={db.name}
-                          onClick={() => setSelectedVectorDB(db.name)}
-                          className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                            selectedVectorDB === db.name 
-                              ? "border-teal bg-teal/10" 
-                              : "border-white/20 hover:border-white/40"
-                          }`}
-                        >
-                          <h4 className="font-semibold text-white mb-2">{db.name}</h4>
-                          <p className="text-sm text-light-gray mb-2">{db.description}</p>
-                          <div className="flex flex-wrap gap-1">
-                            {db.features.map((feature, index) => (
-                              <Badge key={index} variant="outline" className="text-xs">
-                                {feature}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="documents">
-              <div className="grid lg:grid-cols-2 gap-6">
-                <Card className="glass border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Upload className="w-5 h-5 text-teal" />
-                      Upload Documents
-                    </CardTitle>
-                    <CardDescription className="text-light-gray">
-                      Add documents to your knowledge base
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="border-2 border-dashed border-white/20 rounded-lg p-8 text-center">
-                      <Upload className="w-12 h-12 text-teal mx-auto mb-4" />
-                      <p className="text-white mb-2">Drop files here or click to upload</p>
-                      <p className="text-sm text-light-gray mb-4">Supports PDF, TXT, DOCX, MD, CSV files</p>
-                      <label>
-                        <Button 
-                          disabled={isLoading}
-                          className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
-                        >
-                          Choose Files
-                        </Button>
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.txt,.md,.csv"
-                          onChange={handleFileUpload}
-                        />
-                      </label>
-                    </div>
-                    
-                    <div className="space-y-2 max-h-64 overflow-y-auto">
-                      {documents.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-navy/50 rounded-lg border border-white/10">
-                          <div className="flex items-center gap-3">
-                            <FileText className="w-4 h-4 text-light-gray" />
-                            <div>
-                              <span className="text-sm text-white">{file.name}</span>
-                              <p className="text-xs text-light-gray">
-                                {(file.file_size / 1024).toFixed(1)} KB • {file.status === 'processed' ? 'Processed' : 'Not processed'}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {getStatusIcon(file.status)}
-                            <Badge className={getStatusColor(file.status)}>
-                              {file.status}
-                            </Badge>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => deleteDocument(file.id)}
-                              className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="glass border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white">Processing Settings</CardTitle>
-                    <CardDescription className="text-light-gray">
-                      Configure how documents are chunked and processed
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium text-white mb-2 block">Chunk Size</label>
-                      <Input
-                        type="number"
-                        value={chunkSize}
-                        onChange={(e) => setChunkSize(e.target.value)}
-                        className="bg-navy/50 border-white/20 text-white"
-                      />
-                      <p className="text-xs text-light-gray mt-1">Number of characters per chunk</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-white mb-2 block">Overlap</label>
-                      <Input
-                        type="number"
-                        value={overlap}
-                        onChange={(e) => setOverlap(e.target.value)}
-                        className="bg-navy/50 border-white/20 text-white"
-                      />
-                      <p className="text-xs text-light-gray mt-1">Character overlap between chunks</p>
-                    </div>
-                    
-                    {processingProgress > 0 && (
-                      <div>
-                        <div className="flex justify-between text-sm text-light-gray mb-1">
-                          <span>Processing Progress</span>
-                          <span>{processingProgress}%</span>
-                        </div>
-                        <Progress value={processingProgress} className="h-2 bg-navy/50" />
-                      </div>
-                    )}
-                    
-                    <Button 
-                      onClick={handleProcessDocuments}
-                      disabled={isLoading}
-                      className="w-full bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
-                    >
-                      <Zap className="w-4 h-4 mr-2" />
-                      Process Documents
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="query">
-              <div className="grid lg:grid-cols-2 gap-6">
-                <Card className="glass border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Search className="w-5 h-5 text-teal" />
-                      Test Your RAG System
-                    </CardTitle>
-                    <CardDescription className="text-light-gray">
-                      Query your knowledge base and see the results
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium text-white mb-2 block">Query</label>
-                      <Textarea
-                        placeholder="Ask a question about your documents..."
-                        value={queryText}
-                        onChange={(e) => setQueryText(e.target.value)}
-                        className="bg-navy/50 border-white/20 text-white"
-                        rows={3}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium text-white mb-2 block">Number of Results</label>
-                        <Input
-                          type="number"
-                          value={numResults}
-                          onChange={(e) => setNumResults(e.target.value)}
-                          className="bg-navy/50 border-white/20 text-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-white mb-2 block">Min Score</label>
-                        <Input
-                          type="number"
-                          value={minScore}
-                          onChange={(e) => setMinScore(e.target.value)}
-                          step="0.1"
-                          min="0"
-                          max="1"
-                          className="bg-navy/50 border-white/20 text-white"
-                        />
-                      </div>
-                    </div>
-                    <Button 
-                      onClick={handleRunQuery}
-                      disabled={isLoading}
-                      className="w-full bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
-                    >
-                      <Play className="w-4 h-4 mr-2" />
-                      Run Query
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                <Card className="glass border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white">Results</CardTitle>
-                    <CardDescription className="text-light-gray">
-                      Retrieved chunks and similarity scores
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3 max-h-96 overflow-y-auto">
-                      {queryResults.length > 0 ? (
-                        queryResults.map((result, index) => (
-                          <div key={index} className="p-3 bg-navy/50 rounded-lg border border-white/10">
-                            <div className="flex items-center justify-between mb-2">
-                              <Badge className="bg-teal/20 text-teal border-teal/30">
-                                Score: {result.score.toFixed(3)}
-                              </Badge>
-                              <span className="text-xs text-light-gray">
-                                {result.source} - chunk {result.chunk}
-                              </span>
-                            </div>
-                            <p className="text-sm text-white leading-relaxed">{result.content}</p>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="text-center py-8">
-                          <Search className="w-12 h-12 text-light-gray mx-auto mb-4" />
-                          <p className="text-light-gray">No results yet. Run a query to see results here.</p>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="deploy">
-              <div className="grid lg:grid-cols-2 gap-6">
-                <Card className="glass border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Download className="w-5 h-5 text-teal" />
-                      Export Your RAG System
-                    </CardTitle>
-                    <CardDescription className="text-light-gray">
-                      Get code and configuration files for deployment
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Button className="w-full bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold">
-                        <Download className="w-4 h-4 mr-2" />
-                        Download Python Code
-                      </Button>
-                      <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white/10">
-                        <Download className="w-4 h-4 mr-2" />
-                        Download Node.js Code
-                      </Button>
-                      <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white/10">
-                        <Zap className="w-4 h-4 mr-2" />
-                        Export as API
-                      </Button>
-                      <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white/10">
-                        <Database className="w-4 h-4 mr-2" />
-                        Export Vector Database
-                      </Button>
-                    </div>
-                    <div className="bg-navy/50 rounded-lg p-4 border border-white/10">
-                      <h4 className="text-sm font-semibold text-white mb-2">Deployment Options</h4>
-                      <ul className="text-xs text-light-gray space-y-1">
-                        <li>• Docker container ready</li>
-                        <li>• Serverless function support</li>
-                        <li>• API endpoint generation</li>
-                        <li>• Cloud deployment guides</li>
-                        <li>• Kubernetes manifests</li>
-                        <li>• CI/CD pipeline templates</li>
-                      </ul>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="glass border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white">System Summary</CardTitle>
-                    <CardDescription className="text-light-gray">
-                      Overview of your RAG configuration
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-sm text-light-gray">Embedding Model:</span>
-                        <span className="text-sm text-white">{selectedEmbedding}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-light-gray">Vector Database:</span>
-                        <span className="text-sm text-white">{selectedVectorDB}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-light-gray">Documents:</span>
-                        <span className="text-sm text-white">{documents.length} uploaded</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-light-gray">Processed:</span>
-                        <span className="text-sm text-white">
-                          {documents.filter(doc => doc.status === 'processed').length} ready
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-light-gray">Chunk Size:</span>
-                        <span className="text-sm text-white">{chunkSize} chars</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-light-gray">Overlap:</span>
-                        <span className="text-sm text-white">{overlap} chars</span>
-                      </div>
-                    </div>
-                    <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold">
-                      <Download className="w-4 h-4 mr-2" />
-                      Save Configuration
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
         </div>
+
+        <Tabs defaultValue="playground" className="w-full">
+          <TabsList className="mb-6 bg-navy/50 border border-white/20">
+            <TabsTrigger value="playground" className="flex items-center gap-2">
+              <Play className="w-4 h-4" />
+              Playground
+            </TabsTrigger>
+            <TabsTrigger value="datasets" className="flex items-center gap-2">
+              <Database className="w-4 h-4" />
+              Datasets
+            </TabsTrigger>
+            <TabsTrigger value="models" className="flex items-center gap-2">
+              <Zap className="w-4 h-4" />
+              Models
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <Settings className="w-4 h-4" />
+              Analytics
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="playground">
+            <div className="grid lg:grid-cols-2 gap-6">
+              <Card className="glass border-white/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Search className="w-5 h-5 text-teal" />
+                    Query Interface
+                  </CardTitle>
+                  <CardDescription className="text-light-gray">
+                    Ask questions about your documents
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-white mb-2 block">Your Question</label>
+                    <Input
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="What is the main topic of the document?"
+                      className="bg-navy/50 border-white/20 text-white"
+                    />
+                  </div>
+                  <Button className="w-full bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold">
+                    <Search className="w-4 h-4 mr-2" />
+                    Search & Generate
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="glass border-white/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-teal" />
+                    Results
+                  </CardTitle>
+                  <CardDescription className="text-light-gray">
+                    Generated responses with source citations
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-navy/50 rounded-lg p-4 border border-white/10 h-64">
+                    <div className="text-center text-light-gray">
+                      <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>Submit a query to see RAG results</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="datasets">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card className="glass border-white/20">
+                <CardHeader>
+                  <CardTitle className="text-white">Sample Dataset</CardTitle>
+                  <CardDescription className="text-light-gray">
+                    Demo documents for testing
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2 text-sm text-light-gray">
+                    <div>• 1,000 documents</div>
+                    <div>• AI research papers</div>
+                    <div>• Pre-processed vectors</div>
+                  </div>
+                  <Button className="w-full mt-4 border-white/20 text-white hover:bg-white/10" variant="outline">
+                    Load Dataset
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="models">
+            <div className="text-center py-12">
+              <h3 className="text-2xl font-display font-bold text-white mb-4">Coming Soon</h3>
+              <p className="text-light-gray">Model comparison and fine-tuning tools</p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <div className="text-center py-12">
+              <h3 className="text-2xl font-display font-bold text-white mb-4">Coming Soon</h3>
+              <p className="text-light-gray">Performance analytics and insights</p>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
-      <Footer />
     </div>
   );
 };

@@ -1,7 +1,4 @@
-
 import React, { useState } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -178,32 +175,30 @@ const PromptLibrary = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <div className="pt-20 bg-gradient-to-br from-navy via-navy/95 to-black">
-        <div className="container mx-auto px-6 py-12">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">
-              <span className="text-gradient">Prompt Library</span>
-            </h1>
-            <p className="text-xl text-light-gray max-w-2xl mx-auto">
-              Discover, share, and optimize AI prompts for every use case
-            </p>
-            <div className="flex justify-center gap-4 mt-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-teal">{prompts.length}+</div>
-                <div className="text-sm text-light-gray">Prompts</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-teal">50K+</div>
-                <div className="text-sm text-light-gray">Downloads</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-teal">4.7</div>
-                <div className="text-sm text-light-gray">Avg Rating</div>
-              </div>
+    <div className="pt-20 bg-gradient-to-br from-navy via-navy/95 to-black">
+      <div className="container mx-auto px-6 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">
+            <span className="text-gradient">Prompt Library</span>
+          </h1>
+          <p className="text-xl text-light-gray max-w-2xl mx-auto">
+            Discover, share, and optimize AI prompts for every use case
+          </p>
+          <div className="flex justify-center gap-4 mt-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-teal">{prompts.length}+</div>
+              <div className="text-sm text-light-gray">Prompts</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-teal">50K+</div>
+              <div className="text-sm text-light-gray">Downloads</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-teal">4.7</div>
+              <div className="text-sm text-light-gray">Avg Rating</div>
             </div>
           </div>
+        </div>
 
           {/* Search and Actions */}
           <div className="glass rounded-xl p-6 mb-8">
@@ -383,7 +378,6 @@ const PromptLibrary = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

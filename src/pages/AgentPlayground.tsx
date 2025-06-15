@@ -1,7 +1,4 @@
-
 import React, { useState } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -135,257 +132,181 @@ const AgentPlayground = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <div className="pt-20 bg-gradient-to-br from-navy via-navy/95 to-black">
-        <div className="container mx-auto px-6 py-12">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">
-              <span className="text-gradient">Agent Playground</span>
-            </h1>
-            <p className="text-xl text-light-gray max-w-2xl mx-auto">
-              Build, test, and deploy AI agents with our visual workflow builder
-            </p>
-            <div className="flex justify-center gap-6 mt-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-teal">50+</div>
-                <div className="text-sm text-light-gray">Templates</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-teal">20+</div>
-                <div className="text-sm text-light-gray">Integrations</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-teal">1K+</div>
-                <div className="text-sm text-light-gray">Deployed Agents</div>
-              </div>
+    <div className="pt-20 bg-gradient-to-br from-navy via-navy/95 to-black">
+      <div className="container mx-auto px-6 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">
+            <span className="text-gradient">Agent Playground</span>
+          </h1>
+          <p className="text-xl text-light-gray max-w-2xl mx-auto">
+            Build, test, and deploy AI agents with our visual workflow builder
+          </p>
+          <div className="flex justify-center gap-6 mt-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-teal">50+</div>
+              <div className="text-sm text-light-gray">Templates</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-teal">20+</div>
+              <div className="text-sm text-light-gray">Integrations</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-teal">1K+</div>
+              <div className="text-sm text-light-gray">Deployed Agents</div>
             </div>
           </div>
+        </div>
 
-          <Tabs defaultValue="templates" className="w-full">
-            <TabsList className="mb-6 bg-navy/50 border border-white/20">
-              <TabsTrigger value="templates" className="flex items-center gap-2">
-                <Bot className="w-4 h-4" />
-                Templates
-              </TabsTrigger>
-              <TabsTrigger value="builder" className="flex items-center gap-2">
-                <Workflow className="w-4 h-4" />
-                Builder
-              </TabsTrigger>
-              <TabsTrigger value="test" className="flex items-center gap-2">
-                <Play className="w-4 h-4" />
-                Test
-              </TabsTrigger>
-              <TabsTrigger value="deploy" className="flex items-center gap-2">
-                <Zap className="w-4 h-4" />
-                Deploy
-              </TabsTrigger>
-            </TabsList>
+        <Tabs defaultValue="templates" className="w-full">
+          <TabsList className="mb-6 bg-navy/50 border border-white/20">
+            <TabsTrigger value="templates" className="flex items-center gap-2">
+              <Bot className="w-4 h-4" />
+              Templates
+            </TabsTrigger>
+            <TabsTrigger value="builder" className="flex items-center gap-2">
+              <Workflow className="w-4 h-4" />
+              Builder
+            </TabsTrigger>
+            <TabsTrigger value="test" className="flex items-center gap-2">
+              <Play className="w-4 h-4" />
+              Test
+            </TabsTrigger>
+            <TabsTrigger value="deploy" className="flex items-center gap-2">
+              <Zap className="w-4 h-4" />
+              Deploy
+            </TabsTrigger>
+          </TabsList>
 
-            <TabsContent value="templates">
-              <div className="mb-8">
-                <h2 className="text-2xl font-display font-bold text-white mb-4">Choose an Agent Template</h2>
-                <p className="text-light-gray mb-6">Start with a pre-built agent template and customize it to your needs</p>
-                
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {agentTemplates.map((template, index) => (
-                    <Card 
-                      key={index} 
-                      className={`glass border-white/20 hover-glow transition-all duration-300 hover:scale-105 cursor-pointer ${
-                        selectedTemplate === template.name ? 'border-teal/50 bg-teal/10' : ''
-                      }`}
-                      onClick={() => handleTemplateSelect(template.name)}
-                    >
-                      <CardHeader>
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-3">
-                            <span className="text-2xl">{template.icon}</span>
-                            <div>
-                              <CardTitle className="text-xl font-display text-white">
-                                {template.name}
-                              </CardTitle>
-                            </div>
+          <TabsContent value="templates">
+            <div className="mb-8">
+              <h2 className="text-2xl font-display font-bold text-white mb-4">Choose an Agent Template</h2>
+              <p className="text-light-gray mb-6">Start with a pre-built agent template and customize it to your needs</p>
+              
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {agentTemplates.map((template, index) => (
+                  <Card 
+                    key={index} 
+                    className={`glass border-white/20 hover-glow transition-all duration-300 hover:scale-105 cursor-pointer ${
+                      selectedTemplate === template.name ? 'border-teal/50 bg-teal/10' : ''
+                    }`}
+                    onClick={() => handleTemplateSelect(template.name)}
+                  >
+                    <CardHeader>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{template.icon}</span>
+                          <div>
+                            <CardTitle className="text-xl font-display text-white">
+                              {template.name}
+                            </CardTitle>
                           </div>
-                          <Badge variant="outline" className={getComplexityColor(template.complexity)}>
-                            {template.complexity}
-                          </Badge>
                         </div>
-                        <CardDescription className="text-light-gray">
-                          {template.description}
-                        </CardDescription>
-                        <div className="flex items-center gap-2 text-sm text-light-gray">
-                          <span>⏱️ {template.estimatedTime}</span>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <Button 
-                          className={`w-full ${
-                            selectedTemplate === template.name 
-                              ? 'bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold'
-                              : 'border-white/20 text-white hover:bg-white/10'
-                          }`}
-                          variant={selectedTemplate === template.name ? "default" : "outline"}
-                        >
-                          {selectedTemplate === template.name ? 'Selected' : 'Select Template'}
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-
-                <div className="mt-8 flex justify-center">
-                  <Button className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold">
-                    Start with {selectedTemplate}
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="builder">
-              <div className="grid lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
-                  <Card className="glass border-white/20 h-96">
-                    <CardHeader>
-                      <CardTitle className="text-white flex items-center gap-2">
-                        <Workflow className="w-5 h-5 text-teal" />
-                        Visual Workflow Builder
-                      </CardTitle>
+                        <Badge variant="outline" className={getComplexityColor(template.complexity)}>
+                          {template.complexity}
+                        </Badge>
+                      </div>
                       <CardDescription className="text-light-gray">
-                        Drag and drop components to build your agent workflow
+                        {template.description}
                       </CardDescription>
-                    </CardHeader>
-                    <CardContent className="h-full">
-                      <div className="border-2 border-dashed border-white/20 rounded-lg h-full flex items-center justify-center">
-                        <div className="text-center">
-                          <Workflow className="w-16 h-16 text-teal mx-auto mb-4" />
-                          <p className="text-white mb-2">Visual Builder Interface</p>
-                          <p className="text-sm text-light-gray">Drag components from the right panel to build your workflow</p>
-                          <Button className="mt-4 bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold">
-                            Open Builder
-                          </Button>
-                        </div>
+                      <div className="flex items-center gap-2 text-sm text-light-gray">
+                        <span>⏱️ {template.estimatedTime}</span>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <div className="space-y-6">
-                  <Card className="glass border-white/20">
-                    <CardHeader>
-                      <CardTitle className="text-white flex items-center gap-2">
-                        <Settings className="w-5 h-5 text-teal" />
-                        Agent Settings
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <label className="text-sm font-medium text-white mb-2 block">Agent Name</label>
-                        <Input
-                          value={agentName}
-                          onChange={(e) => setAgentName(e.target.value)}
-                          className="bg-navy/50 border-white/20 text-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-white mb-2 block">Model</label>
-                        <select 
-                          value={selectedModel}
-                          onChange={(e) => setSelectedModel(e.target.value)}
-                          className="w-full p-2 bg-navy/50 border border-white/20 rounded text-white"
-                        >
-                          <option value="GPT-4">GPT-4</option>
-                          <option value="GPT-3.5 Turbo">GPT-3.5 Turbo</option>
-                          <option value="Claude">Claude</option>
-                          <option value="Gemini">Gemini</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-white mb-2 block">
-                          Temperature: {temperature}
-                        </label>
-                        <input
-                          type="range"
-                          min="0"
-                          max="2"
-                          step="0.1"
-                          value={temperature}
-                          onChange={(e) => setTemperature(Number(e.target.value))}
-                          className="w-full"
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="glass border-white/20">
-                    <CardHeader>
-                      <CardTitle className="text-white flex items-center gap-2">
-                        <Cpu className="w-5 h-5 text-teal" />
-                        Components
-                      </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-2">
-                        {workflowComponents.map((component) => (
-                          <div 
-                            key={component.name} 
-                            className="flex items-center gap-3 p-3 bg-navy/50 rounded border border-white/10 text-sm text-white cursor-pointer hover:bg-white/10 transition-colors"
-                          >
-                            <component.icon className="w-4 h-4 text-teal" />
-                            <div>
-                              <div className="font-medium">{component.name}</div>
-                              <div className="text-xs text-light-gray">{component.description}</div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                      <Button 
+                        className={`w-full ${
+                          selectedTemplate === template.name 
+                            ? 'bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold'
+                            : 'border-white/20 text-white hover:bg-white/10'
+                        }`}
+                        variant={selectedTemplate === template.name ? "default" : "outline"}
+                      >
+                        {selectedTemplate === template.name ? 'Selected' : 'Select Template'}
+                      </Button>
                     </CardContent>
                   </Card>
-                </div>
+                ))}
               </div>
-            </TabsContent>
 
-            <TabsContent value="test">
-              <div className="grid lg:grid-cols-2 gap-6">
+              <div className="mt-8 flex justify-center">
+                <Button className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold">
+                  Start with {selectedTemplate}
+                </Button>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="builder">
+            <div className="grid lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <Card className="glass border-white/20 h-96">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Workflow className="w-5 h-5 text-teal" />
+                      Visual Workflow Builder
+                    </CardTitle>
+                    <CardDescription className="text-light-gray">
+                      Drag and drop components to build your agent workflow
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="h-full">
+                    <div className="border-2 border-dashed border-white/20 rounded-lg h-full flex items-center justify-center">
+                      <div className="text-center">
+                        <Workflow className="w-16 h-16 text-teal mx-auto mb-4" />
+                        <p className="text-white mb-2">Visual Builder Interface</p>
+                        <p className="text-sm text-light-gray">Drag components from the right panel to build your workflow</p>
+                        <Button className="mt-4 bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold">
+                          Open Builder
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="space-y-6">
                 <Card className="glass border-white/20">
                   <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2">
-                      <MessageSquare className="w-5 h-5 text-teal" />
-                      Test Your Agent
+                      <Settings className="w-5 h-5 text-teal" />
+                      Agent Settings
                     </CardTitle>
-                    <CardDescription className="text-light-gray">
-                      Chat with your agent to test its responses
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="bg-navy/50 rounded-lg p-4 border border-white/10 h-64 overflow-y-auto">
-                      <div className="space-y-3">
-                        {chatMessages.map((message, index) => (
-                          <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
-                              message.role === 'user' 
-                                ? 'bg-teal/20 text-teal' 
-                                : 'bg-white/10 text-white'
-                            }`}>
-                              {message.content}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
+                    <div>
+                      <label className="text-sm font-medium text-white mb-2 block">Agent Name</label>
                       <Input
-                        placeholder="Type your message..."
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                        value={agentName}
+                        onChange={(e) => setAgentName(e.target.value)}
                         className="bg-navy/50 border-white/20 text-white"
                       />
-                      <Button 
-                        onClick={handleSendMessage}
-                        className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-white mb-2 block">Model</label>
+                      <select 
+                        value={selectedModel}
+                        onChange={(e) => setSelectedModel(e.target.value)}
+                        className="w-full p-2 bg-navy/50 border border-white/20 rounded text-white"
                       >
-                        Send
-                      </Button>
+                        <option value="GPT-4">GPT-4</option>
+                        <option value="GPT-3.5 Turbo">GPT-3.5 Turbo</option>
+                        <option value="Claude">Claude</option>
+                        <option value="Gemini">Gemini</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-white mb-2 block">
+                        Temperature: {temperature}
+                      </label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="2"
+                        step="0.1"
+                        value={temperature}
+                        onChange={(e) => setTemperature(Number(e.target.value))}
+                        className="w-full"
+                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -393,43 +314,116 @@ const AgentPlayground = () => {
                 <Card className="glass border-white/20">
                   <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2">
-                      <BarChart3 className="w-5 h-5 text-teal" />
-                      Performance Metrics
+                      <Cpu className="w-5 h-5 text-teal" />
+                      Components
                     </CardTitle>
-                    <CardDescription className="text-light-gray">
-                      Monitor your agent's performance and responses
-                    </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="text-center p-3 bg-navy/50 rounded-lg border border-white/10">
-                          <div className="text-lg font-bold text-teal">{performanceMetrics.responseTime}</div>
-                          <div className="text-xs text-light-gray">Avg Response Time</div>
+                    <div className="space-y-2">
+                      {workflowComponents.map((component) => (
+                        <div 
+                          key={component.name} 
+                          className="flex items-center gap-3 p-3 bg-navy/50 rounded border border-white/10 text-sm text-white cursor-pointer hover:bg-white/10 transition-colors"
+                        >
+                          <component.icon className="w-4 h-4 text-teal" />
+                          <div>
+                            <div className="font-medium">{component.name}</div>
+                            <div className="text-xs text-light-gray">{component.description}</div>
+                          </div>
                         </div>
-                        <div className="text-center p-3 bg-navy/50 rounded-lg border border-white/10">
-                          <div className="text-lg font-bold text-green-300">{performanceMetrics.successRate}</div>
-                          <div className="text-xs text-light-gray">Success Rate</div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="test">
+            <div className="grid lg:grid-cols-2 gap-6">
+              <Card className="glass border-white/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <MessageSquare className="w-5 h-5 text-teal" />
+                    Test Your Agent
+                  </CardTitle>
+                  <CardDescription className="text-light-gray">
+                    Chat with your agent to test its responses
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-navy/50 rounded-lg p-4 border border-white/10 h-64 overflow-y-auto">
+                    <div className="space-y-3">
+                      {chatMessages.map((message, index) => (
+                        <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                          <div className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
+                            message.role === 'user' 
+                              ? 'bg-teal/20 text-teal' 
+                              : 'bg-white/10 text-white'
+                          }`}>
+                            {message.content}
+                          </div>
                         </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Type your message..."
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                      className="bg-navy/50 border-white/20 text-white"
+                    />
+                    <Button 
+                      onClick={handleSendMessage}
+                      className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
+                    >
+                      Send
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass border-white/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-teal" />
+                    Performance Metrics
+                  </CardTitle>
+                  <CardDescription className="text-light-gray">
+                    Monitor your agent's performance and responses
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center p-3 bg-navy/50 rounded-lg border border-white/10">
+                        <div className="text-lg font-bold text-teal">{performanceMetrics.responseTime}</div>
+                        <div className="text-xs text-light-gray">Avg Response Time</div>
                       </div>
-                      
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-light-gray">Total Interactions</span>
-                          <span className="text-sm text-white">{performanceMetrics.totalInteractions.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-light-gray">Tokens Used</span>
-                          <span className="text-sm text-white">{performanceMetrics.tokensUsed.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-light-gray">Average Rating</span>
-                          <span className="text-sm text-white">{performanceMetrics.averageRating}/5.0</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-light-gray">Active Users</span>
-                          <span className="text-sm text-white">{performanceMetrics.activeUsers}</span>
-                        </div>
+                      <div className="text-center p-3 bg-navy/50 rounded-lg border border-white/10">
+                        <div className="text-lg font-bold text-green-300">{performanceMetrics.successRate}</div>
+                        <div className="text-xs text-light-gray">Success Rate</div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-light-gray">Total Interactions</span>
+                        <span className="text-sm text-white">{performanceMetrics.totalInteractions.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-light-gray">Tokens Used</span>
+                        <span className="text-sm text-white">{performanceMetrics.tokensUsed.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-light-gray">Average Rating</span>
+                        <span className="text-sm text-white">{performanceMetrics.averageRating}/5.0</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-light-gray">Active Users</span>
+                        <span className="text-sm text-white">{performanceMetrics.activeUsers}</span>
                       </div>
                     </div>
                   </CardContent>
@@ -536,7 +530,6 @@ const AgentPlayground = () => {
           </Tabs>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

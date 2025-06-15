@@ -1,7 +1,4 @@
-
 import React, { useState } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -253,18 +250,16 @@ const LearningPaths = () => {
   };
 
   return (
-    <div className="min-h-screen">
-      <Header />
-      <div className="pt-20 bg-gradient-to-br from-navy via-navy/95 to-black">
-        <div className="container mx-auto px-6 py-12">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">
-              <span className="text-gradient">Learning Paths</span>
-            </h1>
-            <p className="text-xl text-light-gray max-w-2xl mx-auto">
-              Curated roadmaps to master AI development with interactive labs and NFT badges
-            </p>
-          </div>
+    <div className="pt-20 bg-gradient-to-br from-navy via-navy/95 to-black">
+      <div className="container mx-auto px-6 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">
+            <span className="text-gradient">Learning Paths</span>
+          </h1>
+          <p className="text-xl text-light-gray max-w-2xl mx-auto">
+            Curated roadmaps to master AI development with interactive labs and NFT badges
+          </p>
+        </div>
 
           {/* Search and Filters */}
           <div className="glass rounded-xl p-6 mb-8">
@@ -429,8 +424,6 @@ const LearningPaths = () => {
             </div>
           </div>
         </div>
-      </div>
-      <Footer />
     </div>
   );
 };
