@@ -3,75 +3,9 @@ import Footer from "@/components/Footer";
 import { Calendar, User, ArrowRight, Tag } from "lucide-react";
 import { Link } from "react-router-dom";
 import SEOHead from "@/components/seo/SEOHead";
+import { featuredPost, blogPosts } from "@/data/blogPosts";
 
 const Blog = () => {
-  const featuredPost = {
-    title: "The Future of AI Development: Trends and Predictions for 2024",
-    excerpt: "Explore the latest trends in AI development, from advanced prompt engineering to autonomous AI agents, and discover what's coming next in the rapidly evolving AI landscape.",
-    author: "Dr. Sarah Chen",
-    date: "June 15, 2024",
-    readTime: "8 min read",
-    image: "/placeholder.svg",
-    category: "Industry Insights"
-  };
-
-  const blogPosts = [
-    {
-      title: "Building Production-Ready RAG Systems: Best Practices",
-      excerpt: "Learn how to build scalable and reliable Retrieval-Augmented Generation systems that perform well in production environments.",
-      author: "Michael Rodriguez",
-      date: "June 12, 2024",
-      readTime: "6 min read",
-      category: "Tutorial",
-      tags: ["RAG", "Production", "Best Practices"]
-    },
-    {
-      title: "Prompt Engineering Masterclass: Advanced Techniques",
-      excerpt: "Master advanced prompt engineering techniques to get better results from AI models and build more effective AI applications.",
-      author: "Emma Thompson",
-      date: "June 10, 2024",
-      readTime: "10 min read",
-      category: "Education",
-      tags: ["Prompts", "AI Models", "Techniques"]
-    },
-    {
-      title: "Community Spotlight: Amazing AI Projects Built by Our Users",
-      excerpt: "Discover incredible AI projects created by our community members, from chatbots to complex automation systems.",
-      author: "Alex Kim",
-      date: "June 8, 2024",
-      readTime: "5 min read",
-      category: "Community",
-      tags: ["Community", "Projects", "Showcase"]
-    },
-    {
-      title: "Understanding AI Agent Architecture: A Deep Dive",
-      excerpt: "Explore the fundamental concepts behind AI agents, their architecture, and how to design effective autonomous systems.",
-      author: "Dr. James Wilson",
-      date: "June 5, 2024",
-      readTime: "12 min read",
-      category: "Technical",
-      tags: ["AI Agents", "Architecture", "Deep Dive"]
-    },
-    {
-      title: "Getting Started with Fine-tuning: A Beginner's Guide",
-      excerpt: "Step-by-step guide to fine-tuning AI models for your specific use cases, including best practices and common pitfalls.",
-      author: "Lisa Park",
-      date: "June 3, 2024",
-      readTime: "7 min read",
-      category: "Tutorial",
-      tags: ["Fine-tuning", "Beginner", "Guide"]
-    },
-    {
-      title: "AI Safety and Ethics in Development: What You Need to Know",
-      excerpt: "Important considerations for building responsible AI applications, including bias mitigation and ethical guidelines.",
-      author: "Dr. Priya Sharma",
-      date: "June 1, 2024",
-      readTime: "9 min read",
-      category: "Ethics",
-      tags: ["AI Safety", "Ethics", "Responsibility"]
-    }
-  ];
-
   const categories = ["All", "Tutorial", "Industry Insights", "Community", "Technical", "Education", "Ethics"];
 
   return (
@@ -122,7 +56,7 @@ const Blog = () => {
                     <span>{featuredPost.readTime}</span>
                   </div>
                   <Link
-                    to="#"
+                    to={`/blog/${featuredPost.slug}`}
                     className="inline-flex items-center px-6 py-3 bg-teal text-navy font-semibold rounded-lg hover:bg-teal/90 transition-colors"
                   >
                     Read Article
@@ -204,7 +138,7 @@ const Blog = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-light-gray">{post.readTime}</span>
                       <Link
-                        to="#"
+                        to={`/blog/${post.slug}`}
                         className="flex items-center text-teal hover:text-teal/80 transition-colors text-sm"
                       >
                         Read More

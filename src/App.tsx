@@ -20,6 +20,7 @@ import Documentation from "./pages/Documentation";
 import ApiReference from "./pages/ApiReference";
 import Community from "./pages/Community";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import About from "./pages/About";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
@@ -57,6 +58,7 @@ const App = () => (
                   <Route path="/api" element={<ApiReference />} />
                   <Route path="/community" element={<Community />} />
                   <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/careers" element={<Careers />} />
                   <Route path="/contact" element={<Contact />} />
