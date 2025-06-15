@@ -6,7 +6,8 @@ import { SpamContentFilter } from './spamFilter';
 import { RepetitionFilter } from './repetitionFilter';
 import { ContentSanitizer } from './sanitizer';
 
-export { FilterResult, ContentSanitizer };
+export type { FilterResult };
+export { ContentSanitizer };
 
 export class ContentFilterService {
   static filterContent(text: string, strictMode: boolean = false): FilterResult {

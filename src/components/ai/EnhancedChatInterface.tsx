@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,7 @@ import { useConversations } from '@/hooks/useConversations';
 import { useAISettings } from '@/hooks/useAISettings';
 import { useAuditLog } from '@/hooks/useAuditLog';
 import { useToast } from '@/hooks/use-toast';
-import { ContentFilterService } from '@/services/contentFilterService';
+import { ContentFilterService } from '@/services/contentFilter';
 import { supabase } from '@/integrations/supabase/client';
 import { 
   Send, 
