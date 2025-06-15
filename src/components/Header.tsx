@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -78,7 +79,7 @@ const Header = () => {
                 </Link>
                 <Link
                   to="/auth"
-                  className="bg-teal text-dark-blue rounded-md px-4 py-2 hover:bg-teal-600 transition-colors"
+                  className="bg-teal text-black rounded-md px-4 py-2 hover:bg-teal-600 transition-colors"
                 >
                   Sign Up
                 </Link>
