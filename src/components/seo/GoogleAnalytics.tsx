@@ -2,9 +2,8 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
-// IMPORTANT: Replace this with your actual Google Analytics Measurement ID
-// You can also set this as an environment variable: import.meta.env.VITE_GA_TRACKING_ID
-const GA_TRACKING_ID = 'G-XXXXXXXXXX';
+// Updated with your actual Google Analytics Measurement ID
+const GA_TRACKING_ID = 'G-GPE9K29G42';
 
 const GoogleAnalytics: React.FC = () => {
   // Only add the script in production and if a valid ID is provided.
