@@ -41,6 +41,7 @@ export const BookmarkButton: React.FC<BookmarkButtonProps> = ({
       size="sm"
       onClick={handleToggle}
       className={className}
+      aria-label={bookmarked ? `Remove ${itemTitle} from bookmarks` : `Add ${itemTitle} to bookmarks`}
     >
       {bookmarked ? (
         <BookmarkCheck className="h-4 w-4 text-primary" />

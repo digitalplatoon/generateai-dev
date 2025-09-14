@@ -93,6 +93,7 @@ const HeroSection = () => {
                       index === currentTool ? 'bg-teal scale-125' : 'bg-white/30'
                     }`}
                     onClick={() => setCurrentTool(index)}
+                    aria-label={`Switch to ${toolkits[index].name} toolkit`}
                   />
                 ))}
               </div>
