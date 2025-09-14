@@ -44,7 +44,7 @@ const HeroSection = () => {
 
       <div className="container mx-auto text-center relative z-10">
         {/* Main Headline */}
-        <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 animate-slide-up">
+        <h1 className="text-5xl md:text-7xl font-display font-bold mb-6 animate-slide-up-fast">
           Your AI Copilot for{' '}
           <span className="text-gradient animate-glow">
             Code Generation
