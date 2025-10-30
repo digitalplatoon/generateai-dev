@@ -69,9 +69,9 @@ const About = () => {
   return (
     <>
       <SEOHead
-        title="About Us - Our Mission to Democratize AI | GenerateAI.dev"
-        description="Learn about GenerateAI.dev's mission to make AI development accessible to every developer. Meet our team and discover our core values."
-        keywords="about us, AI development, our mission, AI company, generative AI"
+        title="About GenerateAI.dev - AI Development Platform & Learning Hub"
+        description="GenerateAI.dev is the leading AI code generation platform helping 50K+ developers master LLMs, RAG systems & AI agents. Learn from expert tutorials, build with production-ready tools, and join our thriving developer community."
+        keywords="AI development platform, AI code generation company, LLM training, RAG systems, AI developer tools, machine learning education, AI coding platform, generative AI company, AI development team"
         canonical="https://generateai.dev/about"
       />
       <div className="bg-gradient-to-br from-navy via-navy/95 to-navy/90">

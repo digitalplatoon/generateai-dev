@@ -23,8 +23,8 @@ export const useAdminDashboard = () => {
 
     try {
       const { data, error } = await supabase.rpc('has_role', {
-        _user_id: user.id,
-        _role: 'admin'
+        user_id: user.id,
+        role: 'admin'
       });
 
       if (error) throw error;

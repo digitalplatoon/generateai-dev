@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import SEOHead from '@/components/seo/SEOHead';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +14,14 @@ const RagLab = () => {
   const [results, setResults] = useState([]);
 
   return (
-    <div className="pt-20 bg-gradient-to-br from-navy via-navy/95 to-black">
+    <>
+      <SEOHead
+        title="RAG Lab - Build Retrieval Augmented Generation Systems | GenerateAI.dev"
+        description="Interactive RAG (Retrieval-Augmented Generation) laboratory. Build RAG systems, experiment with vector databases, and learn RAG implementation. Complete RAG tutorial with code examples, architecture guides & best practices."
+        keywords="RAG systems tutorial, retrieval augmented generation, RAG implementation, build RAG system, RAG pipeline tutorial, RAG for developers, RAG system architecture, vector database tutorial, semantic search, RAG best practices, RAG development, LLM RAG integration"
+        canonical="https://generateai.dev/rag-lab"
+      />
+      <div className="pt-20 bg-gradient-to-br from-navy via-navy/95 to-black">
       <div className="container mx-auto px-6 py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">
@@ -148,6 +156,7 @@ const RagLab = () => {
         </Tabs>
       </div>
     </div>
+    </>
   );
 };
 

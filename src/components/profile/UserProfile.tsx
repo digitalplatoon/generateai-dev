@@ -306,18 +306,18 @@ export const UserProfile: React.FC = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="tech-stack">Preferred Technology</Label>
+                    <Label htmlFor="role">Learning Focus</Label>
                     <Select 
-                      value={preferences.preferred_tech_stack} 
-                      onValueChange={(value) => updatePreferences({ preferred_tech_stack: value })}
+                      value={preferences.preferred_role} 
+                      onValueChange={(value) => updatePreferences({ preferred_role: value })}
                     >
                       <SelectTrigger className="mt-2">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Python">Python</SelectItem>
-                        <SelectItem value="JavaScript">JavaScript/TypeScript</SelectItem>
-                        <SelectItem value="R">R</SelectItem>
+                        <SelectItem value="AI Developer">AI Developer</SelectItem>
+                        <SelectItem value="Data Scientist">Data Scientist</SelectItem>
+                        <SelectItem value="ML Engineer">ML Engineer</SelectItem>
                         <SelectItem value="Java">Java</SelectItem>
                         <SelectItem value="C++">C++</SelectItem>
                         <SelectItem value="Other">Other</SelectItem>

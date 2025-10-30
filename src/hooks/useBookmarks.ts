@@ -26,7 +26,7 @@ export const useBookmarks = () => {
 
     try {
       const { data, error } = await supabase
-        .from('user_bookmarks')
+        .from('bookmarks')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
@@ -58,7 +58,7 @@ export const useBookmarks = () => {
 
     try {
       const { error } = await supabase
-        .from('user_bookmarks')
+        .from('bookmarks')
         .insert({
           user_id: user.id,
           item_type: itemType,
@@ -79,7 +79,7 @@ export const useBookmarks = () => {
 
     try {
       const { error } = await supabase
-        .from('user_bookmarks')
+        .from('bookmarks')
         .delete()
         .eq('user_id', user.id)
         .eq('item_type', itemType)

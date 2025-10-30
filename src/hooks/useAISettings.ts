@@ -10,11 +10,7 @@ export interface AISettings {
   temperature: number;
   max_tokens: number;
   do_not_train_consent: boolean;
-  data_retention_days: number;
   preferred_model: string;
-  custom_instructions?: string;
-  stop_sequences: string[];
-  streaming_enabled: boolean;
   created_at: string;
   updated_at: string;
 }

@@ -6,7 +6,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 export interface OnboardingStep {
   id: string;
   step_id: string;
-  completed_at: string;
+  completed: boolean;
   created_at: string;
 }
 
@@ -33,12 +33,12 @@ export const useOnboarding = () => {
 
     try {
       const { data, error } = await supabase
-        .from('user_onboarding')
+        .from('onboarding_steps')
         .select('*')
         .eq('user_id', user.id);
 
       if (error) throw error;
-      setCompletedSteps(data || []);
+      setCompletedSteps((data || []) as OnboardingStep[]);
     } catch (error) {
       console.error('Error fetching onboarding progress:', error);
       setCompletedSteps([]);
@@ -56,7 +56,7 @@ export const useOnboarding = () => {
 
     try {
       const { error } = await supabase
-        .from('user_onboarding')
+        .from('onboarding_steps')
         .upsert({
           user_id: user.id,
           step_id: stepId,

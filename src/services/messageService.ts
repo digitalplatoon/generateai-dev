@@ -16,6 +16,7 @@ export const messageService = {
     const typedMessages: ConversationMessage[] = (data || []).map(message => ({
       ...message,
       role: message.role as 'user' | 'assistant' | 'system',
+      metadata: null,
       tokens_used: message.tokens_used || undefined,
       model_used: message.model_used || undefined,
       temperature: message.temperature || undefined
@@ -43,6 +44,7 @@ export const messageService = {
     const typedMessage: ConversationMessage = {
       ...data,
       role: data.role as 'user' | 'assistant' | 'system',
+      metadata: null,
       tokens_used: data.tokens_used || undefined,
       model_used: data.model_used || undefined,
       temperature: data.temperature || undefined

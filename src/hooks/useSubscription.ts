@@ -37,14 +37,30 @@ export const useSubscription = () => {
       }
 
       // Fallback to database lookup
-      const { data, error } = await supabase.rpc('get_user_subscription', {
-        _user_id: user.id
-      });
+      const { data, error } = await supabase
+        .from('user_subscriptions')
+        .select(`
+          *,
+          subscription_plans(*)
+        `)
+        .eq('user_id', user.id)
+        .single();
 
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') throw error;
 
-      if (data && data.length > 0) {
-        setCurrentSubscription(data[0] as CurrentSubscription);
+      if (data && data.subscription_plans) {
+        const plan = Array.isArray(data.subscription_plans) 
+          ? data.subscription_plans[0] 
+          : data.subscription_plans;
+        
+        setCurrentSubscription({
+          plan_name: plan.name || 'Starter',
+          tier: (plan.tier || 'free') as 'free' | 'basic' | 'premium' | 'enterprise',
+          status: data.status,
+          limits: typeof plan.limits === 'object' ? plan.limits as Record<string, number> : getDefaultLimits(plan.tier || 'free'),
+          features: typeof plan.features === 'object' ? plan.features as Record<string, boolean> : getDefaultFeatures(plan.tier || 'free'),
+          expires_at: data.current_period_end
+        });
       } else {
         // Default to free plan if no subscription found
         setCurrentSubscription({
@@ -147,12 +163,12 @@ export const useSubscription = () => {
       const { data, error } = await supabase
         .from('subscription_plans')
         .select('*')
-        .eq('active', true)
         .order('price_monthly', { ascending: true });
 
       if (error) throw error;
       
-      setAvailablePlans((data || []) as SubscriptionPlan[]);
+      // Type assertion to avoid infinite type instantiation
+      setAvailablePlans(data as any[] || []);
     } catch (error) {
       console.error('Error fetching plans:', error);
       toast({
@@ -167,19 +183,22 @@ export const useSubscription = () => {
     if (!user) return;
 
     try {
-      const today = new Date().toISOString().split('T')[0];
+      // user_usage table tracks monthly usage, not daily
       const { data, error } = await supabase
         .from('user_usage')
         .select('*')
         .eq('user_id', user.id)
-        .eq('date', today);
+        .gte('period_start', new Date().toISOString().split('T')[0]);
 
       if (error) throw error;
 
       const usageMap: Record<string, number> = {};
-      data?.forEach((usage: UserUsage) => {
-        usageMap[usage.feature_type] = usage.usage_count;
-      });
+      // For now, map usage to generic counts since schema differs
+      if (data && data.length > 0) {
+        const usage = data[0];
+        usageMap['chat_message'] = usage.requests_count || 0;
+        usageMap['rag_query'] = Math.floor((usage.tokens_used || 0) / 100);
+      }
       setDailyUsage(usageMap);
     } catch (error) {
       console.error('Error fetching usage:', error);
@@ -187,16 +206,18 @@ export const useSubscription = () => {
   };
 
   const checkUsageLimit = async (featureType: string): Promise<boolean> => {
-    if (!user) return false;
+    if (!user || !currentSubscription) return false;
 
     try {
-      const { data, error } = await supabase.rpc('check_usage_limit', {
-        _user_id: user.id,
-        _feature_type: featureType
-      });
-
-      if (error) throw error;
-      return data;
+      const limitKey = featureType === 'rag_query' ? 'rag_queries_per_day' :
+                       featureType === 'chat_message' ? 'chat_messages_per_day' :
+                       featureType === 'document_upload' ? 'documents_limit' :
+                       `${featureType}_per_day`;
+      
+      const limit = currentSubscription.limits[limitKey];
+      const used = dailyUsage[featureType] || 0;
+      
+      return limit === -1 || used < limit;
     } catch (error) {
       console.error('Error checking usage limit:', error);
       return false;
@@ -207,11 +228,21 @@ export const useSubscription = () => {
     if (!user) return;
 
     try {
-      const { error } = await supabase.rpc('record_usage', {
-        _user_id: user.id,
-        _feature_type: featureType,
-        _count: count
-      });
+      // Update user_usage table directly
+      const today = new Date();
+      const periodStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
+      const periodEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString();
+
+      const { error } = await supabase
+        .from('user_usage')
+        .upsert({
+          user_id: user.id,
+          requests_count: count,
+          period_start: periodStart,
+          period_end: periodEnd
+        }, {
+          onConflict: 'user_id,period_start'
+        });
 
       if (error) throw error;
       

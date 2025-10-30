@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SEOHead from '@/components/seo/SEOHead';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -420,10 +421,10 @@ const LearningPaths = () => {
                 </div>
                 <h4 className="font-display font-semibold mb-2">Community Learning</h4>
                 <p className="text-sm text-light-gray">Learn with peers and expert mentors</p>
-              </div>
             </div>
           </div>
         </div>
+      </div>
     </div>
   );
 };

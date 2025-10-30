@@ -8,7 +8,6 @@ export interface UserProgress {
   learning_path_id: string;
   module_id: string;
   progress_percentage: number;
-  completed_at: string;
   created_at: string;
   updated_at: string;
 }
@@ -33,7 +32,7 @@ export const useUserProgress = () => {
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
-      setProgress(data || []);
+      setProgress((data || []) as UserProgress[]);
     } catch (error) {
       console.error('Error fetching user progress:', error);
       setProgress([]);

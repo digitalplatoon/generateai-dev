@@ -6,10 +6,9 @@ import { useAuthContext } from '@/contexts/AuthContext';
 export interface UserPreferences {
   id: string;
   theme: 'light' | 'dark' | 'auto';
-  learning_pace: 'slow' | 'normal' | 'fast';
+  learning_pace: string;
   notifications_enabled: boolean;
   preferred_role: string;
-  preferred_tech_stack: string;
   profile_visibility: 'public' | 'private';
   created_at: string;
   updated_at: string;

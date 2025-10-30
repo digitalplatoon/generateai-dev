@@ -119,7 +119,6 @@ export const useChatMessages = () => {
             model: settings?.preferred_model || 'gpt-4o-mini',
             temperature: settings?.temperature || 0.7,
             max_tokens: settings?.max_tokens || 1000,
-            custom_instructions: settings?.custom_instructions || '',
             do_not_train: settings?.do_not_train_consent || true
           },
           conversationId: conversation.id,
