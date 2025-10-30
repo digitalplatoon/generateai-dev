@@ -106,20 +106,16 @@ serve(async (req) => {
       logStep("Determined subscription tier", { priceId, amount, subscriptionTier });
     }
 
-    // Update user subscription in database
-    const { error: upsertError } = await supabaseClient
-      .from('user_subscriptions')
-      .upsert({
-        user_id: user.id,
-        plan_id: subscriptions.data[0]?.metadata?.plan_id || null,
-        status: hasActiveSub ? 'active' : 'canceled',
-        stripe_subscription_id: hasActiveSub ? subscriptions.data[0].id : null,
-        expires_at: subscriptionEnd,
-        updated_at: new Date().toISOString(),
-      }, { 
-        onConflict: 'user_id',
-        ignoreDuplicates: false 
-      });
+    // Update user subscription in database using SECURITY DEFINER function
+    const { error: upsertError } = await supabaseClient.rpc('upsert_user_subscription', {
+      p_user_id: user.id,
+      p_plan_id: subscriptions.data[0]?.metadata?.plan_id || null,
+      p_status: hasActiveSub ? 'active' : 'canceled',
+      p_stripe_subscription_id: hasActiveSub ? subscriptions.data[0].id : null,
+      p_stripe_customer_id: customerId,
+      p_current_period_start: hasActiveSub ? new Date(subscriptions.data[0].current_period_start * 1000).toISOString() : null,
+      p_current_period_end: subscriptionEnd,
+    });
 
     if (upsertError) {
       logStep("Database update error", upsertError);

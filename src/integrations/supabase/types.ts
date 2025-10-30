@@ -583,6 +583,18 @@ export type Database = {
         Args: { role: Database["public"]["Enums"]["app_role"]; user_id: string }
         Returns: boolean
       }
+      upsert_user_subscription: {
+        Args: {
+          p_current_period_end: string
+          p_current_period_start: string
+          p_plan_id: string
+          p_status: string
+          p_stripe_customer_id: string
+          p_stripe_subscription_id: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user" | "moderator"
