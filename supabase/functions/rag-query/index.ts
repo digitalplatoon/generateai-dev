@@ -2,11 +2,19 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const querySchema = z.object({
+  query: z.string().min(1).max(2000),
+  numResults: z.number().int().min(1).max(50).optional().default(5),
+  minScore: z.number().min(0).max(1).optional().default(0.7),
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -24,8 +32,47 @@ serve(async (req) => {
       }
     );
 
-    const { query, numResults = 5, minScore = 0.7 } = await req.json();
-    console.log('Processing query:', query);
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      throw new Error('Unauthorized');
+    }
+
+    // Parse and validate input
+    const body = await req.json();
+    const validationResult = querySchema.safeParse(body);
+    
+    if (!validationResult.success) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid input parameters', details: validationResult.error.issues }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    const { query, numResults, minScore } = validationResult.data;
+
+    // Check rate limit: 100 queries per minute
+    const { data: rateLimitOk } = await supabaseClient.rpc('check_rag_rate_limit', {
+      p_user_id: user.id,
+      p_endpoint: 'rag-query',
+      p_max_requests: 100,
+      p_window_minutes: 1,
+    });
+
+    if (!rateLimitOk) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
+        { 
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    console.log('Processing query:', query.substring(0, 100));
 
     // Generate embedding for the query
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');

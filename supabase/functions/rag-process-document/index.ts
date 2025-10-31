@@ -2,11 +2,20 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const processDocumentSchema = z.object({
+  documentId: z.string().uuid(),
+});
+
+// Max file size: 5MB (5 * 1024 * 1024 bytes)
+const MAX_FILE_SIZE = 5242880;
 
 interface DocumentData {
   id: string;
@@ -32,7 +41,45 @@ serve(async (req) => {
       }
     );
 
-    const { documentId } = await req.json();
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      throw new Error('Unauthorized');
+    }
+
+    // Parse and validate input
+    const body = await req.json();
+    const validationResult = processDocumentSchema.safeParse(body);
+    
+    if (!validationResult.success) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid document ID format', details: validationResult.error.issues }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    const { documentId } = validationResult.data;
+
+    // Check rate limit: 10 document uploads per hour
+    const { data: rateLimitOk } = await supabaseClient.rpc('check_rag_rate_limit', {
+      p_user_id: user.id,
+      p_endpoint: 'rag-process-document',
+      p_max_requests: 10,
+      p_window_minutes: 60,
+    });
+
+    if (!rateLimitOk) {
+      return new Response(
+        JSON.stringify({ error: 'Rate limit exceeded. Maximum 10 document uploads per hour.' }),
+        { 
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
     console.log('Processing document:', documentId);
 
     // Get document data
@@ -44,6 +91,16 @@ serve(async (req) => {
 
     if (docError) {
       throw new Error(`Failed to fetch document: ${docError.message}`);
+    }
+
+    // Validate file size
+    if (document.file_size > MAX_FILE_SIZE) {
+      await supabaseClient
+        .from('rag_documents')
+        .update({ status: 'error' })
+        .eq('id', documentId);
+      
+      throw new Error('Document exceeds maximum size of 5MB');
     }
 
     // Update status to processing
