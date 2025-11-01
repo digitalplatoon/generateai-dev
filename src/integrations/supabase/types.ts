@@ -25,7 +25,7 @@ export type Database = {
           request_data: Json | null
           response_data: Json | null
           status: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           action_type: string
@@ -37,7 +37,7 @@ export type Database = {
           request_data?: Json | null
           response_data?: Json | null
           status: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           action_type?: string
@@ -49,7 +49,7 @@ export type Database = {
           request_data?: Json | null
           response_data?: Json | null
           status?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -69,7 +69,7 @@ export type Database = {
           item_id: string
           item_title: string
           item_type: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string | null
@@ -78,7 +78,7 @@ export type Database = {
           item_id: string
           item_title: string
           item_type: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string | null
@@ -87,7 +87,7 @@ export type Database = {
           item_id?: string
           item_title?: string
           item_type?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -177,7 +177,7 @@ export type Database = {
           share_token: string | null
           title: string
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           context_data?: Json | null
@@ -188,7 +188,7 @@ export type Database = {
           share_token?: string | null
           title?: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           context_data?: Json | null
@@ -199,7 +199,7 @@ export type Database = {
           share_token?: string | null
           title?: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -209,21 +209,21 @@ export type Database = {
           created_at: string | null
           id: string
           step_id: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           completed?: boolean | null
           created_at?: string | null
           id?: string
           step_id: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           completed?: boolean | null
           created_at?: string | null
           id?: string
           step_id?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -235,7 +235,7 @@ export type Database = {
           published: boolean | null
           title: string
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           content: string
@@ -244,7 +244,7 @@ export type Database = {
           published?: boolean | null
           title: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           content?: string
@@ -253,7 +253,7 @@ export type Database = {
           published?: boolean | null
           title?: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -300,7 +300,7 @@ export type Database = {
           overlap: number | null
           status: string | null
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           chunk_size?: number | null
@@ -314,7 +314,7 @@ export type Database = {
           overlap?: number | null
           status?: string | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           chunk_size?: number | null
@@ -328,7 +328,7 @@ export type Database = {
           overlap?: number | null
           status?: string | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -410,7 +410,7 @@ export type Database = {
           preferred_model: string | null
           temperature: number | null
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string | null
@@ -420,7 +420,7 @@ export type Database = {
           preferred_model?: string | null
           temperature?: number | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string | null
@@ -430,7 +430,7 @@ export type Database = {
           preferred_model?: string | null
           temperature?: number | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -444,7 +444,7 @@ export type Database = {
           profile_visibility: string | null
           theme: string | null
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string | null
@@ -455,7 +455,7 @@ export type Database = {
           profile_visibility?: string | null
           theme?: string | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string | null
@@ -466,7 +466,7 @@ export type Database = {
           profile_visibility?: string | null
           theme?: string | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -478,7 +478,7 @@ export type Database = {
           module_id: string
           progress_percentage: number | null
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string | null
@@ -487,7 +487,7 @@ export type Database = {
           module_id: string
           progress_percentage?: number | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string | null
@@ -496,7 +496,7 @@ export type Database = {
           module_id?: string
           progress_percentage?: number | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -505,19 +505,19 @@ export type Database = {
           created_at: string | null
           id: string
           role: Database["public"]["Enums"]["app_role"]
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string | null
           id?: string
           role: Database["public"]["Enums"]["app_role"]
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -533,7 +533,7 @@ export type Database = {
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           cancel_at_period_end?: boolean | null
@@ -546,7 +546,7 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           cancel_at_period_end?: boolean | null
@@ -559,7 +559,7 @@ export type Database = {
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -580,7 +580,7 @@ export type Database = {
           requests_count: number | null
           tokens_used: number | null
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string | null
@@ -590,7 +590,7 @@ export type Database = {
           requests_count?: number | null
           tokens_used?: number | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string | null
@@ -600,7 +600,7 @@ export type Database = {
           requests_count?: number | null
           tokens_used?: number | null
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
