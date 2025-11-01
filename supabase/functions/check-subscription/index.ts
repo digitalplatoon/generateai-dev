@@ -141,8 +141,7 @@ serve(async (req) => {
       subscribed: true,
       subscription_tier: "free", 
       subscription_end: null,
-      plan_name: "Starter",
-      error: errorMessage
+      plan_name: "Starter"
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
