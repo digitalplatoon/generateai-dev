@@ -14,6 +14,7 @@ import { PaymentStatusHandler } from '@/components/subscription/PaymentStatusHan
 import { StripeProviderWrapper } from '@/components/subscription/StripeProviderWrapper';
 import { Badge } from '@/components/ui/badge';
 import { CreditCard, Settings, TrendingUp, Search, MessageSquare, RefreshCw } from 'lucide-react';
+import SEOHead from '@/components/seo/SEOHead';
 
 const Subscription: React.FC = () => {
   const { user, loading } = useAuthContext();
@@ -49,12 +50,18 @@ const Subscription: React.FC = () => {
 
   return (
     <StripeProviderWrapper>
+      <SEOHead
+        title="Pricing - Simple & Transparent AI Development Plans | GenerateAI.dev"
+        description="Start free with 100 prompts/month. Pro plan at $29/month includes unlimited prompts, RAG Lab, Agent Builder, and API access. Enterprise solutions available. 30-day money-back guarantee."
+        keywords="AI development pricing, AI tools pricing, RAG systems pricing, AI agent builder pricing, AI platform subscription, AI development costs"
+        canonical="https://generateai.dev/subscription"
+      />
       <PaymentStatusHandler />
       <div className="container mx-auto py-8 space-y-8">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold">Choose Your Plan</h1>
+          <h1 className="text-4xl md:text-5xl font-bold">Simple, Transparent Pricing</h1>
           <p className="text-xl text-muted-foreground">
-            Unlock the full potential of AI-powered learning
+            Start free. Scale as you grow. No hidden fees.
           </p>
           
           <div className="flex items-center justify-center gap-4">

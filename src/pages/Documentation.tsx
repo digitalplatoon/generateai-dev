@@ -1,6 +1,7 @@
 
 import { Book, Search, Code, FileText, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import SEOHead from "@/components/seo/SEOHead";
 
 const Documentation = () => {
   const docSections = [
@@ -40,7 +41,14 @@ const Documentation = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-navy">
+    <>
+      <SEOHead
+        title="Documentation - Complete AI Development Guide | GenerateAI.dev"
+        description="Comprehensive guides, tutorials, and API references for building AI agents, RAG systems, and LLM applications. Quick start guides, best practices, and code examples."
+        keywords="AI documentation, AI development guide, RAG tutorial, AI agent guide, LLM documentation, AI API reference"
+        canonical="https://generateai.dev/docs"
+      />
+      <div className="min-h-screen bg-navy">
       {/* Hero Section */}
       <section className="pt-24 pb-16 px-6">
         <div className="container mx-auto text-center">
@@ -121,6 +129,7 @@ const Documentation = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

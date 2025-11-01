@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search, Filter, Heart, Copy, Star, Plus, Zap, Download, Share, Bookmark } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import SEOHead from '@/components/seo/SEOHead';
 
 const PromptLibrary = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -176,6 +177,12 @@ const PromptLibrary = () => {
 
   return (
     <div className="pt-20 bg-gradient-to-br from-navy via-navy/95 to-black">
+      <SEOHead
+        title="Prompt Library - 2,400+ Battle-Tested AI Prompts | GenerateAI.dev"
+        description="Access 2,400+ production-ready AI prompts for Python debugging, SQL generation, API documentation, code review, and more. Used by 15,600+ developers. Browse and deploy instantly."
+        keywords="AI prompts, prompt library, prompt engineering, AI prompt templates, code generation prompts, debugging prompts, SQL prompts"
+        canonical="https://generateai.dev/prompts"
+      />
       <div className="container mx-auto px-6 py-12">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">

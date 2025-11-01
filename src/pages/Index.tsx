@@ -14,9 +14,9 @@ const Index = () => {
   return (
     <>
       <SEOHead
-        title="GenerateAI.dev - AI Copilot for Developers | Code Generation Platform"
-        description="Master AI code generation, LLM development & RAG systems with interactive tutorials. Build AI agents, learn prompt engineering, and deploy production-ready AI applications. Free AI code generator tools & comprehensive learning paths for developers."
-        keywords="AI code generation, AI code generator, AI copilot for developers, AI coding assistant, LLM tutorial, RAG systems tutorial, AI agent development, generative AI for coding, automated code generation, AI development platform, prompt engineering, machine learning roadmap, AI powered code generation, build AI agents, LLM training guide"
+        title="GenerateAI.dev - Build Production-Ready AI Agents in Minutes"
+        description="Master LLMs, RAG Systems & AI Agents with curated roadmaps, 2,400+ battle-tested prompts, and drag-and-drop tools. Start building AI applications in minutes, not months. Free to start."
+        keywords="AI agents, RAG systems, LLM development, prompt engineering, AI tools, code generation, AI deployment, machine learning, AI builder, no-code AI, production AI, AI agent builder"
         schema={combinedSchema}
         canonical="https://generateai.dev/"
       />

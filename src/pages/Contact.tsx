@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, MessageSquare, Users, Headphones, MapPin, Clock, Phone, Send } from 'lucide-react';
 import { contactFormSchema, sanitizeText, checkRateLimit } from '@/lib/security';
 import { useToast } from '@/hooks/use-toast';
+import SEOHead from '@/components/seo/SEOHead';
 
 const Contact = () => {
   const { toast } = useToast();
@@ -165,7 +166,14 @@ const Contact = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-navy via-navy/95 to-navy/90">
+    <>
+      <SEOHead
+        title="Contact - Get in Touch with GenerateAI.dev Team"
+        description="Contact GenerateAI.dev for support, partnerships, enterprise sales, or press inquiries. Our team responds within 24 hours. Multiple support channels available."
+        keywords="contact AI platform, AI support, GenerateAI contact, AI development help"
+        canonical="https://generateai.dev/contact"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-navy via-navy/95 to-navy/90">
       <main className="pt-24 pb-16">
         {/* Hero Section */}
         <section className="container mx-auto px-6 text-center mb-20">
@@ -389,6 +397,7 @@ const Contact = () => {
         </section>
       </main>
     </div>
+    </>
   );
 };
 
