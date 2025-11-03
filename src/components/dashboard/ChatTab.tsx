@@ -72,7 +72,8 @@ const ChatTab = () => {
         throw new Error('No active session');
       }
       
-      const response = await fetch('https://zguwfogavvdsbujiakko.supabase.co/functions/v1/ai-chat', {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const response = await fetch(`${supabaseUrl}/functions/v1/ai-chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
