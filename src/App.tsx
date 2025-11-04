@@ -18,6 +18,10 @@ import RagLab from "./pages/RagLab";
 import AgentPlayground from "./pages/AgentPlayground";
 import Documentation from "./pages/Documentation";
 import ApiReference from "./pages/ApiReference";
+import Prompts from "./pages/Prompts";
+import Pricing from "./pages/Pricing";
+import RagLabFunctional from "./pages/RagLabFunctional";
+import AgentsFunctional from "./pages/AgentsFunctional";
 import Community from "./pages/Community";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
@@ -53,9 +57,11 @@ const App = () => (
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/enhanced-ai" element={<EnhancedAI />} />
                   <Route path="/paths" element={<LearningPaths />} />
-                  <Route path="/prompts" element={<PromptLibrary />} />
-                  <Route path="/rag-lab" element={<RagLab />} />
-                  <Route path="/agents" element={<AgentPlayground />} />
+                  <Route path="/prompts" element={<Prompts />} />
+                  <Route path="/prompt-library" element={<PromptLibrary />} />
+                  <Route path="/rag-lab" element={<RagLabFunctional />} />
+                  <Route path="/agents" element={<AgentsFunctional />} />
+                  <Route path="/pricing" element={<Pricing />} />
                   <Route path="/docs" element={<Documentation />} />
                   <Route path="/api" element={<ApiReference />} />
                   <Route path="/community" element={<Community />} />

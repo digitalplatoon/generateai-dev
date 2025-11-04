@@ -1,0 +1,148 @@
+{
+  "prompts": [
+    {
+      "id": "prompt-001",
+      "title": "Python Error Debugger",
+      "description": "Analyze Python tracebacks and suggest fixes with explanations",
+      "category": "debugging",
+      "tags": ["python", "debugging", "error-handling"],
+      "author": "alex_dev",
+      "uses": 2847,
+      "rating": 4.9,
+      "template": "Analyze this Python traceback: {error}\n\nProvide:\n1. Root cause analysis\n2. 3 potential fixes with explanations\n3. Best practices to avoid this error\n4. Related documentation links",
+      "sampleOutput": "## Error Analysis\n**Root Cause**: IndexError in list access\n\n## Potential Fixes:\n1. **Bounds Checking**: Add length validation before access\n2. **Try-Catch**: Handle exception gracefully\n3. **List Comprehension**: Use safer iteration patterns"
+    },
+    {
+      "id": "prompt-002",
+      "title": "SQL Query Generator",
+      "description": "Convert natural language to optimized SQL queries",
+      "category": "database",
+      "tags": ["sql", "database", "query-optimization"],
+      "author": "db_master",
+      "uses": 3203,
+      "rating": 4.8,
+      "template": "Convert this natural language request to SQL: {request}\n\nRequirements:\n- Use proper indexing hints\n- Include performance comments\n- Add result explanation\n- Suggest indexes if needed",
+      "sampleOutput": "-- Find top 10 customers by revenue in 2023\nSELECT c.customer_name, SUM(o.total_amount) as total_revenue\nFROM customers c\nJOIN orders o ON c.id = o.customer_id\nWHERE o.order_date >= '2023-01-01'\nGROUP BY c.customer_name\nORDER BY total_revenue DESC\nLIMIT 10;"
+    },
+    {
+      "id": "prompt-003",
+      "title": "React Component Generator",
+      "description": "Generate TypeScript React components from descriptions",
+      "category": "frontend",
+      "tags": ["react", "typescript", "frontend"],
+      "author": "react_ninja",
+      "uses": 1956,
+      "rating": 4.7,
+      "template": "Create a React TypeScript component: {description}\n\nInclude:\n- TypeScript interfaces\n- Prop validation\n- State management\n- Error handling\n- Accessibility features",
+      "sampleOutput": "interface UserCardProps {\n  name: string;\n  email: string;\n}\n\nconst UserCard: React.FC<UserCardProps> = ({ name, email }) => {\n  return <div className='card'>...</div>\n}"
+    },
+    {
+      "id": "prompt-004",
+      "title": "API Documentation Writer",
+      "description": "Generate comprehensive API documentation from code",
+      "category": "documentation",
+      "tags": ["api", "docs", "openapi"],
+      "author": "docs_expert",
+      "uses": 1432,
+      "rating": 4.6,
+      "template": "Document this API endpoint: {code}\n\nInclude:\n- OpenAPI 3.0 specification\n- Request/response examples\n- Error codes\n- Authentication requirements",
+      "sampleOutput": "## POST /api/users\nCreates a new user account\n\n**Authentication**: Bearer token required\n**Request Body**: { name, email, password }\n**Responses**: 201 Created, 400 Bad Request"
+    },
+    {
+      "id": "prompt-005",
+      "title": "Docker Compose Generator",
+      "description": "Create Docker Compose configurations for multi-service apps",
+      "category": "devops",
+      "tags": ["docker", "devops", "containers"],
+      "author": "devops_guru",
+      "uses": 2103,
+      "rating": 4.9,
+      "template": "Create docker-compose.yml for: {services}\n\nInclude:\n- Service dependencies\n- Volume mounts\n- Network configuration\n- Environment variables\n- Health checks",
+      "sampleOutput": "version: '3.8'\nservices:\n  web:\n    image: nginx:alpine\n    ports:\n      - '80:80'\n  db:\n    image: postgres:14\n    environment:\n      POSTGRES_PASSWORD: secret"
+    },
+    {
+      "id": "prompt-006",
+      "title": "Test Case Generator",
+      "description": "Generate comprehensive test cases for any function",
+      "category": "testing",
+      "tags": ["testing", "jest", "unit-tests"],
+      "author": "test_master",
+      "uses": 1687,
+      "rating": 4.5,
+      "template": "Generate test cases for: {code}\n\nInclude:\n- Happy path tests\n- Edge cases\n- Error scenarios\n- Mock data\n- Coverage > 90%",
+      "sampleOutput": "describe('calculateTotal', () => {\n  it('should sum array of numbers', () => {\n    expect(calculateTotal([1,2,3])).toBe(6);\n  });\n  it('should handle empty array', () => {\n    expect(calculateTotal([])).toBe(0);\n  });\n});"
+    },
+    {
+      "id": "prompt-007",
+      "title": "Git Commit Message Writer",
+      "description": "Generate semantic commit messages from code changes",
+      "category": "utilities",
+      "tags": ["git", "commit", "semantic"],
+      "author": "git_pro",
+      "uses": 3421,
+      "rating": 4.8,
+      "template": "Generate commit message for: {changes}\n\nFormat:\n- Conventional Commits standard\n- Type (feat/fix/docs/etc)\n- Scope\n- Breaking changes if any",
+      "sampleOutput": "feat(auth): add OAuth2 Google login\n\nImplements Google OAuth2 authentication flow:\n- Added GoogleAuthProvider\n- Updated user model\n- Added OAuth callback route\n\nBREAKING CHANGE: Requires GOOGLE_CLIENT_ID env var"
+    },
+    {
+      "id": "prompt-008",
+      "title": "Database Schema Designer",
+      "description": "Design normalized database schemas from requirements",
+      "category": "database",
+      "tags": ["database", "schema", "sql"],
+      "author": "db_architect",
+      "uses": 1523,
+      "rating": 4.7,
+      "template": "Design database schema for: {requirements}\n\nInclude:\n- Entity-Relationship diagram\n- Normalized tables (3NF)\n- Foreign key constraints\n- Indexes\n- Sample queries",
+      "sampleOutput": "## E-Commerce Schema\n\nTables:\n- users (id, email, password_hash, created_at)\n- products (id, name, price, stock)\n- orders (id, user_id, total, status)\n- order_items (order_id, product_id, quantity, price)"
+    },
+    {
+      "id": "prompt-009",
+      "title": "CSS Flexbox Layout Generator",
+      "description": "Create responsive Flexbox layouts from wireframes",
+      "category": "frontend",
+      "tags": ["css", "flexbox", "responsive"],
+      "author": "css_wizard",
+      "uses": 1892,
+      "rating": 4.6,
+      "template": "Create Flexbox layout for: {description}\n\nInclude:\n- Mobile-first approach\n- Breakpoints\n- Flex properties\n- Gap/spacing\n- Fallbacks",
+      "sampleOutput": ".container {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 1rem;\n}\n\n.item {\n  flex: 1 1 300px;\n}\n\n@media (max-width: 768px) {\n  .item { flex-basis: 100%; }\n}"
+    },
+    {
+      "id": "prompt-010",
+      "title": "API Error Handler",
+      "description": "Generate comprehensive error handling for REST APIs",
+      "category": "backend",
+      "tags": ["error-handling", "api", "backend"],
+      "author": "backend_dev",
+      "uses": 1765,
+      "rating": 4.8,
+      "template": "Create error handler for: {endpoint}\n\nInclude:\n- HTTP status codes\n- Error response format\n- Logging\n- Client-friendly messages\n- Stack trace handling",
+      "sampleOutput": "class APIError extends Error {\n  constructor(statusCode, message) {\n    super(message);\n    this.statusCode = statusCode;\n  }\n}\n\nconst errorHandler = (err, req, res, next) => {\n  const status = err.statusCode || 500;\n  res.status(status).json({\n    error: err.message,\n    ...(process.env.NODE_ENV === 'dev' && { stack: err.stack })\n  });\n}"
+    },
+    {
+      "id": "prompt-011",
+      "title": "TypeScript Interface Generator",
+      "description": "Generate TypeScript interfaces from JSON data",
+      "category": "frontend",
+      "tags": ["typescript", "interfaces", "types"],
+      "author": "ts_expert",
+      "uses": 2214,
+      "rating": 4.9,
+      "template": "Generate TypeScript interface from: {json}\n\nInclude:\n- Nested objects\n- Optional properties\n- Array types\n- Union types\n- JSDoc comments",
+      "sampleOutput": "interface User {\n  /** Unique user identifier */\n  id: string;\n  name: string;\n  email: string;\n  roles?: ('admin' | 'user')[];\n  metadata: Record<string, any>;\n}"
+    },
+    {
+      "id": "prompt-012",
+      "title": "REST API Route Planner",
+      "description": "Design RESTful API routes following best practices",
+      "category": "backend",
+      "tags": ["rest", "api", "design"],
+      "author": "api_designer",
+      "uses": 1643,
+      "rating": 4.7,
+      "template": "Design REST API for: {resource}\n\nInclude:\n- CRUD operations\n- Nested resources\n- Query parameters\n- Pagination\n- Versioning",
+      "sampleOutput": "GET    /api/v1/users          - List users\nPOST   /api/v1/users          - Create user\nGET    /api/v1/users/:id      - Get user\nPUT    /api/v1/users/:id      - Update user\nDELETE /api/v1/users/:id      - Delete user\nGET    /api/v1/users/:id/posts - Get user posts"
+    }
+  ]
+}

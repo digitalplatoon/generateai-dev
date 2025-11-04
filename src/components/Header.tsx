@@ -49,6 +49,9 @@ const Header = () => {
             <Link to="/docs" className="text-light-gray hover:text-teal transition-colors">
               Docs
             </Link>
+            <Link to="/pricing" className="text-light-gray hover:text-teal transition-colors">
+              Pricing
+            </Link>
           </nav>
 
           {/* User Menu / Auth Controls */}
