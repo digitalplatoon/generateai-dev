@@ -64,10 +64,10 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				// GenerateAI.dev custom colors
-				navy: '#0A192F',
-				teal: '#64FFDA',
-				'light-gray': '#8892B0',
-				'text-light': '#CCD6F6'
+				navy: 'hsl(var(--navy))',
+				teal: 'hsl(var(--teal))',
+				'light-gray': 'hsl(var(--light-gray))',
+				'text-light': 'hsl(var(--text-light))'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

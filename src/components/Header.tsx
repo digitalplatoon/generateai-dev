@@ -21,7 +21,7 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-dark-blue border-b border-gray-800 sticky top-0 z-50">
+    <header className="bg-background border-b border-border sticky top-0 z-50 backdrop-blur-md">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
@@ -30,26 +30,26 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/paths" className="text-light-gray hover:text-teal transition-colors">
+            <Link to="/paths" className="text-muted-foreground hover:text-primary transition-colors">
               Learning Paths
             </Link>
-            <Link to="/prompts" className="text-light-gray hover:text-teal transition-colors">
+            <Link to="/prompts" className="text-muted-foreground hover:text-primary transition-colors">
               Prompts
             </Link>
-            <Link to="/rag-lab" className="text-light-gray hover:text-teal transition-colors">
+            <Link to="/rag-lab" className="text-muted-foreground hover:text-primary transition-colors">
               RAG Lab
             </Link>
-            <Link to="/agents" className="text-light-gray hover:text-teal transition-colors">
+            <Link to="/agents" className="text-muted-foreground hover:text-primary transition-colors">
               Agents
             </Link>
-            <Link to="/enhanced-ai" className="text-light-gray hover:text-teal transition-colors flex items-center gap-1">
+            <Link to="/enhanced-ai" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
               Enhanced AI
               <Badge variant="secondary" className="text-xs">New</Badge>
             </Link>
-            <Link to="/docs" className="text-light-gray hover:text-teal transition-colors">
+            <Link to="/docs" className="text-muted-foreground hover:text-primary transition-colors">
               Docs
             </Link>
-            <Link to="/pricing" className="text-light-gray hover:text-teal transition-colors">
+            <Link to="/pricing" className="text-muted-foreground hover:text-primary transition-colors">
               Pricing
             </Link>
           </nav>
@@ -77,12 +77,12 @@ const Header = () => {
               </DropdownMenu>
             ) : (
               <>
-                <Link to="/auth" className="text-light-gray hover:text-teal transition-colors">
+                <Link to="/auth" className="text-muted-foreground hover:text-primary transition-colors">
                   Sign In
                 </Link>
                 <Link
                   to="/auth"
-                  className="bg-teal text-black rounded-md px-4 py-2 hover:bg-teal-600 transition-colors"
+                  className="bg-primary text-primary-foreground rounded-md px-4 py-2 hover:bg-primary/90 transition-colors"
                 >
                   Sign Up
                 </Link>
@@ -94,48 +94,48 @@ const Header = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-light-gray focus:outline-none"
+              className="text-muted-foreground focus:outline-none"
             >
               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
 
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
-              <div className="absolute top-full right-0 bg-dark-blue border border-gray-800 rounded-md shadow-lg mt-2 py-2 w-48 z-50">
-                <Link to="/paths" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+              <div className="absolute top-full right-0 bg-card border border-border rounded-md shadow-lg mt-2 py-2 w-48 z-50">
+                <Link to="/paths" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                   Learning Paths
                 </Link>
-                <Link to="/prompts" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                <Link to="/prompts" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                   Prompts
                 </Link>
-                <Link to="/rag-lab" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                <Link to="/rag-lab" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                   RAG Lab
                 </Link>
-                <Link to="/agents" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                <Link to="/agents" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                   Agents
                 </Link>
-                 <Link to="/enhanced-ai" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors flex items-center gap-1">
+                 <Link to="/enhanced-ai" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
                   Enhanced AI
                   <Badge variant="secondary" className="text-xs">New</Badge>
                 </Link>
-                <Link to="/docs" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                <Link to="/docs" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                   Docs
                 </Link>
                 {user ? (
                   <>
-                    <Link to="/dashboard" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                    <Link to="/dashboard" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                       Dashboard
                     </Link>
-                    <button onClick={() => signOut()} className="block px-4 py-2 text-light-gray hover:text-teal transition-colors w-full text-left">
+                    <button onClick={() => signOut()} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors w-full text-left">
                       Sign Out
                     </button>
                   </>
                 ) : (
                   <>
-                    <Link to="/auth" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                    <Link to="/auth" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                       Sign In
                     </Link>
-                    <Link to="/auth" className="block px-4 py-2 text-light-gray hover:text-teal transition-colors">
+                    <Link to="/auth" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                       Sign Up
                     </Link>
                   </>
