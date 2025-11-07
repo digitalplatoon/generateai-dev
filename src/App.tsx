@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { HelmetProvider } from 'react-helmet-async';
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Index from "./pages/Index";
@@ -54,13 +55,13 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/enhanced-ai" element={<EnhancedAI />} />
+                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                  <Route path="/enhanced-ai" element={<ProtectedRoute><EnhancedAI /></ProtectedRoute>} />
                   <Route path="/paths" element={<LearningPaths />} />
                   <Route path="/prompts" element={<Prompts />} />
                   <Route path="/prompt-library" element={<PromptLibrary />} />
-                  <Route path="/rag-lab" element={<RagLabFunctional />} />
-                  <Route path="/agents" element={<AgentsFunctional />} />
+                  <Route path="/rag-lab" element={<ProtectedRoute><RagLabFunctional /></ProtectedRoute>} />
+                  <Route path="/agents" element={<ProtectedRoute><AgentsFunctional /></ProtectedRoute>} />
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/docs" element={<Documentation />} />
                   <Route path="/api" element={<ApiReference />} />
