@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Upload, FileText, Database, Zap, Settings, Play, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Upload, FileText, Database, Zap, Settings, Play, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,43 +8,82 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import SEOHead from '@/components/seo/SEOHead';
 import { toast } from 'sonner';
+import { useRagLab } from '@/hooks/useRagLab';
+import type { RagDocument } from '@/types/rag';
 
 const RagLabFunctional = () => {
-  const [documents, setDocuments] = useState<File[]>([]);
   const [query, setQuery] = useState('');
-  const [response, setResponse] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [config, setConfig] = useState({
-    chunkSize: 512,
-    overlap: 50,
-    embeddingModel: 'openai-ada-002',
-    topK: 3
-  });
+  const [numResults, setNumResults] = useState(3);
+  const [minScore, setMinScore] = useState(0.5);
+  const [chunkSize, setChunkSize] = useState(500);
+  const [overlap, setOverlap] = useState(50);
+  const [embeddingModel, setEmbeddingModel] = useState('text-embedding-ada-002');
+  const [queryResults, setQueryResults] = useState<string>('');
+  
+  const {
+    documents,
+    isLoading,
+    uploadDocument,
+    processDocument,
+    queryDocuments,
+    fetchDocuments,
+    deleteDocument
+  } = useRagLab();
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    setDocuments(prev => [...prev, ...files]);
-    toast.success(`${files.length} file(s) uploaded`);
-  };
-
-  const handleRemoveFile = (index: number) => {
-    setDocuments(prev => prev.filter((_, i) => i !== index));
+    
+    for (const file of files) {
+      try {
+        const doc = await uploadDocument(file, chunkSize, overlap, embeddingModel);
+        if (doc) {
+          const docWithId = doc as any;
+          if (docWithId.id) {
+            await processDocument(docWithId.id);
+          }
+        }
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
+    }
+    
+    await fetchDocuments();
   };
 
   const handleQuery = async () => {
-    if (!query.trim() || documents.length === 0) {
-      toast.error('Please upload documents and enter a query');
+    if (!query.trim()) {
+      toast.error('Please enter a query');
       return;
     }
     
-    setIsProcessing(true);
+    if (documents.length === 0) {
+      toast.error('Please upload and process documents first');
+      return;
+    }
     
-    // Simulate RAG processing
-    setTimeout(() => {
-      setResponse(`Based on your ${documents.length} uploaded document(s), here's the answer:\n\n${query}\n\nThis is a demo response showing RAG technology in action. In production, this would:\n\n1. Process your documents into ${config.chunkSize}-token chunks\n2. Generate embeddings using ${config.embeddingModel}\n3. Perform semantic search to find top ${config.topK} relevant chunks\n4. Generate a contextual response using retrieved information\n\nThe system found ${config.topK} highly relevant passages from your documents to answer this question.`);
-      setIsProcessing(false);
-      toast.success('Query processed successfully!');
-    }, 2000);
+    try {
+      const results = await queryDocuments(query, numResults, minScore);
+      
+      if (results.length === 0) {
+        setQueryResults('No relevant results found. Try adjusting your query or minimum score.');
+      } else {
+        const formattedResults = results.map((result, index) => 
+          `**Result ${index + 1}** (Score: ${result.score.toFixed(2)})\nSource: ${result.source}, Chunk: ${result.chunk}\n\n${result.content}\n\n---\n`
+        ).join('\n');
+        setQueryResults(formattedResults);
+      }
+    } catch (error) {
+      console.error('Query error:', error);
+    }
+  };
+
+  const handleDeleteDocument = async (docId: string) => {
+    await deleteDocument(docId);
+    await fetchDocuments();
   };
 
   return (
@@ -107,9 +146,14 @@ const RagLabFunctional = () => {
                         accept=".pdf,.txt,.md,.doc,.docx"
                         onChange={handleFileUpload}
                         className="hidden"
+                        disabled={isLoading}
                       />
                       <label htmlFor="file-upload" className="cursor-pointer flex flex-col items-center">
-                        <Upload size={32} className="mb-3 text-muted-foreground" />
+                        {isLoading ? (
+                          <Loader2 className="h-8 w-8 animate-spin mb-3" />
+                        ) : (
+                          <Upload size={32} className="mb-3 text-muted-foreground" />
+                        )}
                         <span className="font-medium mb-1">Click to upload or drag and drop</span>
                         <span className="text-sm text-muted-foreground">PDF, TXT, MD, DOC (Max 10MB each)</span>
                       </label>
@@ -118,20 +162,23 @@ const RagLabFunctional = () => {
                     {/* Uploaded Files List */}
                     {documents.length > 0 && (
                       <div className="space-y-2">
-                        <Label>Uploaded Files</Label>
-                        {documents.map((file, index) => (
-                          <div key={index} className="flex items-center justify-between p-3 bg-secondary rounded">
-                            <div className="flex items-center gap-2">
+                        <Label>Processed Documents ({documents.length})</Label>
+                        {documents.map((doc) => (
+                          <div key={doc.id} className="flex items-center justify-between p-3 bg-secondary rounded">
+                            <div className="flex items-center gap-2 flex-1">
                               <FileText size={16} />
-                              <span className="text-sm font-medium">{file.name}</span>
-                              <span className="text-xs text-muted-foreground">
-                                ({(file.size / 1024).toFixed(1)} KB)
-                              </span>
+                              <div className="flex-1">
+                                <div className="text-sm font-medium">{doc.name}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {doc.file_type} · {(doc.file_size / 1024).toFixed(1)} KB · Status: {doc.status}
+                                </div>
+                              </div>
                             </div>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleRemoveFile(index)}
+                              onClick={() => handleDeleteDocument(doc.id)}
+                              disabled={isLoading}
                             >
                               <X size={16} />
                             </Button>
@@ -157,8 +204,8 @@ const RagLabFunctional = () => {
                       <Input
                         type="number"
                         id="chunk-size"
-                        value={config.chunkSize}
-                        onChange={(e) => setConfig({...config, chunkSize: parseInt(e.target.value)})}
+                        value={chunkSize}
+                        onChange={(e) => setChunkSize(parseInt(e.target.value))}
                       />
                     </div>
 
@@ -167,38 +214,50 @@ const RagLabFunctional = () => {
                       <Input
                         type="number"
                         id="overlap"
-                        value={config.overlap}
-                        onChange={(e) => setConfig({...config, overlap: parseInt(e.target.value)})}
+                        value={overlap}
+                        onChange={(e) => setOverlap(parseInt(e.target.value))}
                       />
                     </div>
 
                     <div>
                       <Label htmlFor="embedding-model">Embedding Model</Label>
                       <Select
-                        value={config.embeddingModel}
-                        onValueChange={(value) => setConfig({...config, embeddingModel: value})}
+                        value={embeddingModel}
+                        onValueChange={setEmbeddingModel}
                       >
                         <SelectTrigger id="embedding-model">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="openai-ada-002">OpenAI Ada-002</SelectItem>
-                          <SelectItem value="openai-3-small">OpenAI Embedding-3-Small</SelectItem>
-                          <SelectItem value="openai-3-large">OpenAI Embedding-3-Large</SelectItem>
-                          <SelectItem value="cohere">Cohere Embed</SelectItem>
+                          <SelectItem value="text-embedding-ada-002">OpenAI Ada-002</SelectItem>
+                          <SelectItem value="text-embedding-3-small">OpenAI Embedding-3-Small</SelectItem>
+                          <SelectItem value="text-embedding-3-large">OpenAI Embedding-3-Large</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div>
-                      <Label htmlFor="top-k">Top K Results</Label>
+                      <Label htmlFor="num-results">Number of Results</Label>
                       <Input
                         type="number"
-                        id="top-k"
-                        value={config.topK}
-                        onChange={(e) => setConfig({...config, topK: parseInt(e.target.value)})}
+                        id="num-results"
+                        value={numResults}
+                        onChange={(e) => setNumResults(parseInt(e.target.value))}
                         min="1"
                         max="10"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="min-score">Minimum Score</Label>
+                      <Input
+                        type="number"
+                        id="min-score"
+                        value={minScore}
+                        onChange={(e) => setMinScore(parseFloat(e.target.value))}
+                        min="0"
+                        max="1"
+                        step="0.1"
                       />
                     </div>
                   </CardContent>
@@ -227,10 +286,13 @@ const RagLabFunctional = () => {
                       className="w-full"
                       size="lg"
                       onClick={handleQuery}
-                      disabled={documents.length === 0 || !query.trim() || isProcessing}
+                      disabled={documents.length === 0 || !query.trim() || isLoading}
                     >
-                      {isProcessing ? (
-                        <>Processing...</>
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Processing...
+                        </>
                       ) : (
                         <>
                           <Play className="mr-2 h-4 w-4" /> Run Query
@@ -241,19 +303,19 @@ const RagLabFunctional = () => {
                 </Card>
 
                 {/* Response Section */}
-                {response ? (
+                {queryResults ? (
                   <Card>
                     <CardHeader>
-                      <CardTitle>Response</CardTitle>
+                      <CardTitle>Query Results</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <pre className="bg-secondary p-4 rounded text-sm whitespace-pre-wrap">
-                        {response}
-                      </pre>
+                      <div className="bg-secondary p-4 rounded text-sm whitespace-pre-wrap max-h-96 overflow-y-auto">
+                        {queryResults}
+                      </div>
                       
                       <div className="mt-4 pt-4 border-t flex justify-between text-sm text-muted-foreground">
-                        <span>✓ Retrieved from {config.topK} document chunks</span>
-                        <span>Model: {config.embeddingModel}</span>
+                        <span>✓ Retrieved from {documents.length} processed documents</span>
+                        <span>Model: {embeddingModel}</span>
                       </div>
                     </CardContent>
                   </Card>
@@ -261,8 +323,8 @@ const RagLabFunctional = () => {
                   <Card>
                     <CardContent className="flex flex-col items-center justify-center py-12">
                       <Database size={48} className="text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">
-                        Upload documents and run a query to see RAG in action
+                      <p className="text-muted-foreground text-center">
+                        Upload documents, wait for them to process, then run a query to see RAG in action
                       </p>
                     </CardContent>
                   </Card>

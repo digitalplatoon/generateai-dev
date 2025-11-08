@@ -11,6 +11,7 @@ import { Loader2 } from 'lucide-react';
 import { authSchema, sanitizeText } from '@/lib/security';
 import { useToast } from '@/hooks/use-toast';
 import SEOHead from '@/components/seo/SEOHead';
+import { PasswordResetForm } from '@/components/auth/PasswordResetForm';
 
 const Auth = () => {
   const { signIn, signUp, user, loading } = useAuth();
@@ -19,6 +20,7 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
 
   // Redirect if user is already authenticated
   useEffect(() => {
@@ -158,13 +160,16 @@ const Auth = () => {
             <p className="text-light-gray">Welcome to the future of AI development</p>
           </div>
 
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            </TabsList>
+          {showPasswordReset ? (
+            <PasswordResetForm onBack={() => setShowPasswordReset(false)} />
+          ) : (
+            <Tabs defaultValue="signin" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="signin">Sign In</TabsTrigger>
+                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="signin">
+              <TabsContent value="signin">
               <Card className="bg-navy/80 border-white/10">
                 <CardHeader>
                   <CardTitle className="text-white">Sign In</CardTitle>
@@ -203,7 +208,7 @@ const Auth = () => {
                       )}
                     </div>
                   </CardContent>
-                  <CardFooter>
+                  <CardFooter className="flex-col gap-3">
                     <Button 
                       type="submit" 
                       className="w-full bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold"
@@ -211,6 +216,14 @@ const Auth = () => {
                     >
                       {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                       Sign In
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="text-light-gray hover:text-white"
+                      onClick={() => setShowPasswordReset(true)}
+                    >
+                      Forgot your password?
                     </Button>
                   </CardFooter>
                 </form>
@@ -285,6 +298,7 @@ const Auth = () => {
               </Card>
             </TabsContent>
           </Tabs>
+          )}
 
           {error && (
             <Alert className="mt-4 border-red-500/20 bg-red-500/10">
