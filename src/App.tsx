@@ -23,6 +23,7 @@ import Prompts from "./pages/Prompts";
 import Pricing from "./pages/Pricing";
 import RagLabFunctional from "./pages/RagLabFunctional";
 import AgentsFunctional from "./pages/AgentsFunctional";
+import Analytics from "./pages/Analytics";
 import Community from "./pages/Community";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
@@ -62,6 +63,7 @@ const App = () => (
                   <Route path="/prompt-library" element={<PromptLibrary />} />
                   <Route path="/rag-lab" element={<ProtectedRoute><RagLabFunctional /></ProtectedRoute>} />
                   <Route path="/agents" element={<ProtectedRoute><AgentsFunctional /></ProtectedRoute>} />
+                  <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/docs" element={<Documentation />} />
                   <Route path="/api" element={<ApiReference />} />

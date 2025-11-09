@@ -42,6 +42,9 @@ const Header = () => {
             <Link to="/agents" className="text-muted-foreground hover:text-primary transition-colors">
               Agents
             </Link>
+            <Link to="/analytics" className="text-muted-foreground hover:text-primary transition-colors">
+              Analytics
+            </Link>
             <Link to="/enhanced-ai" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
               Enhanced AI
               <Badge variant="secondary" className="text-xs">New</Badge>
@@ -113,6 +116,9 @@ const Header = () => {
                 </Link>
                 <Link to="/agents" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                   Agents
+                </Link>
+                <Link to="/analytics" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                  Analytics
                 </Link>
                  <Link to="/enhanced-ai" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
                   Enhanced AI
