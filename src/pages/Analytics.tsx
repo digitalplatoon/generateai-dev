@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp, Activity, BookOpen, MessageSquare, FileText, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import InsightsPanel from '@/components/analytics/InsightsPanel';
 
 const Analytics = () => {
   const { user } = useAuth();
@@ -114,6 +115,9 @@ const Analytics = () => {
           <h1 className="text-4xl font-bold mb-2">Analytics Dashboard</h1>
           <p className="text-muted-foreground">Track your engagement, feature usage, and learning progress</p>
         </div>
+
+        {/* Personalized Insights */}
+        <InsightsPanel />
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
