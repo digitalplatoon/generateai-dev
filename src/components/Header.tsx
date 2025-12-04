@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from 'lucide-react';
 import EnhancedLogo from '@/components/ui/EnhancedLogo';
+import GlobalSearch from '@/components/search/GlobalSearch';
 
 const Header = () => {
   const { user, signOut } = useAuthContext();
@@ -57,8 +58,9 @@ const Header = () => {
             </Link>
           </nav>
 
-          {/* User Menu / Auth Controls */}
+          {/* Search & User Menu */}
           <div className="hidden md:flex items-center space-x-4">
+            <GlobalSearch />
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
