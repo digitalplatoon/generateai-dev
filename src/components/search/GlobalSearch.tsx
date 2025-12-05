@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/command';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Toggle } from '@/components/ui/toggle';
 import { useGlobalSearch, SearchResult } from '@/hooks/useGlobalSearch';
 
 const typeIcons = {
@@ -31,16 +32,18 @@ const typeColors = {
   conversation: 'bg-purple-500/10 text-purple-500',
 };
 
+type FilterType = 'prompt' | 'learning-path' | 'conversation';
+
 interface GlobalSearchProps {
   trigger?: React.ReactNode;
 }
 
 const GlobalSearch: React.FC<GlobalSearchProps> = ({ trigger }) => {
   const [open, setOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<Set<FilterType>>(new Set());
   const { query, setQuery, results } = useGlobalSearch();
   const navigate = useNavigate();
 
-  // Keyboard shortcut to open search
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
@@ -59,7 +62,23 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ trigger }) => {
     navigate(result.link);
   };
 
-  const groupedResults = results.reduce((acc, result) => {
+  const toggleFilter = (type: FilterType) => {
+    setActiveFilters((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) {
+        next.delete(type);
+      } else {
+        next.add(type);
+      }
+      return next;
+    });
+  };
+
+  const filteredResults = activeFilters.size === 0
+    ? results
+    : results.filter((result) => activeFilters.has(result.type as FilterType));
+
+  const groupedResults = filteredResults.reduce((acc, result) => {
     if (!acc[result.type]) {
       acc[result.type] = [];
     }
@@ -91,6 +110,27 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ trigger }) => {
           value={query}
           onValueChange={setQuery}
         />
+        
+        <div className="flex items-center gap-2 px-3 py-2 border-b">
+          <span className="text-xs text-muted-foreground">Filter:</span>
+          {(Object.keys(typeLabels) as FilterType[]).map((type) => {
+            const Icon = typeIcons[type];
+            const isActive = activeFilters.has(type);
+            return (
+              <Toggle
+                key={type}
+                size="sm"
+                pressed={isActive}
+                onPressedChange={() => toggleFilter(type)}
+                className="h-7 px-2 gap-1 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+              >
+                <Icon className="h-3 w-3" />
+                <span className="text-xs">{typeLabels[type]}s</span>
+              </Toggle>
+            );
+          })}
+        </div>
+
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
           
