@@ -1,10 +1,10 @@
 import { useState } from 'react';
+import DOMPurify from 'dompurify';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Search, ChevronUp, ChevronDown, Code, BookOpen } from "lucide-react";
-
 const PromptLibrarySection = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -203,7 +203,7 @@ Creates a new user account
                   </div>
                   <div className="text-sm text-light-gray">
                     <div dangerouslySetInnerHTML={{ 
-                      __html: prompt.sampleOutput.substring(0, 150).replace(/\n/g, '<br>') 
+                      __html: DOMPurify.sanitize(prompt.sampleOutput.substring(0, 150).replace(/\n/g, '<br>')) 
                     }} />...
                   </div>
                 </div>
