@@ -8,6 +8,28 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Allowlist of valid origins to prevent open redirect attacks
+const ALLOWED_ORIGINS = [
+  'https://preview--generateai-dev.lovable.app',
+  'https://generateai-dev.lovable.app',
+  'https://generateai.dev',
+  'https://www.generateai.dev',
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:8080'
+];
+
+function validateOrigin(origin: string | null): string {
+  if (!origin) return ALLOWED_ORIGINS[0];
+  if (ALLOWED_ORIGINS.includes(origin)) return origin;
+  // Check for Lovable preview URLs pattern
+  if (origin.match(/^https:\/\/[a-z0-9-]+--generateai-dev\.lovable\.app$/)) {
+    return origin;
+  }
+  console.log(`[CREATE-CHECKOUT] Rejected invalid origin: ${origin}`);
+  return ALLOWED_ORIGINS[0]; // Default to production
+}
+
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
@@ -97,8 +119,8 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${req.headers.get("origin")}/subscription?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin")}/subscription?canceled=true`,
+      success_url: `${validateOrigin(req.headers.get("origin"))}/subscription?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${validateOrigin(req.headers.get("origin"))}/subscription?canceled=true`,
       metadata: {
         user_id: user.id,
         plan_id: planId,
