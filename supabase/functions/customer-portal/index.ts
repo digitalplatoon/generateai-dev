@@ -8,6 +8,28 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Allowlist of valid origins to prevent open redirect attacks
+const ALLOWED_ORIGINS = [
+  'https://preview--generateai-dev.lovable.app',
+  'https://generateai-dev.lovable.app',
+  'https://generateai.dev',
+  'https://www.generateai.dev',
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:8080'
+];
+
+function validateOrigin(origin: string | null): string {
+  if (!origin) return ALLOWED_ORIGINS[0];
+  if (ALLOWED_ORIGINS.includes(origin)) return origin;
+  // Check for Lovable preview URLs pattern
+  if (origin.match(/^https:\/\/[a-z0-9-]+--generateai-dev\.lovable\.app$/)) {
+    return origin;
+  }
+  console.log(`[CUSTOMER-PORTAL] Rejected invalid origin: ${origin}`);
+  return ALLOWED_ORIGINS[0]; // Default to production
+}
+
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CUSTOMER-PORTAL] ${step}${detailsStr}`);
@@ -56,7 +78,7 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
-    const origin = req.headers.get("origin") || "http://localhost:3000";
+    const origin = validateOrigin(req.headers.get("origin"));
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customerId,
       return_url: `${origin}/subscription`,
