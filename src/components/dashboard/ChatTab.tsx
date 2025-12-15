@@ -141,10 +141,9 @@ const ChatTab = () => {
                       ? 'bg-teal text-navy' 
                       : 'bg-white/10 text-white'
                   }`}>
-                    <div 
-                      className="break-words"
-                      dangerouslySetInnerHTML={{ __html: msg.content }}
-                    />
+                    <div className="break-words whitespace-pre-wrap">
+                      {msg.content}
+                    </div>
                     <div className={`text-xs mt-1 opacity-70 ${
                       msg.role === 'user' ? 'text-navy/70' : 'text-white/70'
                     }`}>
