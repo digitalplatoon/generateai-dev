@@ -287,6 +287,41 @@ export type Database = {
         }
         Relationships: []
       }
+      rag_chunks: {
+        Row: {
+          chunk_number: number
+          content: string
+          created_at: string
+          document_id: string
+          embedding: string | null
+          id: string
+        }
+        Insert: {
+          chunk_number: number
+          content: string
+          created_at?: string
+          document_id: string
+          embedding?: string | null
+          id?: string
+        }
+        Update: {
+          chunk_number?: number
+          content?: string
+          created_at?: string
+          document_id?: string
+          embedding?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rag_chunks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "rag_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rag_documents: {
         Row: {
           chunk_size: number | null
@@ -621,6 +656,20 @@ export type Database = {
       has_role: {
         Args: { role: Database["public"]["Enums"]["app_role"]; user_id: string }
         Returns: boolean
+      }
+      search_chunks: {
+        Args: {
+          match_count?: number
+          min_similarity?: number
+          query_embedding: string
+        }
+        Returns: {
+          chunk_number: number
+          content: string
+          document_id: string
+          id: string
+          similarity: number
+        }[]
       }
       upsert_user_subscription: {
         Args: {
