@@ -1,8 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useABTest, HERO_CTA_TEST } from "@/hooks/useABTest";
 
 const HeroSection = () => {
+  const { variant, trackConversion, isLoading } = useABTest(HERO_CTA_TEST);
+
+  const getCTAText = () => {
+    switch (variant) {
+      case 'variant_a':
+        return '🚀 Get Started Now';
+      case 'variant_b':
+        return '🚀 Try Free Today';
+      default:
+        return '🚀 Start Building Free';
+    }
+  };
+
+  const handleCTAClick = () => {
+    trackConversion('cta_click');
+  };
+
   return (
     <section className="min-h-screen flex flex-col justify-center items-center relative pt-20 px-6">
       {/* Background Elements */}
@@ -46,13 +64,19 @@ const HeroSection = () => {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-slide-up" style={{animationDelay: '0.4s'}}>
           <div className="flex flex-col items-center gap-2">
-            <Button asChild size="lg" className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold text-lg px-8 py-6 hover-glow">
-              <Link to="/auth">🚀 Start Building Free</Link>
+            <Button 
+              asChild 
+              size="lg" 
+              className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold text-lg px-8 py-6 hover-glow"
+            >
+              <Link to="/auth" onClick={handleCTAClick}>
+                {isLoading ? '🚀 Loading...' : getCTAText()}
+              </Link>
             </Button>
             <span className="text-xs text-light-gray">No credit card • 100 free prompts</span>
           </div>
           <Button asChild size="lg" variant="outline" className="border-teal/30 text-teal hover:bg-teal/10 text-lg px-8 py-6 hover-glow">
-            <Link to="/auth">▶️ Watch Demo (2 min)</Link>
+            <Link to="/auth" onClick={() => trackConversion('demo_click')}>▶️ Watch Demo (2 min)</Link>
           </Button>
         </div>
 
