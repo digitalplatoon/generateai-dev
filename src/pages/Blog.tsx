@@ -1,12 +1,50 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { Calendar, User, ArrowRight, Tag } from "lucide-react";
+import { useState } from "react";
+import { Calendar, User, ArrowRight, Tag, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import SEOHead from "@/components/seo/SEOHead";
 import { featuredPost, blogPosts } from "@/data/blogPosts";
+import { createBreadcrumbSchema } from "@/components/seo/StructuredData";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { z } from "zod";
+
+const emailSchema = z.string().email("Please enter a valid email address");
 
 const Blog = () => {
   const categories = ["All", "Tutorial", "Industry Insights", "Community", "Technical", "Education", "Ethics"];
+  const [email, setEmail] = useState("");
+  const [isSubscribing, setIsSubscribing] = useState(false);
+
+  const breadcrumbSchema = createBreadcrumbSchema([
+    { name: "Home", url: "https://generateai.dev" },
+    { name: "Blog", url: "https://generateai.dev/blog" }
+  ]);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const result = emailSchema.safeParse(email);
+    if (!result.success) {
+      toast.error(result.error.errors[0].message);
+      return;
+    }
+
+    setIsSubscribing(true);
+    try {
+      const { error } = await supabase.functions.invoke("newsletter-subscribe", {
+        body: { email: email.trim() }
+      });
+
+      if (error) throw error;
+      
+      toast.success("Successfully subscribed! Check your email for confirmation.");
+      setEmail("");
+    } catch (error) {
+      toast.error("Failed to subscribe. Please try again later.");
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
 
   return (
     <>
@@ -15,6 +53,7 @@ const Blog = () => {
         description="Stay updated with the latest insights, tutorials, and trends in AI development. Learn from experts and discover new techniques to enhance your AI projects."
         keywords="AI blog, AI development, machine learning tutorials, prompt engineering, RAG systems, AI agents"
         canonical="https://generateai.dev/blog"
+        schema={breadcrumbSchema}
       />
       <div className="bg-navy">
         {/* Hero Section */}
@@ -164,16 +203,24 @@ const Blog = () => {
               Subscribe to our newsletter and never miss the latest AI development insights, 
               tutorials, and community updates.
             </p>
-            <div className="max-w-md mx-auto flex gap-3">
+            <form onSubmit={handleSubscribe} className="max-w-md mx-auto flex gap-3">
               <input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
+                required
                 className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent"
               />
-              <button className="px-6 py-3 bg-teal text-navy font-semibold rounded-lg hover:bg-teal/90 transition-colors">
-                Subscribe
+              <button 
+                type="submit"
+                disabled={isSubscribing}
+                className="px-6 py-3 bg-teal text-navy font-semibold rounded-lg hover:bg-teal/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isSubscribing && <Loader2 className="w-4 h-4 animate-spin" />}
+                {isSubscribing ? "Subscribing..." : "Subscribe"}
               </button>
-            </div>
+            </form>
           </div>
         </section>
       </div>

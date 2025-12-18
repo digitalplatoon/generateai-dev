@@ -1,4 +1,3 @@
-import React from 'react';
 import { featuredPost } from '@/data/blogPosts';
 
 export const OrganizationSchema = {
@@ -8,6 +7,7 @@ export const OrganizationSchema = {
   "url": "https://generateai.dev",
   "logo": "https://generateai.dev/logo.png",
   "description": "The world's leading platform for learning, building, and deploying generative AI applications",
+  "foundingDate": "2024",
   "sameAs": [
     "https://twitter.com/generateai_dev",
     "https://github.com/generateai-dev",
@@ -16,7 +16,12 @@ export const OrganizationSchema = {
   "contactPoint": {
     "@type": "ContactPoint",
     "contactType": "customer service",
-    "url": "https://generateai.dev/contact"
+    "url": "https://generateai.dev/contact",
+    "email": "support@generateai.dev"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "US"
   }
 };
 
@@ -71,6 +76,23 @@ export const CourseSchema = {
   "educationalLevel": "intermediate"
 };
 
+// BreadcrumbList schema generator
+export interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+export const createBreadcrumbSchema = (items: BreadcrumbItem[]) => ({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": items.map((item, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "name": item.name,
+    "item": item.url
+  }))
+});
+
 type Post = typeof featuredPost;
 
 export const createBlogPostingSchema = (post: Post, url: string) => ({
@@ -81,7 +103,7 @@ export const createBlogPostingSchema = (post: Post, url: string) => ({
   "image": post.image,
   "url": url,
   "datePublished": new Date(post.date).toISOString(),
-  "dateModified": new Date(post.date).toISOString(), // Assuming no modified date is available
+  "dateModified": new Date(post.date).toISOString(),
   "author": {
     "@type": "Person",
     "name": post.author
@@ -99,3 +121,11 @@ export const createBlogPostingSchema = (post: Post, url: string) => ({
     "@id": url
   }
 });
+
+// Dynamic OG Image URL generator
+export const generateOGImageUrl = (title: string, description?: string): string => {
+  const encodedTitle = encodeURIComponent(title.slice(0, 60));
+  const encodedDesc = description ? encodeURIComponent(description.slice(0, 100)) : '';
+  // Using a simple OG image service pattern - can be replaced with custom endpoint
+  return `https://og.generateai.dev/api/og?title=${encodedTitle}&description=${encodedDesc}`;
+};
