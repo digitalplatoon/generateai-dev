@@ -76,6 +76,9 @@ const Header = () => {
                   <DropdownMenuItem>
                     <Link to="/dashboard" className="w-full block">Dashboard</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to="/admin" className="w-full block">Admin Dashboard</Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => signOut()}>Sign Out</DropdownMenuItem>
                 </DropdownMenuContent>
@@ -133,6 +136,9 @@ const Header = () => {
                   <>
                     <Link to="/dashboard" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                       Dashboard
+                    </Link>
+                    <Link to="/admin" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                      Admin Dashboard
                     </Link>
                     <button onClick={() => signOut()} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors w-full text-left">
                       Sign Out
