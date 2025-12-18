@@ -35,6 +35,7 @@ import Privacy from "./pages/Privacy";
 import Cookies from "./pages/Cookies";
 import NotFound from "./pages/NotFound";
 import SitemapXml from "./pages/SitemapXml";
+import AdminDashboard from "./pages/AdminDashboard";
 import GoogleAnalytics from "@/components/seo/GoogleAnalytics";
 import { useWebVitals } from "@/hooks/useWebVitals";
 import "./App.css";
@@ -71,6 +72,7 @@ const App = () => (
                   <Route path="/rag-lab" element={<ProtectedRoute><RagLabFunctional /></ProtectedRoute>} />
                   <Route path="/agents" element={<ProtectedRoute><AgentsFunctional /></ProtectedRoute>} />
                   <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+                  <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/docs" element={<Documentation />} />
                   <Route path="/api" element={<ApiReference />} />
