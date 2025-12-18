@@ -68,6 +68,8 @@ const Blog = () => {
                     src={featuredPost.image}
                     alt={featuredPost.title}
                     className="w-full h-64 object-cover rounded-lg"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
               </div>
