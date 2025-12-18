@@ -1,7 +1,6 @@
-
-import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -47,13 +46,13 @@ const HeroSection = () => {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 animate-slide-up" style={{animationDelay: '0.4s'}}>
           <div className="flex flex-col items-center gap-2">
-            <Button size="lg" className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold text-lg px-8 py-6 hover-glow">
-              🚀 Start Building Free
+            <Button asChild size="lg" className="bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold text-lg px-8 py-6 hover-glow">
+              <Link to="/auth">🚀 Start Building Free</Link>
             </Button>
             <span className="text-xs text-light-gray">No credit card • 100 free prompts</span>
           </div>
-          <Button size="lg" variant="outline" className="border-teal/30 text-teal hover:bg-teal/10 text-lg px-8 py-6 hover-glow">
-            ▶️ Watch Demo (2 min)
+          <Button asChild size="lg" variant="outline" className="border-teal/30 text-teal hover:bg-teal/10 text-lg px-8 py-6 hover-glow">
+            <Link to="/auth">▶️ Watch Demo (2 min)</Link>
           </Button>
         </div>
 
