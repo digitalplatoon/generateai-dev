@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -37,18 +36,26 @@ import Cookies from "./pages/Cookies";
 import NotFound from "./pages/NotFound";
 import SitemapXml from "./pages/SitemapXml";
 import GoogleAnalytics from "@/components/seo/GoogleAnalytics";
+import { useWebVitals } from "@/hooks/useWebVitals";
 import "./App.css";
 
 const queryClient = new QueryClient();
+
+// Web Vitals monitoring component
+const WebVitalsMonitor = ({ children }: { children: React.ReactNode }) => {
+  useWebVitals();
+  return <>{children}</>;
+};
 
 const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <TooltipProvider>
-          <GoogleAnalytics />
-          <Toaster />
-          <Sonner />
+          <WebVitalsMonitor>
+            <GoogleAnalytics />
+            <Toaster />
+            <Sonner />
           <BrowserRouter>
             <div className="min-h-screen flex flex-col bg-dark">
               <Header />
@@ -84,6 +91,7 @@ const App = () => (
               <Footer />
             </div>
           </BrowserRouter>
+          </WebVitalsMonitor>
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
