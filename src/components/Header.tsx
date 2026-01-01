@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useAdminRole } from '@/hooks/useAdminRole';
 import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
@@ -19,6 +20,7 @@ import GlobalSearch from '@/components/search/GlobalSearch';
 
 const Header = () => {
   const { user, signOut } = useAuthContext();
+  const { isAdmin } = useAdminRole();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -76,9 +78,11 @@ const Header = () => {
                   <DropdownMenuItem>
                     <Link to="/dashboard" className="w-full block">Dashboard</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link to="/admin" className="w-full block">Admin Dashboard</Link>
-                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem>
+                      <Link to="/admin" className="w-full block">Admin Dashboard</Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => signOut()}>Sign Out</DropdownMenuItem>
                 </DropdownMenuContent>
@@ -137,9 +141,11 @@ const Header = () => {
                     <Link to="/dashboard" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                       Dashboard
                     </Link>
-                    <Link to="/admin" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
-                      Admin Dashboard
-                    </Link>
+                    {isAdmin && (
+                      <Link to="/admin" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                        Admin Dashboard
+                      </Link>
+                    )}
                     <button onClick={() => signOut()} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors w-full text-left">
                       Sign Out
                     </button>
