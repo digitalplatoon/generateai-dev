@@ -36,6 +36,9 @@ import Cookies from "./pages/Cookies";
 import NotFound from "./pages/NotFound";
 import SitemapXml from "./pages/SitemapXml";
 import AdminDashboard from "./pages/AdminDashboard";
+import SeoProjects from "./pages/SeoProjects";
+import SeoProjectDetail from "./pages/SeoProjectDetail";
+import SeoAuditReport from "./pages/SeoAuditReport";
 import GoogleAnalytics from "@/components/seo/GoogleAnalytics";
 import { useWebVitals } from "@/hooks/useWebVitals";
 import "./App.css";
@@ -73,6 +76,9 @@ const App = () => (
                   <Route path="/agents" element={<ProtectedRoute><AgentsFunctional /></ProtectedRoute>} />
                   <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
                   <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+                  <Route path="/seo-projects" element={<ProtectedRoute><SeoProjects /></ProtectedRoute>} />
+                  <Route path="/seo-projects/:id" element={<ProtectedRoute><SeoProjectDetail /></ProtectedRoute>} />
+                  <Route path="/seo-audit/:scanRunId" element={<ProtectedRoute><SeoAuditReport /></ProtectedRoute>} />
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/docs" element={<Documentation />} />
                   <Route path="/api" element={<ApiReference />} />
