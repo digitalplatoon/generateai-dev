@@ -397,6 +397,330 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_generated_prompts: {
+        Row: {
+          created_at: string | null
+          id: string
+          issues_addressed: string[] | null
+          prompt_content: string
+          prompt_type: string
+          scan_run_id: string
+          url_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          issues_addressed?: string[] | null
+          prompt_content: string
+          prompt_type: string
+          scan_run_id: string
+          url_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          issues_addressed?: string[] | null
+          prompt_content?: string
+          prompt_type?: string
+          scan_run_id?: string
+          url_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seo_generated_prompts_scan_run_id_fkey"
+            columns: ["scan_run_id"]
+            isOneToOne: false
+            referencedRelation: "seo_scan_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seo_generated_prompts_url_id_fkey"
+            columns: ["url_id"]
+            isOneToOne: false
+            referencedRelation: "seo_project_urls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seo_issues: {
+        Row: {
+          category: string
+          change_vs_previous: Json | null
+          created_at: string | null
+          description: string | null
+          evidence: Json | null
+          fix_steps: string[] | null
+          id: string
+          priority: string
+          psi_result_id: string
+          title: string
+        }
+        Insert: {
+          category: string
+          change_vs_previous?: Json | null
+          created_at?: string | null
+          description?: string | null
+          evidence?: Json | null
+          fix_steps?: string[] | null
+          id?: string
+          priority: string
+          psi_result_id: string
+          title: string
+        }
+        Update: {
+          category?: string
+          change_vs_previous?: Json | null
+          created_at?: string | null
+          description?: string | null
+          evidence?: Json | null
+          fix_steps?: string[] | null
+          id?: string
+          priority?: string
+          psi_result_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seo_issues_psi_result_id_fkey"
+            columns: ["psi_result_id"]
+            isOneToOne: false
+            referencedRelation: "seo_psi_results"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seo_project_urls: {
+        Row: {
+          created_at: string | null
+          discovered_from: string | null
+          id: string
+          is_key_url: boolean | null
+          last_scanned_at: string | null
+          project_id: string
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          discovered_from?: string | null
+          id?: string
+          is_key_url?: boolean | null
+          last_scanned_at?: string | null
+          project_id: string
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          discovered_from?: string | null
+          id?: string
+          is_key_url?: boolean | null
+          last_scanned_at?: string | null
+          project_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seo_project_urls_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "seo_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seo_projects: {
+        Row: {
+          country: string | null
+          created_at: string | null
+          domain: string
+          id: string
+          language: string | null
+          name: string
+          notes: string | null
+          priority_score: number | null
+          stack: Json | null
+          tags: string[] | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string | null
+          domain: string
+          id?: string
+          language?: string | null
+          name: string
+          notes?: string | null
+          priority_score?: number | null
+          stack?: Json | null
+          tags?: string[] | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string | null
+          domain?: string
+          id?: string
+          language?: string | null
+          name?: string
+          notes?: string | null
+          priority_score?: number | null
+          stack?: Json | null
+          tags?: string[] | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      seo_prompt_templates: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_default: boolean | null
+          name: string
+          template: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          name: string
+          template: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          template?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      seo_psi_results: {
+        Row: {
+          accessibility_score: number | null
+          best_practices_score: number | null
+          cls: number | null
+          created_at: string | null
+          error_message: string | null
+          fcp_ms: number | null
+          id: string
+          lcp_ms: number | null
+          performance_score: number | null
+          raw_json: Json | null
+          scan_run_id: string
+          seo_score: number | null
+          speed_index: number | null
+          strategy: string
+          tbt_ms: number | null
+          url_id: string
+        }
+        Insert: {
+          accessibility_score?: number | null
+          best_practices_score?: number | null
+          cls?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          fcp_ms?: number | null
+          id?: string
+          lcp_ms?: number | null
+          performance_score?: number | null
+          raw_json?: Json | null
+          scan_run_id: string
+          seo_score?: number | null
+          speed_index?: number | null
+          strategy: string
+          tbt_ms?: number | null
+          url_id: string
+        }
+        Update: {
+          accessibility_score?: number | null
+          best_practices_score?: number | null
+          cls?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          fcp_ms?: number | null
+          id?: string
+          lcp_ms?: number | null
+          performance_score?: number | null
+          raw_json?: Json | null
+          scan_run_id?: string
+          seo_score?: number | null
+          speed_index?: number | null
+          strategy?: string
+          tbt_ms?: number | null
+          url_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seo_psi_results_scan_run_id_fkey"
+            columns: ["scan_run_id"]
+            isOneToOne: false
+            referencedRelation: "seo_scan_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seo_psi_results_url_id_fkey"
+            columns: ["url_id"]
+            isOneToOne: false
+            referencedRelation: "seo_project_urls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      seo_scan_runs: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          project_id: string
+          started_at: string | null
+          status: string | null
+          triggered_by: string | null
+          urls_failed: number | null
+          urls_scanned: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          project_id: string
+          started_at?: string | null
+          status?: string | null
+          triggered_by?: string | null
+          urls_failed?: number | null
+          urls_scanned?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          project_id?: string
+          started_at?: string | null
+          status?: string | null
+          triggered_by?: string | null
+          urls_failed?: number | null
+          urls_scanned?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seo_scan_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "seo_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_plans: {
         Row: {
           created_at: string | null
