@@ -23,3 +23,12 @@ verify_jwt = true
 
 [functions.newsletter-subscribe]
 verify_jwt = false
+
+[functions.seo-scan-project]
+verify_jwt = true
+
+[functions.seo-discover-urls]
+verify_jwt = true
+
+[functions.seo-generate-prompts]
+verify_jwt = true
