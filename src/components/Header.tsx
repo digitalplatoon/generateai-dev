@@ -58,6 +58,11 @@ const Header = () => {
             <Link to="/pricing" className="text-muted-foreground hover:text-primary transition-colors">
               Pricing
             </Link>
+            {isAdmin && (
+              <Link to="/seo-projects" className="text-muted-foreground hover:text-primary transition-colors">
+                SEO Copilot
+              </Link>
+            )}
           </nav>
 
           {/* Search & User Menu */}
@@ -136,6 +141,11 @@ const Header = () => {
                 <Link to="/docs" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                   Docs
                 </Link>
+                {isAdmin && (
+                  <Link to="/seo-projects" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                    SEO Copilot
+                  </Link>
+                )}
                 {user ? (
                   <>
                     <Link to="/dashboard" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
