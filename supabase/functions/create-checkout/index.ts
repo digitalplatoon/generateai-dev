@@ -1,7 +1,7 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,6 +18,12 @@ const ALLOWED_ORIGINS = [
   'http://localhost:5173',
   'http://localhost:8080'
 ];
+
+// Input validation schema
+const checkoutRequestSchema = z.object({
+  planId: z.string().uuid('Invalid plan ID format'),
+  billingPeriod: z.enum(['monthly', 'yearly']).default('monthly'),
+});
 
 function validateOrigin(origin: string | null): string {
   if (!origin) return ALLOWED_ORIGINS[0];
@@ -68,8 +74,22 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const { planId, billingPeriod = 'monthly' } = await req.json();
-    if (!planId) throw new Error("Plan ID is required");
+    // Validate and parse request body
+    const rawBody = await req.json();
+    const parseResult = checkoutRequestSchema.safeParse(rawBody);
+    
+    if (!parseResult.success) {
+      logStep("Validation failed", { errors: parseResult.error.errors });
+      return new Response(JSON.stringify({ 
+        error: "Invalid request parameters",
+        details: parseResult.error.errors.map(e => e.message)
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+    
+    const { planId, billingPeriod } = parseResult.data;
 
     // Get plan details from database
     const { data: plan, error: planError } = await supabaseClient

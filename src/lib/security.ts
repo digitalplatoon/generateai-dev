@@ -56,7 +56,22 @@ export const authSchema = z.object({
     .optional(),
 });
 
-// Rate limiting helper
+/**
+ * CLIENT-SIDE RATE LIMITING
+ * 
+ * IMPORTANT: This is for UX purposes only - to prevent accidental rapid requests
+ * and provide immediate feedback to users. This is NOT a security measure.
+ * 
+ * Attackers can easily bypass this by:
+ * - Clearing browser state
+ * - Opening multiple tabs/sessions
+ * - Modifying client-side code
+ * 
+ * REAL rate limiting is enforced server-side:
+ * - Edge functions check authentication before processing
+ * - rag_rate_limits table tracks server-side limits
+ * - check_rag_rate_limit database function enforces limits
+ */
 const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
 
 export const checkRateLimit = (identifier: string, maxRequests: number = 5, windowMs: number = 60000): boolean => {

@@ -1,14 +1,39 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+// Allowed origins for CORS - restrict to trusted domains only
+const ALLOWED_ORIGINS = [
+  'https://generateai.dev',
+  'https://www.generateai.dev',
+  'https://preview--generateai-dev.lovable.app',
+  'https://generateai-dev.lovable.app',
+  'http://localhost:5173',
+  'http://localhost:8080',
+];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('origin') || '';
+  // Check for Lovable preview URLs pattern
+  const isLovablePreview = origin.match(/^https:\/\/[a-z0-9-]+--generateai-dev\.lovable\.app$/);
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) || isLovablePreview ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  };
+}
+
+// Input validation schema
+const scanRequestSchema = z.object({
+  projectId: z.string().uuid('Invalid project ID format'),
+  urlIds: z.array(z.string().uuid('Invalid URL ID format')).optional(),
+});
 
 const PSI_API_KEY = Deno.env.get('GOOGLE_PSI_API_KEY');
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -19,8 +44,22 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    const { projectId, urlIds } = await req.json();
-    if (!projectId) throw new Error('projectId is required');
+    // Validate and parse request body
+    const rawBody = await req.json();
+    const parseResult = scanRequestSchema.safeParse(rawBody);
+    
+    if (!parseResult.success) {
+      console.error('Validation failed:', parseResult.error.errors);
+      return new Response(JSON.stringify({ 
+        error: 'Invalid request parameters',
+        details: parseResult.error.errors.map(e => e.message)
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
+    const { projectId, urlIds } = parseResult.data;
 
     // Get URLs to scan
     let query = supabase.from('seo_project_urls').select('*').eq('project_id', projectId);
