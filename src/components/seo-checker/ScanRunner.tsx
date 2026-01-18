@@ -19,7 +19,7 @@ interface ScanRunnerProps {
   projectId: string;
   scans: SeoScanRun[];
   isLoading: boolean;
-  onTriggerScan: (urlIds?: string[]) => Promise<void>;
+  onTriggerScan: (urlIds?: string[]) => Promise<unknown>;
   isTriggering: boolean;
   urlCount: number;
 }
