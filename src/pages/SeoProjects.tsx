@@ -7,7 +7,7 @@ import { useSeoProjects } from '@/hooks/useSeoProjects';
 import { ProjectCard } from '@/components/seo-checker/ProjectCard';
 import { ProjectForm } from '@/components/seo-checker/ProjectForm';
 import type { SeoProject } from '@/types/seo';
-import { SEOHead } from '@/components/seo/SEOHead';
+import SEOHead from '@/components/seo/SEOHead';
 
 export default function SeoProjects() {
   const navigate = useNavigate();

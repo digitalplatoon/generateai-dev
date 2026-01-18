@@ -9,7 +9,7 @@ import { IssuesList } from '@/components/seo-checker/IssuesList';
 import { PromptViewer } from '@/components/seo-checker/PromptViewer';
 import { ExportButton } from '@/components/seo-checker/ExportButton';
 import { Badge } from '@/components/ui/badge';
-import { SEOHead } from '@/components/seo/SEOHead';
+import SEOHead from '@/components/seo/SEOHead';
 import { format } from 'date-fns';
 
 export default function SeoAuditReport() {

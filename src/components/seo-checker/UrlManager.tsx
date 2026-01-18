@@ -26,9 +26,9 @@ import { format } from 'date-fns';
 interface UrlManagerProps {
   urls: SeoProjectUrl[];
   isLoading: boolean;
-  onAddUrl: (data: { url: string; is_key_url: boolean }) => Promise<void>;
-  onDeleteUrl: (id: string) => Promise<void>;
-  onDiscoverUrls: () => Promise<void>;
+  onAddUrl: (data: { url: string; is_key_url: boolean }) => Promise<unknown>;
+  onDeleteUrl: (id: string) => Promise<unknown>;
+  onDiscoverUrls: () => Promise<unknown>;
   isAdding: boolean;
   isDeleting: boolean;
   isDiscovering: boolean;

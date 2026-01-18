@@ -8,7 +8,7 @@ import type { SeoGeneratedPrompt } from '@/types/seo';
 
 interface PromptViewerProps {
   prompts: SeoGeneratedPrompt[];
-  onGenerate: () => Promise<void>;
+  onGenerate: () => Promise<unknown>;
   isGenerating: boolean;
   hasIssues: boolean;
 }

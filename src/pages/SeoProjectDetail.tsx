@@ -8,7 +8,7 @@ import { useSeoUrls } from '@/hooks/useSeoUrls';
 import { useSeoScans } from '@/hooks/useSeoScans';
 import { UrlManager } from '@/components/seo-checker/UrlManager';
 import { ScanRunner } from '@/components/seo-checker/ScanRunner';
-import { SEOHead } from '@/components/seo/SEOHead';
+import SEOHead from '@/components/seo/SEOHead';
 
 export default function SeoProjectDetail() {
   const { id } = useParams<{ id: string }>();
