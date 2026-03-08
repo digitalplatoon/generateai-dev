@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
-// Allowed origins for CORS - restrict to trusted domains only
 const ALLOWED_ORIGINS = [
   'https://generateai.dev',
   'https://www.generateai.dev',
@@ -12,10 +11,11 @@ const ALLOWED_ORIGINS = [
 
 function getCorsHeaders(req: Request) {
   const origin = req.headers.get('origin') || '';
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const isLovablePreview = origin.match(/^https:\/\/[a-z0-9-]+--[a-z0-9-]+\.lovable\.app$/);
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) || isLovablePreview ? origin : ALLOWED_ORIGINS[0];
   return {
     'Access-Control-Allow-Origin': allowedOrigin,
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
   };
 }
 
@@ -49,7 +49,6 @@ serve(async (req) => {
       });
     }
 
-    // Fetch user data
     const [logsResult, progressResult, preferencesResult] = await Promise.all([
       supabase.from("ai_audit_logs").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(100),
       supabase.from("user_progress").select("*").eq("user_id", user.id),
@@ -60,7 +59,6 @@ serve(async (req) => {
     const progress = progressResult.data || [];
     const preferences = preferencesResult.data;
 
-    // Prepare summary for AI
     const summary = {
       totalActions: logs.length,
       recentActions: logs.slice(0, 10).map(l => l.action_type),
@@ -79,92 +77,96 @@ serve(async (req) => {
       });
     }
 
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content: "You are an AI learning assistant analyzing user behavior patterns. Generate 3-5 actionable, personalized insights and recommendations based on the user's activity data. Be specific, encouraging, and helpful. Format your response as a JSON array of objects with 'type' (insight/recommendation/tip), 'title', 'description', and 'priority' (low/medium/high) fields."
-          },
-          {
-            role: "user",
-            content: `Analyze this user's behavior and generate personalized insights:\n${JSON.stringify(summary, null, 2)}`
-          }
-        ],
-        tools: [{
-          type: "function",
-          function: {
-            name: "generate_insights",
-            description: "Generate personalized insights and recommendations",
-            parameters: {
-              type: "object",
-              properties: {
-                insights: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      type: { type: "string", enum: ["insight", "recommendation", "tip"] },
-                      title: { type: "string" },
-                      description: { type: "string" },
-                      priority: { type: "string", enum: ["low", "medium", "high"] }
-                    },
-                    required: ["type", "title", "description", "priority"],
-                    additionalProperties: false
-                  }
-                }
-              },
-              required: ["insights"],
-              additionalProperties: false
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
+    try {
+      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            {
+              role: "system",
+              content: "You are an AI learning assistant analyzing user behavior patterns. Generate 3-5 actionable, personalized insights and recommendations based on the user's activity data. Be specific, encouraging, and helpful. Format your response as a JSON array of objects with 'type' (insight/recommendation/tip), 'title', 'description', and 'priority' (low/medium/high) fields."
+            },
+            {
+              role: "user",
+              content: `Analyze this user's behavior and generate personalized insights:\n${JSON.stringify(summary, null, 2)}`
             }
-          }
-        }],
-        tool_choice: { type: "function", function: { name: "generate_insights" } }
-      }),
-    });
+          ],
+          tools: [{
+            type: "function",
+            function: {
+              name: "generate_insights",
+              description: "Generate personalized insights and recommendations",
+              parameters: {
+                type: "object",
+                properties: {
+                  insights: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        type: { type: "string", enum: ["insight", "recommendation", "tip"] },
+                        title: { type: "string" },
+                        description: { type: "string" },
+                        priority: { type: "string", enum: ["low", "medium", "high"] }
+                      },
+                      required: ["type", "title", "description", "priority"],
+                      additionalProperties: false
+                    }
+                  }
+                },
+                required: ["insights"],
+                additionalProperties: false
+              }
+            }
+          }],
+          tool_choice: { type: "function", function: { name: "generate_insights" } }
+        }),
+        signal: controller.signal,
+      });
 
-    if (!aiResponse.ok) {
-      if (aiResponse.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+      if (!aiResponse.ok) {
+        if (aiResponse.status === 429) {
+          return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
+            status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        if (aiResponse.status === 402) {
+          return new Response(JSON.stringify({ error: "AI credits exhausted. Please add credits to continue." }), {
+            status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        const errorText = await aiResponse.text();
+        console.error("AI gateway error:", aiResponse.status, errorText);
+        return new Response(JSON.stringify({ error: "Failed to generate insights" }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      if (aiResponse.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add credits to continue." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+
+      const aiData = await aiResponse.json();
+      const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
+      
+      if (!toolCall) {
+        return new Response(JSON.stringify({ error: "No insights generated" }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const errorText = await aiResponse.text();
-      console.error("AI gateway error:", aiResponse.status, errorText);
-      return new Response(JSON.stringify({ error: "Failed to generate insights" }), {
-        status: 500,
+
+      const insights = JSON.parse(toolCall.function.arguments).insights;
+
+      return new Response(JSON.stringify({ insights }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    } finally {
+      clearTimeout(timeout);
     }
-
-    const aiData = await aiResponse.json();
-    const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
-    
-    if (!toolCall) {
-      return new Response(JSON.stringify({ error: "No insights generated" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const insights = JSON.parse(toolCall.function.arguments).insights;
-
-    return new Response(JSON.stringify({ insights }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
   } catch (error) {
     console.error("Error:", error);
     return new Response(JSON.stringify({ error: error.message || "Unknown error" }), {

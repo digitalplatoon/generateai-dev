@@ -3,23 +3,26 @@ import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
-
-// Allowlist of valid origins to prevent open redirect attacks
 const ALLOWED_ORIGINS = [
-  'https://preview--generateai-dev.lovable.app',
-  'https://generateai-dev.lovable.app',
   'https://generateai.dev',
   'https://www.generateai.dev',
+  'https://generateai-dev.lovable.app',
+  'https://preview--generateai-dev.lovable.app',
   'http://localhost:3000',
   'http://localhost:5173',
-  'http://localhost:8080'
+  'http://localhost:8080',
 ];
 
-// Input validation schema
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('origin') || '';
+  const isLovablePreview = origin.match(/^https:\/\/[a-z0-9-]+--[a-z0-9-]+\.lovable\.app$/);
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) || isLovablePreview ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+  };
+}
+
 const checkoutRequestSchema = z.object({
   planId: z.string().uuid('Invalid plan ID format'),
   billingPeriod: z.enum(['monthly', 'yearly']).default('monthly'),
@@ -28,12 +31,8 @@ const checkoutRequestSchema = z.object({
 function validateOrigin(origin: string | null): string {
   if (!origin) return ALLOWED_ORIGINS[0];
   if (ALLOWED_ORIGINS.includes(origin)) return origin;
-  // Check for Lovable preview URLs pattern
-  if (origin.match(/^https:\/\/[a-z0-9-]+--generateai-dev\.lovable\.app$/)) {
-    return origin;
-  }
-  console.log(`[CREATE-CHECKOUT] Rejected invalid origin: ${origin}`);
-  return ALLOWED_ORIGINS[0]; // Default to production
+  if (origin.match(/^https:\/\/[a-z0-9-]+--[a-z0-9-]+\.lovable\.app$/)) return origin;
+  return ALLOWED_ORIGINS[0];
 }
 
 const logStep = (step: string, details?: any) => {
@@ -42,6 +41,8 @@ const logStep = (step: string, details?: any) => {
 };
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -72,9 +73,8 @@ serve(async (req) => {
     
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated", { userId: user.id });
 
-    // Validate and parse request body
     const rawBody = await req.json();
     const parseResult = checkoutRequestSchema.safeParse(rawBody);
     
@@ -91,7 +91,6 @@ serve(async (req) => {
     
     const { planId, billingPeriod } = parseResult.data;
 
-    // Get plan details from database
     const { data: plan, error: planError } = await supabaseClient
       .from('subscription_plans')
       .select('*')
@@ -104,7 +103,6 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     
-    // Check if customer exists
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId;
     if (customers.data.length > 0) {
@@ -128,9 +126,8 @@ serve(async (req) => {
             currency: "usd",
             product_data: { 
               name: `${plan.name} Plan`,
-              description: `${plan.tier.charAt(0).toUpperCase() + plan.tier.slice(1)} subscription`
             },
-            unit_amount: Math.round(price * 100), // Convert to cents
+            unit_amount: Math.round(price * 100),
             recurring: { 
               interval: billingPeriod === 'monthly' ? "month" : "year"
             },
@@ -148,7 +145,7 @@ serve(async (req) => {
       }
     });
 
-    logStep("Checkout session created", { sessionId: session.id, url: session.url });
+    logStep("Checkout session created", { sessionId: session.id });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
