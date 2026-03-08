@@ -37,8 +37,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       <meta name="robots" content="index, follow" />
       <link rel="canonical" href={currentUrl} />
 
-      {/* Google Site Verification: Replace content with your verification code from Google Search Console */}
-      <meta name="google-site-verification" content="YOUR_GOOGLE_SITE_VERIFICATION_CODE" />
+      {/* Google Site Verification - add actual code when available */}
 
       {/* Open Graph Tags */}
       <meta property="og:title" content={fullTitle} />

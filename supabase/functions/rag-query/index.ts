@@ -4,7 +4,6 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
-// Allowed origins for CORS - restrict to trusted domains only
 const ALLOWED_ORIGINS = [
   'https://generateai.dev',
   'https://www.generateai.dev',
@@ -15,14 +14,14 @@ const ALLOWED_ORIGINS = [
 
 function getCorsHeaders(req: Request) {
   const origin = req.headers.get('origin') || '';
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const isLovablePreview = origin.match(/^https:\/\/[a-z0-9-]+--[a-z0-9-]+\.lovable\.app$/);
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) || isLovablePreview ? origin : ALLOWED_ORIGINS[0];
   return {
     'Access-Control-Allow-Origin': allowedOrigin,
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
   };
 }
 
-// Input validation schema
 const querySchema = z.object({
   query: z.string().min(1).max(2000),
   numResults: z.number().int().min(1).max(50).optional().default(5),
@@ -47,29 +46,23 @@ serve(async (req) => {
       }
     );
 
-    // Get authenticated user
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     if (authError || !user) {
       throw new Error('Unauthorized');
     }
 
-    // Parse and validate input
     const body = await req.json();
     const validationResult = querySchema.safeParse(body);
     
     if (!validationResult.success) {
       return new Response(
         JSON.stringify({ error: 'Invalid input parameters', details: validationResult.error.issues }),
-        { 
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     const { query, numResults, minScore } = validationResult.data;
 
-    // Check rate limit: 100 queries per minute
     const { data: rateLimitOk } = await supabaseClient.rpc('check_rag_rate_limit', {
       p_user_id: user.id,
       p_endpoint: 'rag-query',
@@ -80,16 +73,12 @@ serve(async (req) => {
     if (!rateLimitOk) {
       return new Response(
         JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
-        { 
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     console.log('Processing query:', query.substring(0, 100));
 
-    // Generate embedding for the query
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openaiApiKey) {
       throw new Error('OpenAI API key not configured');
@@ -97,7 +86,6 @@ serve(async (req) => {
 
     const queryEmbedding = await generateEmbedding(query, openaiApiKey);
 
-    // Search for similar chunks using vector similarity
     const { data: chunks, error: searchError } = await supabaseClient.rpc('search_chunks', {
       query_embedding: queryEmbedding,
       match_threshold: minScore,
@@ -108,22 +96,27 @@ serve(async (req) => {
       throw new Error(`Search failed: ${searchError.message}`);
     }
 
-    // Get document information for each chunk
-    const results = [];
-    for (const chunk of chunks || []) {
-      const { data: document } = await supabaseClient
+    // Batch-fetch document names to avoid N+1 queries
+    const documentIds = [...new Set((chunks || []).map((c: any) => c.document_id))];
+    const documentMap: Record<string, string> = {};
+    
+    if (documentIds.length > 0) {
+      const { data: documents } = await supabaseClient
         .from('rag_documents')
-        .select('name')
-        .eq('id', chunk.document_id)
-        .single();
-
-      results.push({
-        score: chunk.similarity,
-        source: document?.name || 'Unknown',
-        chunk: chunk.chunk_index + 1,
-        content: chunk.content,
-      });
+        .select('id, name')
+        .in('id', documentIds);
+      
+      for (const doc of documents || []) {
+        documentMap[doc.id] = doc.name;
+      }
     }
+
+    const results = (chunks || []).map((chunk: any) => ({
+      score: chunk.similarity,
+      source: documentMap[chunk.document_id] || 'Unknown',
+      chunk: (chunk.chunk_index ?? chunk.chunk_number ?? 0) + 1,
+      content: chunk.content,
+    }));
 
     console.log(`Found ${results.length} relevant chunks`);
 
@@ -136,32 +129,37 @@ serve(async (req) => {
     console.error('Error in RAG query:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
 
 async function generateEmbedding(text: string, apiKey: string): Promise<number[]> {
-  const response = await fetch('https://api.openai.com/v1/embeddings', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'text-embedding-3-small',
-      input: text,
-    }),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`OpenAI API error: ${error}`);
+  try {
+    const response = await fetch('https://api.openai.com/v1/embeddings', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'text-embedding-3-small',
+        input: text,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`OpenAI API error: ${error}`);
+    }
+
+    const data = await response.json();
+    return data.data[0].embedding;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  const data = await response.json();
-  return data.data[0].embedding;
 }

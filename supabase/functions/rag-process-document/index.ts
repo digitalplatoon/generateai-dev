@@ -4,7 +4,6 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
-// Allowed origins for CORS - restrict to trusted domains only
 const ALLOWED_ORIGINS = [
   'https://generateai.dev',
   'https://www.generateai.dev',
@@ -15,28 +14,19 @@ const ALLOWED_ORIGINS = [
 
 function getCorsHeaders(req: Request) {
   const origin = req.headers.get('origin') || '';
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const isLovablePreview = origin.match(/^https:\/\/[a-z0-9-]+--[a-z0-9-]+\.lovable\.app$/);
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) || isLovablePreview ? origin : ALLOWED_ORIGINS[0];
   return {
     'Access-Control-Allow-Origin': allowedOrigin,
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
   };
 }
 
-// Input validation schema
 const processDocumentSchema = z.object({
   documentId: z.string().uuid(),
 });
 
-// Max file size: 5MB (5 * 1024 * 1024 bytes)
 const MAX_FILE_SIZE = 5242880;
-
-interface DocumentData {
-  id: string;
-  content: string;
-  chunk_size: number;
-  overlap: number;
-  embedding_model: string;
-}
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
@@ -44,6 +34,9 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // Store documentId at top scope for error handler
+  let parsedDocumentId: string | null = null;
 
   try {
     const supabaseClient = createClient(
@@ -56,29 +49,24 @@ serve(async (req) => {
       }
     );
 
-    // Get authenticated user
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     if (authError || !user) {
       throw new Error('Unauthorized');
     }
 
-    // Parse and validate input
     const body = await req.json();
     const validationResult = processDocumentSchema.safeParse(body);
     
     if (!validationResult.success) {
       return new Response(
         JSON.stringify({ error: 'Invalid document ID format', details: validationResult.error.issues }),
-        { 
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     const { documentId } = validationResult.data;
+    parsedDocumentId = documentId;
 
-    // Check rate limit: 10 document uploads per hour
     const { data: rateLimitOk } = await supabaseClient.rpc('check_rag_rate_limit', {
       p_user_id: user.id,
       p_endpoint: 'rag-process-document',
@@ -89,15 +77,11 @@ serve(async (req) => {
     if (!rateLimitOk) {
       return new Response(
         JSON.stringify({ error: 'Rate limit exceeded. Maximum 10 document uploads per hour.' }),
-        { 
-          status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
     console.log('Processing document:', documentId);
 
-    // Get document data
     const { data: document, error: docError } = await supabaseClient
       .from('rag_documents')
       .select('*')
@@ -108,7 +92,6 @@ serve(async (req) => {
       throw new Error(`Failed to fetch document: ${docError.message}`);
     }
 
-    // Validate file size
     if (document.file_size > MAX_FILE_SIZE) {
       await supabaseClient
         .from('rag_documents')
@@ -118,17 +101,14 @@ serve(async (req) => {
       throw new Error('Document exceeds maximum size of 5MB');
     }
 
-    // Update status to processing
     await supabaseClient
       .from('rag_documents')
       .update({ status: 'processing' })
       .eq('id', documentId);
 
-    // Chunk the document
     const chunks = chunkText(document.content, document.chunk_size, document.overlap);
     console.log(`Created ${chunks.length} chunks`);
 
-    // Generate embeddings for each chunk
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openaiApiKey) {
       throw new Error('OpenAI API key not configured');
@@ -142,13 +122,12 @@ serve(async (req) => {
       
       chunkData.push({
         document_id: documentId,
-        chunk_index: i,
+        chunk_number: i,
         content: chunks[i],
         embedding: embedding,
       });
     }
 
-    // Store chunks and embeddings
     const { error: chunksError } = await supabaseClient
       .from('rag_chunks')
       .insert(chunkData);
@@ -157,7 +136,6 @@ serve(async (req) => {
       throw new Error(`Failed to store chunks: ${chunksError.message}`);
     }
 
-    // Update document status to processed
     await supabaseClient
       .from('rag_documents')
       .update({ status: 'processed' })
@@ -177,10 +155,9 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error processing document:', error);
 
-    // Update document status to error if we have the documentId
-    try {
-      const { documentId } = await req.json();
-      if (documentId) {
+    // Update document status to error using the stored documentId
+    if (parsedDocumentId) {
+      try {
         const supabaseClient = createClient(
           Deno.env.get('SUPABASE_URL') ?? '',
           Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -194,18 +171,15 @@ serve(async (req) => {
         await supabaseClient
           .from('rag_documents')
           .update({ status: 'error' })
-          .eq('id', documentId);
+          .eq('id', parsedDocumentId);
+      } catch (updateError) {
+        console.error('Failed to update document status to error:', updateError);
       }
-    } catch (updateError) {
-      console.error('Failed to update document status to error:', updateError);
     }
 
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
@@ -227,23 +201,31 @@ function chunkText(text: string, chunkSize: number, overlap: number): string[] {
 }
 
 async function generateEmbedding(text: string, apiKey: string): Promise<number[]> {
-  const response = await fetch('https://api.openai.com/v1/embeddings', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'text-embedding-3-small',
-      input: text,
-    }),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`OpenAI API error: ${error}`);
+  try {
+    const response = await fetch('https://api.openai.com/v1/embeddings', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'text-embedding-3-small',
+        input: text,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`OpenAI API error: ${error}`);
+    }
+
+    const data = await response.json();
+    return data.data[0].embedding;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  const data = await response.json();
-  return data.data[0].embedding;
 }

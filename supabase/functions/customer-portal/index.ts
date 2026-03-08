@@ -3,31 +3,31 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
-
-// Allowlist of valid origins to prevent open redirect attacks
 const ALLOWED_ORIGINS = [
-  'https://preview--generateai-dev.lovable.app',
-  'https://generateai-dev.lovable.app',
   'https://generateai.dev',
   'https://www.generateai.dev',
+  'https://generateai-dev.lovable.app',
+  'https://preview--generateai-dev.lovable.app',
   'http://localhost:3000',
   'http://localhost:5173',
-  'http://localhost:8080'
+  'http://localhost:8080',
 ];
+
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('origin') || '';
+  const isLovablePreview = origin.match(/^https:\/\/[a-z0-9-]+--[a-z0-9-]+\.lovable\.app$/);
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) || isLovablePreview ? origin : ALLOWED_ORIGINS[0];
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+  };
+}
 
 function validateOrigin(origin: string | null): string {
   if (!origin) return ALLOWED_ORIGINS[0];
   if (ALLOWED_ORIGINS.includes(origin)) return origin;
-  // Check for Lovable preview URLs pattern
-  if (origin.match(/^https:\/\/[a-z0-9-]+--generateai-dev\.lovable\.app$/)) {
-    return origin;
-  }
-  console.log(`[CUSTOMER-PORTAL] Rejected invalid origin: ${origin}`);
-  return ALLOWED_ORIGINS[0]; // Default to production
+  if (origin.match(/^https:\/\/[a-z0-9-]+--[a-z0-9-]+\.lovable\.app$/)) return origin;
+  return ALLOWED_ORIGINS[0];
 }
 
 const logStep = (step: string, details?: any) => {
@@ -36,6 +36,8 @@ const logStep = (step: string, details?: any) => {
 };
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -84,7 +86,7 @@ serve(async (req) => {
       return_url: `${origin}/subscription`,
     });
     
-    logStep("Customer portal session created", { sessionId: portalSession.id, url: portalSession.url });
+    logStep("Customer portal session created", { sessionId: portalSession.id });
 
     return new Response(JSON.stringify({ url: portalSession.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
