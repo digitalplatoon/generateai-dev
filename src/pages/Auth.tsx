@@ -341,6 +341,7 @@ const Auth = () => {
               </Card>
             </TabsContent>
           </Tabs>
+            </>
           )}
 
           {successMessage && (
