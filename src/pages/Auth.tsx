@@ -12,6 +12,8 @@ import { authSchema, sanitizeText } from '@/lib/security';
 import { useToast } from '@/hooks/use-toast';
 import SEOHead from '@/components/seo/SEOHead';
 import { PasswordResetForm } from '@/components/auth/PasswordResetForm';
+import { lovable } from '@/integrations/lovable/index';
+import { Separator } from '@/components/ui/separator';
 
 const Auth = () => {
   const { signIn, signUp, user, loading } = useAuth();
