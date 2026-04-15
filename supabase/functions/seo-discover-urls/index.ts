@@ -20,6 +20,42 @@ function getCorsHeaders(req: Request) {
   };
 }
 
+function validateDomainSafety(domain: string): void {
+  let domainUrl: URL;
+  try {
+    domainUrl = new URL(domain);
+  } catch {
+    throw new Error('Invalid domain URL format');
+  }
+
+  if (!['http:', 'https:'].includes(domainUrl.protocol)) {
+    throw new Error('Invalid protocol: only http/https allowed');
+  }
+
+  const hostname = domainUrl.hostname.toLowerCase();
+
+  const BLOCKED_PATTERNS = [
+    /^localhost$/i,
+    /^127\./,
+    /^0\.0\.0\.0$/,
+    /^10\./,
+    /^172\.(1[6-9]|2[0-9]|3[01])\./,
+    /^192\.168\./,
+    /^169\.254\./,
+    /^fc00:/,
+    /^fe80:/,
+    /^\[::1\]$/,
+  ];
+
+  if (BLOCKED_PATTERNS.some(pattern => pattern.test(hostname))) {
+    throw new Error('Cannot fetch from internal/private IP addresses');
+  }
+
+  if (!hostname.includes('.')) {
+    throw new Error('Domain must be a valid public hostname');
+  }
+}
+
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
 
@@ -58,6 +94,10 @@ serve(async (req) => {
     if (!isOwner && !isAdmin) throw new Error('Access denied');
 
     const domain = project.domain.replace(/\/$/, '');
+    
+    // Validate domain to prevent SSRF
+    validateDomainSafety(domain);
+    
     const urls: string[] = [];
 
     // Try sitemap.xml with timeout

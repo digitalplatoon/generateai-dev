@@ -9,7 +9,7 @@ const GoogleAnalytics: React.FC = () => {
 
   useEffect(() => {
     // Only add the script in production and if a valid ID is provided.
-    if (process.env.NODE_ENV !== 'production' || !GA_TRACKING_ID.startsWith('G-')) {
+    if (import.meta.env.MODE !== 'production' || !GA_TRACKING_ID.startsWith('G-')) {
       return;
     }
 
@@ -34,7 +34,7 @@ const GoogleAnalytics: React.FC = () => {
   }, []);
 
   // Only add the script in production and if a valid ID is provided.
-  if (process.env.NODE_ENV !== 'production' || !GA_TRACKING_ID.startsWith('G-') || !shouldLoadGA) {
+  if (import.meta.env.MODE !== 'production' || !GA_TRACKING_ID.startsWith('G-') || !shouldLoadGA) {
     return null;
   }
 
