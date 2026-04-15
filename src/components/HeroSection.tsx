@@ -76,7 +76,7 @@ const HeroSection = () => {
             <span className="text-xs text-light-gray">No credit card • 100 free prompts</span>
           </div>
           <Button asChild size="lg" variant="outline" className="border-teal/30 text-teal hover:bg-teal/10 text-lg px-8 py-6 hover-glow">
-            <Link to="/auth" onClick={() => trackConversion('demo_click')}>▶️ Watch Demo (2 min)</Link>
+            <Link to="/docs" onClick={() => trackConversion('demo_click')}>📖 Explore Docs</Link>
           </Button>
         </div>
 

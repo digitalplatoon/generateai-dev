@@ -4,6 +4,7 @@ import { OrganizationSchema, WebsiteSchema, SoftwareApplicationSchema } from "@/
 import HeroSection from "@/components/HeroSection";
 import LearningPathsSection from "@/components/LearningPathsSection";
 import PromptLibrarySection from "@/components/PromptLibrarySection";
+import TestimonialsSection from "@/components/TestimonialsSection";
 
 const Index = () => {
   const combinedSchema = {
@@ -24,6 +25,7 @@ const Index = () => {
         <HeroSection />
         <LearningPathsSection />
         <PromptLibrarySection />
+        <TestimonialsSection />
       </div>
     </>
   );

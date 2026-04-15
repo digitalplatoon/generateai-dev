@@ -81,7 +81,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-border pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="text-muted-foreground text-sm mb-4 md:mb-0">
-            © {new Date().getFullYear()} Available View. All rights reserved.
+            © {new Date().getFullYear()} GenerateAI.dev. All rights reserved.
           </div>
           <div className="flex space-x-6 text-sm">
             <Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors">

@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Menu, X } from 'lucide-react';
 import EnhancedLogo from '@/components/ui/EnhancedLogo';
 import GlobalSearch from '@/components/search/GlobalSearch';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const Header = () => {
   const { user, signOut } = useAuthContext();
@@ -68,6 +69,7 @@ const Header = () => {
           {/* Search & User Menu */}
           <div className="hidden md:flex items-center space-x-4">
             <GlobalSearch />
+            <ThemeToggle />
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -121,53 +123,53 @@ const Header = () => {
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
               <div className="absolute top-full right-0 bg-card border border-border rounded-md shadow-lg mt-2 py-2 w-48 z-50">
-                <Link to="/paths" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/paths" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                   Learning Paths
                 </Link>
-                <Link to="/prompts" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/prompts" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                   Prompts
                 </Link>
-                <Link to="/rag-lab" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/rag-lab" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                   RAG Lab
                 </Link>
-                <Link to="/agents" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/agents" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                   Agents
                 </Link>
-                <Link to="/analytics" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/analytics" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                   Analytics
                 </Link>
-                 <Link to="/enhanced-ai" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+                 <Link to="/enhanced-ai" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
                   Enhanced AI
                   <Badge variant="secondary" className="text-xs">New</Badge>
                 </Link>
-                <Link to="/docs" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/docs" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                   Docs
                 </Link>
                 {isAdmin && (
-                  <Link to="/seo-projects" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                  <Link to="/seo-projects" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                     SEO Copilot
                   </Link>
                 )}
                 {user ? (
                   <>
-                    <Link to="/dashboard" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                    <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                       Dashboard
                     </Link>
                     {isAdmin && (
-                      <Link to="/admin" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                      <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                         Admin Dashboard
                       </Link>
                     )}
-                    <button onClick={() => signOut()} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors w-full text-left">
+                    <button onClick={() => { signOut(); setIsMobileMenuOpen(false); }} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors w-full text-left">
                       Sign Out
                     </button>
                   </>
                 ) : (
                   <>
-                    <Link to="/auth" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                    <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                       Sign In
                     </Link>
-                    <Link to="/auth" className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
+                    <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-muted-foreground hover:text-primary transition-colors">
                       Sign Up
                     </Link>
                   </>

@@ -6,238 +6,17 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { BookOpen, Code, FolderOpen, Search, Filter, Play, Clock, Trophy, Users } from 'lucide-react';
+import { learningPaths, roleOptions, techStack } from '@/data/learningPaths';
 
 const LearningPaths = () => {
   const [selectedRole, setSelectedRole] = useState("Beginner");
   const [selectedTech, setSelectedTech] = useState("Python");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const roleOptions = ["Beginner", "Full-Stack", "ML Engineer", "DevOps", "Data Scientist"];
-  const techStack = ["Python", "JavaScript", "Rust", "Enterprise", "React", "Node.js"];
-
-  const learningPaths = {
-    "Beginner": {
-      "Python": [
-        { 
-          title: "AI Fundamentals", 
-          duration: "2 weeks", 
-          modules: 8, 
-          badge: "Foundation", 
-          description: "Learn the core concepts of artificial intelligence and machine learning",
-          difficulty: "Beginner",
-          enrolled: 1247,
-          rating: 4.8,
-          progress: 0
-        },
-        { 
-          title: "Prompt Engineering", 
-          duration: "1 week", 
-          modules: 5, 
-          badge: "Prompting", 
-          description: "Master the art of crafting effective prompts for AI models",
-          difficulty: "Beginner",
-          enrolled: 892,
-          rating: 4.9,
-          progress: 0
-        },
-        { 
-          title: "Basic RAG Systems", 
-          duration: "3 weeks", 
-          modules: 12, 
-          badge: "RAG Builder", 
-          description: "Build your first Retrieval-Augmented Generation system",
-          difficulty: "Intermediate",
-          enrolled: 634,
-          rating: 4.7,
-          progress: 0
-        }
-      ],
-      "JavaScript": [
-        { 
-          title: "Web AI Integration", 
-          duration: "2 weeks", 
-          modules: 10, 
-          badge: "Frontend AI", 
-          description: "Integrate AI capabilities into web applications",
-          difficulty: "Beginner",
-          enrolled: 567,
-          rating: 4.6,
-          progress: 0
-        },
-        { 
-          title: "Node.js AI APIs", 
-          duration: "2.5 weeks", 
-          modules: 9, 
-          badge: "Backend AI", 
-          description: "Create AI-powered backend services with Node.js",
-          difficulty: "Intermediate",
-          enrolled: 432,
-          rating: 4.5,
-          progress: 0
-        },
-        { 
-          title: "React AI Components", 
-          duration: "1.5 weeks", 
-          modules: 7, 
-          badge: "Component Master", 
-          description: "Build reusable AI components for React",
-          difficulty: "Intermediate",
-          enrolled: 789,
-          rating: 4.8,
-          progress: 0
-        }
-      ]
-    },
-    "Full-Stack": {
-      "Python": [
-        { 
-          title: "FastAPI + LangChain", 
-          duration: "3 weeks", 
-          modules: 15, 
-          badge: "API Master", 
-          description: "Build production-ready AI APIs with FastAPI and LangChain",
-          difficulty: "Advanced",
-          enrolled: 345,
-          rating: 4.9,
-          progress: 0
-        },
-        { 
-          title: "Vector Databases", 
-          duration: "2 weeks", 
-          modules: 8, 
-          badge: "Vector Expert", 
-          description: "Master vector databases for AI applications",
-          difficulty: "Advanced",
-          enrolled: 278,
-          rating: 4.7,
-          progress: 0
-        },
-        { 
-          title: "Production RAG", 
-          duration: "4 weeks", 
-          modules: 18, 
-          badge: "RAG Architect", 
-          description: "Deploy scalable RAG systems in production",
-          difficulty: "Expert",
-          enrolled: 198,
-          rating: 4.8,
-          progress: 0
-        }
-      ],
-      "JavaScript": [
-        { 
-          title: "Next.js AI Apps", 
-          duration: "3 weeks", 
-          modules: 14, 
-          badge: "Full-Stack AI", 
-          description: "Build full-stack AI applications with Next.js",
-          difficulty: "Advanced",
-          enrolled: 412,
-          rating: 4.6,
-          progress: 0
-        },
-        { 
-          title: "Serverless AI", 
-          duration: "2 weeks", 
-          modules: 9, 
-          badge: "Serverless Pro", 
-          description: "Deploy AI functions with serverless architecture",
-          difficulty: "Advanced",
-          enrolled: 234,
-          rating: 4.5,
-          progress: 0
-        },
-        { 
-          title: "Real-time AI Chat", 
-          duration: "2.5 weeks", 
-          modules: 11, 
-          badge: "Chat Expert", 
-          description: "Create real-time AI chat applications",
-          difficulty: "Advanced",
-          enrolled: 356,
-          rating: 4.7,
-          progress: 0
-        }
-      ]
-    },
-    "ML Engineer": {
-      "Python": [
-        { 
-          title: "Model Fine-tuning", 
-          duration: "4 weeks", 
-          modules: 20, 
-          badge: "Tuning Expert", 
-          description: "Fine-tune large language models for specific tasks",
-          difficulty: "Expert",
-          enrolled: 156,
-          rating: 4.9,
-          progress: 0
-        },
-        { 
-          title: "Custom Training", 
-          duration: "5 weeks", 
-          modules: 25, 
-          badge: "ML Architect", 
-          description: "Train custom AI models from scratch",
-          difficulty: "Expert",
-          enrolled: 89,
-          rating: 4.8,
-          progress: 0
-        },
-        { 
-          title: "Model Deployment", 
-          duration: "3 weeks", 
-          modules: 15, 
-          badge: "Deploy Master", 
-          description: "Deploy and monitor ML models in production",
-          difficulty: "Expert",
-          enrolled: 134,
-          rating: 4.7,
-          progress: 0
-        }
-      ],
-      "Rust": [
-        { 
-          title: "Rust AI Performance", 
-          duration: "4 weeks", 
-          modules: 18, 
-          badge: "Performance Expert", 
-          description: "Build high-performance AI applications with Rust",
-          difficulty: "Expert",
-          enrolled: 67,
-          rating: 4.6,
-          progress: 0
-        },
-        { 
-          title: "WASM AI Models", 
-          duration: "3 weeks", 
-          modules: 12, 
-          badge: "WASM Master", 
-          description: "Deploy AI models to the browser with WebAssembly",
-          difficulty: "Expert",
-          enrolled: 45,
-          rating: 4.5,
-          progress: 0
-        },
-        { 
-          title: "GPU Acceleration", 
-          duration: "3.5 weeks", 
-          modules: 16, 
-          badge: "GPU Specialist", 
-          description: "Accelerate AI workloads with GPU computing",
-          difficulty: "Expert",
-          enrolled: 78,
-          rating: 4.8,
-          progress: 0
-        }
-      ]
-    }
-  };
-
   const currentPaths = learningPaths[selectedRole]?.[selectedTech] || [];
   const filteredPaths = currentPaths.filter(path => 
     path.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    path.description.toLowerCase().includes(searchTerm.toLowerCase())
+    (path.description || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getDifficultyColor = (difficulty: string) => {
@@ -251,16 +30,23 @@ const LearningPaths = () => {
   };
 
   return (
-    <div className="pt-20 bg-gradient-to-br from-navy via-navy/95 to-black">
-      <div className="container mx-auto px-6 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">
-            <span className="text-gradient">Learning Paths</span>
-          </h1>
-          <p className="text-xl text-light-gray max-w-2xl mx-auto">
-            Curated roadmaps to master AI development with interactive labs and NFT badges
-          </p>
-        </div>
+    <>
+      <SEOHead
+        title="Learning Paths - Master AI Development | GenerateAI.dev"
+        description="Curated AI learning roadmaps for every skill level. Master LLMs, RAG systems, prompt engineering, and AI agent development with interactive labs."
+        keywords="AI learning paths, LLM tutorial, RAG tutorial, prompt engineering course, AI development roadmap"
+        canonical="https://generateai.dev/paths"
+      />
+      <div className="pt-20 bg-gradient-to-br from-navy via-navy/95 to-black">
+        <div className="container mx-auto px-6 py-12">
+          <div className="text-center mb-12">
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-6">
+              <span className="text-gradient">Learning Paths</span>
+            </h1>
+            <p className="text-xl text-light-gray max-w-2xl mx-auto">
+              Curated roadmaps to master AI development with interactive labs and NFT badges
+            </p>
+          </div>
 
           {/* Search and Filters */}
           <div className="glass rounded-xl p-6 mb-8">
@@ -323,69 +109,89 @@ const LearningPaths = () => {
 
           {/* Learning Path Cards */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {filteredPaths.map((path, index) => (
-              <Card key={index} className="glass border-white/20 hover-glow transition-all duration-300 hover:scale-105">
-                <CardHeader>
-                  <div className="flex items-center justify-between mb-2">
-                    <BookOpen className="w-8 h-8 text-teal" />
-                    <div className="flex gap-2">
-                      <Badge variant="secondary" className="bg-teal/20 text-teal border-teal/30">
-                        {path.badge}
-                      </Badge>
-                      <Badge variant="outline" className={getDifficultyColor(path.difficulty)}>
-                        {path.difficulty}
-                      </Badge>
+            {filteredPaths.length === 0 ? (
+              <div className="col-span-full text-center py-16">
+                <BookOpen className="w-12 h-12 text-light-gray/40 mx-auto mb-4" />
+                <p className="text-light-gray text-lg font-display">No learning paths found</p>
+                <p className="text-light-gray/60 text-sm mt-2">
+                  {searchTerm ? 'Try a different search term.' : 'Try selecting a different role or tech stack combination.'}
+                </p>
+              </div>
+            ) : (
+              filteredPaths.map((path, index) => (
+                <Card key={index} className="glass border-white/20 hover-glow transition-all duration-300 hover:scale-105">
+                  <CardHeader>
+                    <div className="flex items-center justify-between mb-2">
+                      <BookOpen className="w-8 h-8 text-teal" />
+                      <div className="flex gap-2">
+                        <Badge variant="secondary" className="bg-teal/20 text-teal border-teal/30">
+                          {path.badge}
+                        </Badge>
+                        {path.difficulty && (
+                          <Badge variant="outline" className={getDifficultyColor(path.difficulty)}>
+                            {path.difficulty}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <CardTitle className="text-xl font-display text-white">
-                    {path.title}
-                  </CardTitle>
-                  <CardDescription className="text-light-gray">
-                    {path.duration} • {path.modules} modules
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-light-gray mb-4">{path.description}</p>
-                  
-                  <div className="flex items-center justify-between mb-4 text-sm text-light-gray">
-                    <div className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
-                      <span>{path.enrolled.toLocaleString()} enrolled</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Trophy className="w-4 h-4 text-yellow-400" />
-                      <span>{path.rating}</span>
-                    </div>
-                  </div>
+                    <CardTitle className="text-xl font-display text-white">
+                      {path.title}
+                    </CardTitle>
+                    <CardDescription className="text-light-gray">
+                      {path.duration} • {path.modules} modules
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {path.description && (
+                      <p className="text-sm text-light-gray mb-4">{path.description}</p>
+                    )}
+                    
+                    {(path.enrolled || path.rating) && (
+                      <div className="flex items-center justify-between mb-4 text-sm text-light-gray">
+                        {path.enrolled && (
+                          <div className="flex items-center gap-1">
+                            <Users className="w-4 h-4" />
+                            <span>{path.enrolled.toLocaleString()} enrolled</span>
+                          </div>
+                        )}
+                        {path.rating && (
+                          <div className="flex items-center gap-1">
+                            <Trophy className="w-4 h-4 text-yellow-400" />
+                            <span>{path.rating}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-4 text-sm text-light-gray">
-                      <span className="flex items-center space-x-1">
-                        <Code className="w-4 h-4" />
-                        <span>Interactive Labs</span>
-                      </span>
-                      <span className="flex items-center space-x-1">
-                        <FolderOpen className="w-4 h-4" />
-                        <span>Projects</span>
-                      </span>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-4 text-sm text-light-gray">
+                        <span className="flex items-center space-x-1">
+                          <Code className="w-4 h-4" />
+                          <span>Interactive Labs</span>
+                        </span>
+                        <span className="flex items-center space-x-1">
+                          <FolderOpen className="w-4 h-4" />
+                          <span>Projects</span>
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm text-light-gray mb-1">
-                      <span>Progress</span>
-                      <span>{path.progress}%</span>
+                    
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm text-light-gray mb-1">
+                        <span>Progress</span>
+                        <span>{path.progress || 0}%</span>
+                      </div>
+                      <Progress value={path.progress || 0} className="h-2 bg-navy/50" />
                     </div>
-                    <Progress value={path.progress} className="h-2 bg-navy/50" />
-                  </div>
-                  
-                  <Button className="w-full bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold">
-                    <Play className="w-4 h-4 mr-2" />
-                    {path.progress > 0 ? 'Continue Learning' : 'Start Learning Path'}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+                    
+                    <Button className="w-full bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold">
+                      <Play className="w-4 h-4 mr-2" />
+                      {(path.progress || 0) > 0 ? 'Continue Learning' : 'Start Learning Path'}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
 
           {/* Enhanced Features Section */}
@@ -421,11 +227,12 @@ const LearningPaths = () => {
                 </div>
                 <h4 className="font-display font-semibold mb-2">Community Learning</h4>
                 <p className="text-sm text-light-gray">Learn with peers and expert mentors</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
