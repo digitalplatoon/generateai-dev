@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Menu, X } from 'lucide-react';
 import EnhancedLogo from '@/components/ui/EnhancedLogo';
 import GlobalSearch from '@/components/search/GlobalSearch';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const Header = () => {
   const { user, signOut } = useAuthContext();
@@ -68,6 +69,7 @@ const Header = () => {
           {/* Search & User Menu */}
           <div className="hidden md:flex items-center space-x-4">
             <GlobalSearch />
+            <ThemeToggle />
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
