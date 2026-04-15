@@ -19,6 +19,7 @@ const Auth = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showPasswordReset, setShowPasswordReset] = useState(false);
 
@@ -116,7 +117,8 @@ const Auth = () => {
           title: "Account Created",
           description: "Please check your email to confirm your account!",
         });
-        setError('Please check your email to confirm your account!');
+        setError(null);
+        setSuccessMessage('Please check your email to confirm your account!');
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
@@ -298,6 +300,14 @@ const Auth = () => {
               </Card>
             </TabsContent>
           </Tabs>
+          )}
+
+          {successMessage && (
+            <Alert className="mt-4 border-green-500/20 bg-green-500/10">
+              <AlertDescription className="text-green-400">
+                {successMessage}
+              </AlertDescription>
+            </Alert>
           )}
 
           {error && (
