@@ -16,7 +16,7 @@ const Index = () => {
     <>
       <SEOHead
         title="GenerateAI.dev - Build Production-Ready AI Agents in Minutes"
-        description="Master LLMs, RAG Systems & AI Agents with curated roadmaps, 2,400+ battle-tested prompts, and drag-and-drop tools. Start building AI applications in minutes, not months. Free to start."
+        description="Master LLMs, RAG & AI Agents with curated roadmaps, 2,400+ prompts, and drag-and-drop tools. Start building in minutes. Free to start."
         keywords="AI agents, RAG systems, LLM development, prompt engineering, AI tools, code generation, AI deployment, machine learning, AI builder, no-code AI, production AI, AI agent builder"
         schema={combinedSchema}
         canonical="https://generateai.dev/"
