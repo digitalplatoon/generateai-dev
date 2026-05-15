@@ -168,8 +168,8 @@ serve(async (req) => {
       clearTimeout(timeout);
     }
   } catch (error) {
-    console.error("Error:", error);
-    return new Response(JSON.stringify({ error: error.message || "Unknown error" }), {
+    console.error("Internal error in generate-insights:", error);
+    return new Response(JSON.stringify({ error: "An internal error occurred. Please try again." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
