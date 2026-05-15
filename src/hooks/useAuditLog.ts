@@ -35,6 +35,7 @@ export const useAuditLog = () => {
     // Audit log writes are restricted to service_role (server-side only).
     // Client-side inserts are intentionally a no-op; edge functions should write entries.
     return;
+  };
 
   const fetchLogs = async (limit: number = 50) => {
     if (!user) return;
