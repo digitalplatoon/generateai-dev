@@ -44,7 +44,7 @@ const Documentation = () => {
     <>
       <SEOHead
         title="Documentation - Complete AI Development Guide | GenerateAI.dev"
-        description="Comprehensive guides, tutorials, and API references for building AI agents, RAG systems, and LLM applications. Quick start guides, best practices, and code examples."
+        description="Complete guides, tutorials & API references for building AI agents, RAG systems, and LLM apps. Quick starts, best practices & code examples."
         keywords="AI documentation, AI development guide, RAG tutorial, AI agent guide, LLM documentation, AI API reference"
         canonical="https://generateai.dev/docs"
       />
