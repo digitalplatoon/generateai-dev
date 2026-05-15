@@ -70,7 +70,7 @@ const About = () => {
     <>
       <SEOHead
         title="About GenerateAI.dev - AI Development Platform & Learning Hub"
-        description="GenerateAI.dev is the leading AI code generation platform helping 50K+ developers master LLMs, RAG systems & AI agents. Learn from expert tutorials, build with production-ready tools, and join our thriving developer community."
+        description="GenerateAI.dev helps 50K+ developers master LLMs, RAG & AI agents with expert tutorials and production-ready tools. Join our community."
         keywords="AI development platform, AI code generation company, LLM training, RAG systems, AI developer tools, machine learning education, AI coding platform, generative AI company, AI development team"
         canonical="https://generateai.dev/about"
       />

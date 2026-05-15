@@ -17,7 +17,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   title = "GenerateAI.dev - Your AI Copilot for Code Generation & Deployment",
   description = "Master LLMs, RAG Systems & AI Agents with Curated Roadmaps and Interactive Playgrounds. Your complete AI development resource hub.",
   keywords = "AI development, LLM, RAG systems, AI agents, machine learning, artificial intelligence, developer tools, code generation",
-  image = "https://lovable.dev/opengraph-image-p98pqg.png",
+  image = "https://generateai.dev/og-image.jpg",
   url = "https://generateai.dev",
   type = "website",
   schema,

@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Shield, User, Globe, AlertTriangle, Scale, Calendar, Mail } from 'lucide-react';
+import SEOHead from '@/components/seo/SEOHead';
 
 const Terms = () => {
   const sections = [
@@ -117,6 +118,13 @@ const Terms = () => {
   ];
 
   return (
+    <>
+      <SEOHead
+        title="Terms of Service - GenerateAI.dev"
+        description="Read the GenerateAI.dev Terms of Service. Understand your rights and obligations when using our AI development platform."
+        keywords="terms of service, terms and conditions, user agreement, legal"
+        canonical="https://generateai.dev/terms"
+      />
     <div className="min-h-screen bg-gradient-to-br from-navy via-navy/95 to-navy/90">
       <main className="pt-24 pb-16">
         {/* Hero Section */}
@@ -200,6 +208,7 @@ const Terms = () => {
         </section>
       </main>
     </div>
+    </>
   );
 };
 

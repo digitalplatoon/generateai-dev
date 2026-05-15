@@ -87,12 +87,31 @@ const Pricing = () => {
     }
   ];
 
+  const faqItems = [
+    { q: 'What are AI tokens?', a: 'AI tokens represent the amount of text processed by our AI models. Approximately 750 words equals 1,000 tokens. Your usage is tracked in real-time.' },
+    { q: 'Can I upgrade or downgrade anytime?', a: 'Yes! You can change your plan at any time. Upgrades take effect immediately, downgrades at the end of your billing period.' },
+    { q: 'What happens if I exceed my token limit?', a: "We'll notify you when you reach 80% and 100% of your limit. You can purchase additional tokens or upgrade your plan at any time." },
+    { q: 'Do you offer refunds?', a: 'Yes, we offer a 30-day money-back guarantee on all paid plans. No questions asked.' },
+  ];
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqItems.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  };
+
   return (
     <>
       <SEOHead
         title="Pricing - Choose Your Plan | GenerateAI.dev"
         description="Transparent pricing for AI development tools. Start free, upgrade as you grow. From hobbyists to enterprises."
         keywords="AI pricing, developer tools pricing, subscription plans, API pricing"
+        canonical="https://generateai.dev/pricing"
+        schema={faqSchema}
       />
       
       <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
