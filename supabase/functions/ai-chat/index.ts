@@ -129,7 +129,10 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured')
     }
 
-    const {
+    const ALLOWED_MODELS = ['gpt-4o-mini', 'gpt-4o', 'gpt-3.5-turbo'];
+    const MAX_TOKENS_CEILING = 4000;
+
+    let {
       model = 'gpt-4o-mini',
       temperature = 0.7,
       max_tokens = 1000,
@@ -137,6 +140,13 @@ serve(async (req) => {
       custom_instructions = '',
       do_not_train = true
     } = settings
+
+    // Validate/clamp client-supplied AI parameters to prevent cost abuse
+    if (!ALLOWED_MODELS.includes(model)) {
+      model = 'gpt-4o-mini';
+    }
+    temperature = Math.max(0, Math.min(2, Number(temperature) || 0.7));
+    max_tokens = Math.max(1, Math.min(MAX_TOKENS_CEILING, Number(max_tokens) || 1000));
 
     const openaiMessages = []
     
@@ -270,7 +280,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('AI chat error:', error)
     return new Response(
-      JSON.stringify({ error: error.message || 'Internal server error', timestamp: new Date().toISOString() }),
+      JSON.stringify({ error: 'An internal error occurred. Please try again.', timestamp: new Date().toISOString() }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }

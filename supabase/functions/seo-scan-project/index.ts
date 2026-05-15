@@ -41,6 +41,23 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
+    // Authenticate user
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const rawBody = await req.json();
     const parseResult = scanRequestSchema.safeParse(rawBody);
     
@@ -56,6 +73,27 @@ serve(async (req) => {
     }
     
     const { projectId, urlIds } = parseResult.data;
+
+    // Verify ownership or admin
+    const { data: project, error: projectError } = await supabase
+      .from('seo_projects')
+      .select('user_id')
+      .eq('id', projectId)
+      .single();
+    if (projectError || !project) {
+      return new Response(JSON.stringify({ error: 'Project not found' }), {
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const isOwner = project.user_id === user.id;
+    const { data: isAdmin } = await supabase.rpc('has_role', { user_id: user.id, role: 'admin' });
+    if (!isOwner && !isAdmin) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     let query = supabase.from('seo_project_urls').select('*').eq('project_id', projectId);
     if (urlIds?.length) {
@@ -158,8 +196,8 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error('Internal error in seo-scan-project:', error);
+    return new Response(JSON.stringify({ error: 'An internal error occurred. Please try again.' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
