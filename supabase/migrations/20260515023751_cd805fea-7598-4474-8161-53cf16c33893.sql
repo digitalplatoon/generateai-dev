@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Users can create their own audit logs" ON public.ai_audit_logs;
