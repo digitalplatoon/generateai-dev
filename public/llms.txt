@@ -1,0 +1,28 @@
+# GenerateAI.dev
+
+> AI development platform to learn, build, and deploy LLMs, RAG systems, and AI agents with curated learning paths, 2,400+ prompts, and production-ready tools.
+
+GenerateAI.dev helps developers master generative AI through interactive learning paths, hands-on labs, and a battle-tested prompt library. The platform includes a RAG lab, agent playground, and AI chat copilot.
+
+## Pages
+
+- [Home](/): Platform overview and featured tools.
+- [Learning Paths](/paths): Role-based curricula for AI development.
+- [Prompt Library](/prompts): 2,400+ curated prompts for AI tasks.
+- [RAG Lab](/rag-lab): Interactive retrieval-augmented generation playground.
+- [Agents](/agents): Build and test AI agents.
+- [AI Chat](/enhanced-ai): Multi-model AI copilot.
+- [Pricing](/subscription): Subscription plans and limits.
+- [Documentation](/docs): Guides, tutorials, and API references.
+- [API Reference](/api): API endpoints and usage.
+- [Blog](/blog): Articles on AI development.
+- [About](/about): Company mission and team.
+- [Community](/community): Developer community hub.
+- [Contact](/contact): Get in touch.
+
+## Optional
+
+- [Careers](/careers): Open roles.
+- [Terms](/terms): Terms of service.
+- [Privacy](/privacy): Privacy policy.
+- [Cookies](/cookies): Cookie policy.
