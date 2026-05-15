@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Shield, User, Globe, AlertTriangle, Scale, Calendar, Mail } from 'lucide-react';
+import SEOHead from '@/components/seo/SEOHead';
 
 const Terms = () => {
   const sections = [
