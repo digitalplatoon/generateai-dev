@@ -190,15 +190,17 @@ serve(async (req) => {
 
 function chunkText(text: string, chunkSize: number, overlap: number): string[] {
   const chunks: string[] = [];
+  const MAX_CHUNKS = 2000;
+  const safeChunkSize = Math.max(1, chunkSize);
+  const safeOverlap = Math.max(0, Math.min(overlap, safeChunkSize - 1));
   let start = 0;
 
   while (start < text.length) {
-    const end = Math.min(start + chunkSize, text.length);
-    const chunk = text.slice(start, end);
-    chunks.push(chunk);
-    
+    if (chunks.length >= MAX_CHUNKS) break;
+    const end = Math.min(start + safeChunkSize, text.length);
+    chunks.push(text.slice(start, end));
     if (end === text.length) break;
-    start = end - overlap;
+    start = end - safeOverlap;
   }
 
   return chunks;
