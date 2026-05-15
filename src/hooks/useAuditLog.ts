@@ -32,27 +32,9 @@ export const useAuditLog = () => {
     errorMessage?: string,
     processingTimeMs?: number
   ) => {
-    if (!user) return;
-
-    try {
-      await supabase
-        .from('ai_audit_logs')
-        .insert({
-          user_id: user.id,
-          conversation_id: conversationId,
-          action_type: actionType,
-          status,
-          request_data: requestData,
-          response_data: responseData,
-          error_message: errorMessage,
-          processing_time_ms: processingTimeMs,
-          ip_address: null, // Would need server-side implementation
-          user_agent: navigator.userAgent
-        });
-    } catch (error) {
-      console.error('Error logging action:', error);
-    }
-  };
+    // Audit log writes are restricted to service_role (server-side only).
+    // Client-side inserts are intentionally a no-op; edge functions should write entries.
+    return;
 
   const fetchLogs = async (limit: number = 50) => {
     if (!user) return;
