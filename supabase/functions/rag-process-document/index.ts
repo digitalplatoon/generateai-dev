@@ -106,7 +106,11 @@ serve(async (req) => {
       .update({ status: 'processing' })
       .eq('id', documentId);
 
-    const chunks = chunkText(document.content, document.chunk_size, document.overlap);
+    const MIN_CHUNK = 50;
+    const MAX_CHUNK = 8000;
+    const safeChunkSize = Math.max(MIN_CHUNK, Math.min(MAX_CHUNK, document.chunk_size ?? 500));
+    const safeOverlap = Math.max(0, Math.min(Math.floor(safeChunkSize * 0.4), document.overlap ?? 50));
+    const chunks = chunkText(document.content, safeChunkSize, safeOverlap);
     console.log(`Created ${chunks.length} chunks`);
 
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
