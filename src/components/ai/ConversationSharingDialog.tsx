@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -57,7 +58,7 @@ const ConversationSharingDialog = ({
       setIsPublic(data.is_shared || false);
       setShareToken(data.share_token || '');
     } catch (error) {
-      console.error('Error fetching sharing settings:', error);
+      logger.error('Error fetching sharing settings:', error);
     }
   };
 
@@ -101,7 +102,7 @@ const ConversationSharingDialog = ({
           : "The conversation is now private",
       });
     } catch (error) {
-      console.error('Error updating sharing settings:', error);
+      logger.error('Error updating sharing settings:', error);
       toast({
         title: "Error",
         description: "Failed to update sharing settings",
@@ -137,7 +138,7 @@ const ConversationSharingDialog = ({
         description: "Share link will expire on the selected date",
       });
     } catch (error) {
-      console.error('Error setting expiration:', error);
+      logger.error('Error setting expiration:', error);
       toast({
         title: "Error",
         description: "Failed to set expiration date",

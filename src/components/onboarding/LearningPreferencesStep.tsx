@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -25,7 +26,7 @@ export const LearningPreferencesStep: React.FC<LearningPreferencesStepProps> = (
       await updatePreferences(preferences);
       onComplete();
     } catch (error) {
-      console.error('Preferences update error:', error);
+      logger.error('Preferences update error:', error);
     } finally {
       setIsLoading(false);
     }

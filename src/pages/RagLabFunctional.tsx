@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { useState, useEffect } from 'react';
 import { Upload, FileText, Database, Zap, Settings, Play, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -47,7 +48,7 @@ const RagLabFunctional = () => {
           }
         }
       } catch (error) {
-        console.error('Error uploading file:', error);
+        logger.error('Error uploading file:', error);
       }
     }
     
@@ -77,7 +78,7 @@ const RagLabFunctional = () => {
         setQueryResults(formattedResults);
       }
     } catch (error) {
-      console.error('Query error:', error);
+      logger.error('Query error:', error);
     }
   };
 
