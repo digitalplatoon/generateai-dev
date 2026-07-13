@@ -109,14 +109,14 @@ const HeroSection = () => {
 
         {/* Code Preview Window */}
         <div className="max-w-4xl mx-auto mt-16 animate-slide-up" style={{animationDelay: '0.7s'}}>
-          <div className="glass rounded-2xl overflow-hidden border border-white/10">
-            <div className="bg-navy/80 px-4 py-3 flex items-center gap-2 border-b border-white/10">
+          <div className="glass rounded-2xl overflow-hidden border border-border">
+            <div className="bg-card/80 px-4 py-3 flex items-center gap-2 border-b border-border">
               <div className="w-3 h-3 rounded-full bg-red-400"></div>
               <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
               <div className="w-3 h-3 rounded-full bg-green-400"></div>
-              <span className="ml-4 text-sm text-light-gray font-mono">AI Agent Builder</span>
+              <span className="ml-4 text-sm text-muted-foreground font-mono">AI Agent Builder</span>
             </div>
-            <div className="p-8 bg-navy/50">
+            <div className="p-8 bg-card/50">
               <pre className="text-left text-sm md:text-base text-light-gray font-mono">
                 <code>
                   <span className="text-purple-400">// Build AI agent in 3 lines</span>{'\n'}

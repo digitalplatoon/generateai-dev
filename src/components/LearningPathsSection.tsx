@@ -105,7 +105,7 @@ const LearningPathsSection = () => {
                       </span>
                     </div>
                   </div>
-                  <div className="w-full bg-navy/50 rounded-full h-2 mb-4">
+                  <div className="w-full bg-muted rounded-full h-2 mb-4">
                     <div className="bg-gradient-to-r from-teal to-blue-400 h-2 rounded-full" style={{width: '0%'}}></div>
                   </div>
                   <Button className="w-full bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold">
