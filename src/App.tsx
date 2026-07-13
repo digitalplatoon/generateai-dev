@@ -10,6 +10,8 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
+import SkipToContent from "@/components/SkipToContent";
 import GoogleAnalytics from "@/components/seo/GoogleAnalytics";
 import { useWebVitals } from "@/hooks/useWebVitals";
 import "./App.css";
@@ -68,9 +70,11 @@ const App = () => (
             <Toaster />
             <Sonner />
           <BrowserRouter>
-            <div className="min-h-screen flex flex-col bg-dark">
+            <ScrollToTop />
+            <div className="min-h-screen flex flex-col bg-background text-foreground">
+              <SkipToContent />
               <Header />
-              <main className="flex-1">
+              <main id="main" className="flex-1">
                 <ErrorBoundary>
                   <Suspense fallback={<PageLoader />}>
                     <Routes>

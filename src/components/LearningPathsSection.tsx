@@ -105,7 +105,7 @@ const LearningPathsSection = () => {
                       </span>
                     </div>
                   </div>
-                  <div className="w-full bg-navy/50 rounded-full h-2 mb-4">
+                  <div className="w-full bg-muted rounded-full h-2 mb-4">
                     <div className="bg-gradient-to-r from-teal to-blue-400 h-2 rounded-full" style={{width: '0%'}}></div>
                   </div>
                   <Button className="w-full bg-gradient-to-r from-teal to-blue-400 hover:from-teal/80 hover:to-blue-400/80 text-navy font-semibold">
@@ -123,21 +123,21 @@ const LearningPathsSection = () => {
             Track Your Progress & Earn NFT Badges
           </h3>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="text-center p-6 bg-navy/30 rounded-xl border border-white/10">
+            <div className="text-center p-6 bg-muted/40 rounded-xl border border-border">
               <div className="w-16 h-16 bg-gradient-to-br from-teal to-blue-400 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-2xl">🎯</span>
               </div>
               <h4 className="font-display font-semibold mb-2">Interactive Progress</h4>
               <p className="text-sm text-light-gray">Real-time tracking with visual milestones</p>
             </div>
-            <div className="text-center p-6 bg-navy/30 rounded-xl border border-white/10">
+            <div className="text-center p-6 bg-muted/40 rounded-xl border border-border">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-2xl">🚀</span>
               </div>
               <h4 className="font-display font-semibold mb-2">Live Code Sandboxes</h4>
               <p className="text-sm text-light-gray">Practice in embedded Replit environments</p>
             </div>
-            <div className="text-center p-6 bg-navy/30 rounded-xl border border-white/10">
+            <div className="text-center p-6 bg-muted/40 rounded-xl border border-border">
               <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-400 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <span className="text-2xl">🏆</span>
               </div>

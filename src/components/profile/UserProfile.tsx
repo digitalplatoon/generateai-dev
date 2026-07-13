@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -62,7 +63,7 @@ export const UserProfile: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Fetch profile error:', error);
+      logger.error('Fetch profile error:', error);
     }
   };
 
@@ -85,7 +86,7 @@ export const UserProfile: React.FC = () => {
         description: "Your profile has been saved successfully.",
       });
     } catch (error) {
-      console.error('Update profile error:', error);
+      logger.error('Update profile error:', error);
       toast({
         title: "Failed to update profile",
         description: error instanceof Error ? error.message : 'Unknown error',

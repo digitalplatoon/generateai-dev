@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,7 +41,7 @@ export const useOnboarding = () => {
       if (error) throw error;
       setCompletedSteps((data || []) as OnboardingStep[]);
     } catch (error) {
-      console.error('Error fetching onboarding progress:', error);
+      logger.error('Error fetching onboarding progress:', error);
       setCompletedSteps([]);
     } finally {
       setIsLoading(false);
@@ -65,7 +66,7 @@ export const useOnboarding = () => {
       if (error) throw error;
       await fetchCompletedSteps(); // Refresh steps
     } catch (error) {
-      console.error('Error completing onboarding step:', error);
+      logger.error('Error completing onboarding step:', error);
     }
   };
 

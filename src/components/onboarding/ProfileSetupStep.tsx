@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -44,7 +45,7 @@ export const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({ onComplete }
 
       onComplete();
     } catch (error) {
-      console.error('Profile update error:', error);
+      logger.error('Profile update error:', error);
       toast({
         title: "Failed to update profile",
         description: error instanceof Error ? error.message : 'Unknown error',
