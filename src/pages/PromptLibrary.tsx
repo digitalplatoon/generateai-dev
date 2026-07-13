@@ -353,28 +353,28 @@ const PromptLibrary = () => {
             Join the Prompt Community
           </h3>
           <div className="grid md:grid-cols-4 gap-6">
-            <div className="text-center p-6 bg-navy/30 rounded-xl border border-white/10">
+            <div className="text-center p-6 bg-muted/40 rounded-xl border border-border">
               <div className="w-16 h-16 bg-gradient-to-br from-teal to-blue-400 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Plus className="text-2xl text-navy w-8 h-8" />
               </div>
               <h4 className="font-display font-semibold mb-2">Share Your Prompts</h4>
               <p className="text-sm text-light-gray">Contribute to the community and help others</p>
             </div>
-            <div className="text-center p-6 bg-navy/30 rounded-xl border border-white/10">
+            <div className="text-center p-6 bg-muted/40 rounded-xl border border-border">
               <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Star className="text-2xl text-white w-8 h-8" />
               </div>
               <h4 className="font-display font-semibold mb-2">Rate & Review</h4>
               <p className="text-sm text-light-gray">Help improve prompt quality through feedback</p>
             </div>
-            <div className="text-center p-6 bg-navy/30 rounded-xl border border-white/10">
+            <div className="text-center p-6 bg-muted/40 rounded-xl border border-border">
               <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-400 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Zap className="text-2xl text-white w-8 h-8" />
               </div>
               <h4 className="font-display font-semibold mb-2">AI-Powered Optimization</h4>
               <p className="text-sm text-light-gray">Get suggestions to improve your prompts</p>
             </div>
-            <div className="text-center p-6 bg-navy/30 rounded-xl border border-white/10">
+            <div className="text-center p-6 bg-muted/40 rounded-xl border border-border">
               <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-blue-400 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Download className="text-2xl text-white w-8 h-8" />
               </div>
