@@ -1,0 +1,33 @@
+{
+  "ci": {
+    "collect": {
+      "url": [
+        "https://generateai.dev/",
+        "https://generateai.dev/about",
+        "https://generateai.dev/pricing",
+        "https://generateai.dev/docs",
+        "https://generateai.dev/learning-paths"
+      ],
+      "numberOfRuns": 2,
+      "settings": {
+        "preset": "desktop",
+        "chromeFlags": "--no-sandbox --headless=new"
+      }
+    },
+    "assert": {
+      "preset": "lighthouse:recommended",
+      "assertions": {
+        "categories:performance": ["warn", { "minScore": 0.8 }],
+        "categories:accessibility": ["error", { "minScore": 0.9 }],
+        "categories:best-practices": ["warn", { "minScore": 0.9 }],
+        "categories:seo": ["error", { "minScore": 0.95 }],
+        "uses-http2": "off",
+        "csp-xss": "off"
+      }
+    },
+    "upload": {
+      "target": "filesystem",
+      "outputDir": ".lighthouseci"
+    }
+  }
+}

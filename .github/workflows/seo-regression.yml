@@ -1,0 +1,84 @@
+name: SEO Regression
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Daily at 06:00 UTC
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: seo-regression-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Install Lighthouse CI
+        run: npm i -g @lhci/cli@0.14.x
+
+      - name: Run Lighthouse CI (published site)
+        run: lhci autorun --config=./.lighthouserc.json
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: .lighthouseci/
+          if-no-files-found: ignore
+
+  search-console:
+    name: Search Console SEO Regression
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch Search Console data & compare
+        env:
+          GSC_SITE_URL: ${{ vars.GSC_SITE_URL || 'https://generateai.dev/' }}
+          GSC_ACCESS_TOKEN: ${{ secrets.GSC_ACCESS_TOKEN }}
+        run: node scripts/seo-regression.mjs
+
+      - name: Upload SEO regression report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-regression-report
+          path: seo-report/
+          if-no-files-found: ignore
+
+      - name: Comment PR with SEO summary
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'seo-report/summary.md';
+            if (!fs.existsSync(path)) return;
+            const body = fs.readFileSync(path, 'utf8');
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            });
