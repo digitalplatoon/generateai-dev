@@ -14,3 +14,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://generateai.dev/sitemap.xml
+Sitemap: https://generateai.dev/sitemap-index.xml
