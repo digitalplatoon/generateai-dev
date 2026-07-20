@@ -8,16 +8,15 @@ export interface SiteMapRoute {
   lastmod?: string;
 }
 
+// Only include publicly indexable routes. Auth-protected routes (redirect to /auth)
+// and alias routes (e.g. /prompt-library → /prompts) are omitted to avoid
+// "non-canonical page in sitemap" SEO errors.
 export const siteMapRoutes: SiteMapRoute[] = [
   { path: '/', priority: 1.0, changefreq: 'weekly' },
-  { path: '/auth', priority: 0.8, changefreq: 'monthly' },
-  { path: '/dashboard', priority: 0.9, changefreq: 'daily' },
-  { path: '/enhanced-ai', priority: 0.9, changefreq: 'daily' },
+  { path: '/auth', priority: 0.6, changefreq: 'monthly' },
   { path: '/paths', priority: 0.9, changefreq: 'weekly' },
   { path: '/prompts', priority: 0.8, changefreq: 'weekly' },
-  { path: '/rag-lab', priority: 0.8, changefreq: 'weekly' },
-  { path: '/agents', priority: 0.8, changefreq: 'weekly' },
-  { path: '/analytics', priority: 0.7, changefreq: 'weekly' },
+  { path: '/pricing', priority: 0.9, changefreq: 'weekly' },
   { path: '/docs', priority: 0.7, changefreq: 'weekly' },
   { path: '/api', priority: 0.7, changefreq: 'monthly' },
   { path: '/community', priority: 0.6, changefreq: 'weekly' },
@@ -25,7 +24,6 @@ export const siteMapRoutes: SiteMapRoute[] = [
   { path: '/about', priority: 0.5, changefreq: 'monthly' },
   { path: '/careers', priority: 0.4, changefreq: 'monthly' },
   { path: '/contact', priority: 0.5, changefreq: 'monthly' },
-  { path: '/subscription', priority: 0.7, changefreq: 'weekly' },
   { path: '/terms', priority: 0.3, changefreq: 'yearly' },
   { path: '/privacy', priority: 0.3, changefreq: 'yearly' },
   { path: '/cookies', priority: 0.3, changefreq: 'yearly' }

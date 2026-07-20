@@ -161,6 +161,7 @@ const Auth = () => {
                 GenerateAI.dev
               </span>
             </div>
+            <h1 className="text-3xl font-display font-bold text-white mb-2">Sign in to GenerateAI.dev</h1>
             <p className="text-light-gray">Welcome to the future of AI development</p>
           </div>
 

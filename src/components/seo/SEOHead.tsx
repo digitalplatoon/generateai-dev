@@ -14,8 +14,8 @@ interface SEOHeadProps {
 }
 
 const SEOHead: React.FC<SEOHeadProps> = ({
-  title = "GenerateAI.dev - Your AI Copilot for Code Generation & Deployment",
-  description = "Master LLMs, RAG Systems & AI Agents with Curated Roadmaps and Interactive Playgrounds. Your complete AI development resource hub.",
+  title = "GenerateAI.dev - Build Production-Ready AI Agents in Minutes",
+  description = "Master LLMs, RAG & AI Agents with curated roadmaps, 2,400+ prompts, and drag-and-drop tools. Start building in minutes. Free to start.",
   keywords = "AI development, LLM, RAG systems, AI agents, machine learning, artificial intelligence, developer tools, code generation",
   image = "https://generateai.dev/og-image.jpg",
   url = "https://generateai.dev",
