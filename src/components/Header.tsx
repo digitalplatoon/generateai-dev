@@ -220,7 +220,7 @@ const Header = () => {
             role="dialog"
             aria-modal="true"
             aria-label="Mobile navigation"
-            className="lg:hidden border-t border-border py-3 space-y-1"
+            className="xl:hidden border-t border-border py-3 space-y-1"
           >
             <nav aria-label="Mobile primary" className="space-y-1">
               {navItems.map((item, idx) => {
