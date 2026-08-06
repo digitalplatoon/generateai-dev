@@ -116,6 +116,7 @@ const Prompts = () => {
         {/* Filters Section */}
         <section className="pb-8 px-6">
           <div className="container mx-auto">
+            <h2 className="sr-only">Filter and sort prompts</h2>
             {/* Sort Buttons */}
             <div className="flex flex-wrap gap-3 mb-6">
               <Button
@@ -210,14 +211,14 @@ const Prompts = () => {
                       {expandedPrompt === prompt.id && (
                         <div className="mt-4 space-y-4">
                           <div>
-                            <h4 className="font-semibold mb-2">Prompt Template</h4>
+                            <h3 className="font-semibold mb-2">Prompt Template</h3>
                             <pre className="bg-secondary p-3 rounded text-xs overflow-x-auto">
                               {prompt.template}
                             </pre>
                           </div>
                           
                           <div>
-                            <h4 className="font-semibold mb-2">Sample Output</h4>
+                            <h3 className="font-semibold mb-2">Sample Output</h3>
                             <pre className="bg-secondary p-3 rounded text-xs overflow-x-auto">
                               {prompt.sampleOutput}
                             </pre>

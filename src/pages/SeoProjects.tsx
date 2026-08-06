@@ -38,7 +38,7 @@ export default function SeoProjects() {
 
   return (
     <>
-      <SEOHead title="SEO Projects" description="Manage your SEO projects and website audits" />
+      <SEOHead title="SEO Projects" description="Manage your SEO projects, track website audits, and monitor technical SEO health across every site you own." />
       <div className="container py-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>

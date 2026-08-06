@@ -35,7 +35,7 @@ export default function SeoAuditReport() {
 
   return (
     <>
-      <SEOHead title="Audit Report" description="SEO audit scan results and issues" />
+      <SEOHead title="Audit Report" description="Review detailed SEO audit results, prioritised issues, and AI-generated fix prompts for the pages in this scan." />
       <div className="container py-8 space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
