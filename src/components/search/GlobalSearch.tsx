@@ -150,7 +150,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ trigger, enableShortcut = t
                 {items.map((result) => (
                   <CommandItem
                     key={result.id}
-                    value={result.title}
+                    value={`${result.title} ${result.description} ${result.category ?? ''}`}
                     onSelect={() => handleSelect(result)}
                     className="flex items-center gap-3 py-3"
                   >
