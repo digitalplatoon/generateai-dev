@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, FileText, GraduationCap, MessageSquare } from 'lucide-react';
+import { Search, FileText, GraduationCap, MessageSquare, Compass, Newspaper } from 'lucide-react';
 import {
   CommandDialog,
   CommandEmpty,
@@ -15,36 +15,45 @@ import { Toggle } from '@/components/ui/toggle';
 import { useGlobalSearch, SearchResult } from '@/hooks/useGlobalSearch';
 
 const typeIcons = {
+  page: Compass,
   prompt: FileText,
   'learning-path': GraduationCap,
+  blog: Newspaper,
   conversation: MessageSquare,
 };
 
 const typeLabels = {
+  page: 'Page',
   prompt: 'Prompt',
   'learning-path': 'Learning Path',
+  blog: 'Article',
   conversation: 'Conversation',
 };
 
 const typeColors = {
+  page: 'bg-primary/10 text-primary',
+  blog: 'bg-amber-500/10 text-amber-500',
   prompt: 'bg-blue-500/10 text-blue-500',
   'learning-path': 'bg-green-500/10 text-green-500',
   conversation: 'bg-purple-500/10 text-purple-500',
 };
 
-type FilterType = 'prompt' | 'learning-path' | 'conversation';
+type FilterType = 'page' | 'prompt' | 'learning-path' | 'blog' | 'conversation';
 
 interface GlobalSearchProps {
   trigger?: React.ReactNode;
+  /** Only one mounted instance should own the global keyboard shortcut. */
+  enableShortcut?: boolean;
 }
 
-const GlobalSearch: React.FC<GlobalSearchProps> = ({ trigger }) => {
+const GlobalSearch: React.FC<GlobalSearchProps> = ({ trigger, enableShortcut = true }) => {
   const [open, setOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<Set<FilterType>>(new Set());
   const { query, setQuery, results } = useGlobalSearch();
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!enableShortcut) return;
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
@@ -54,7 +63,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ trigger }) => {
 
     document.addEventListener('keydown', down);
     return () => document.removeEventListener('keydown', down);
-  }, []);
+  }, [enableShortcut]);
 
   const handleSelect = (result: SearchResult) => {
     setOpen(false);
@@ -93,12 +102,12 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ trigger }) => {
       ) : (
         <Button
           variant="outline"
-          className="relative h-9 w-9 p-0 xl:h-10 xl:w-60 xl:justify-start xl:px-3 xl:py-2"
+          className="relative h-9 w-9 p-0 2xl:h-10 2xl:w-56 2xl:justify-start 2xl:px-3 2xl:py-2"
           onClick={() => setOpen(true)}
         >
-          <Search className="h-4 w-4 xl:mr-2" />
-          <span className="hidden xl:inline-flex">Search...</span>
-          <kbd className="pointer-events-none absolute right-1.5 top-2 hidden h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 xl:flex">
+          <Search className="h-4 w-4 2xl:mr-2" />
+          <span className="hidden 2xl:inline-flex">Search...</span>
+          <kbd className="pointer-events-none absolute right-1.5 top-2 hidden h-6 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 2xl:flex">
             <span className="text-xs">⌘</span>K
           </kbd>
         </Button>
@@ -106,12 +115,12 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ trigger }) => {
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput
-          placeholder="Search prompts, learning paths, conversations..."
+          placeholder="Search pages, prompts, learning paths, articles..."
           value={query}
           onValueChange={setQuery}
         />
         
-        <div className="flex items-center gap-2 px-3 py-2 border-b">
+        <div className="flex flex-wrap items-center gap-2 px-3 py-2 border-b">
           <span className="text-xs text-muted-foreground">Filter:</span>
           {(Object.keys(typeLabels) as FilterType[]).map((type) => {
             const Icon = typeIcons[type];
@@ -141,7 +150,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ trigger }) => {
                 {items.map((result) => (
                   <CommandItem
                     key={result.id}
-                    value={result.title}
+                    value={`${result.title} ${result.description} ${result.category ?? ''}`}
                     onSelect={() => handleSelect(result)}
                     className="flex items-center gap-3 py-3"
                   >
