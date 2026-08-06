@@ -197,7 +197,7 @@ const Header = () => {
 
           {/* Mobile controls */}
           <div className="lg:hidden flex items-center gap-2">
-            <GlobalSearch />
+            <GlobalSearch enableShortcut={false} />
             <ThemeToggle />
             <button
               ref={mobileToggleRef}

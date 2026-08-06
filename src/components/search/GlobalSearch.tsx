@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, FileText, GraduationCap, MessageSquare } from 'lucide-react';
+import { Search, FileText, GraduationCap, MessageSquare, Compass, Newspaper } from 'lucide-react';
 import {
   CommandDialog,
   CommandEmpty,
@@ -15,36 +15,45 @@ import { Toggle } from '@/components/ui/toggle';
 import { useGlobalSearch, SearchResult } from '@/hooks/useGlobalSearch';
 
 const typeIcons = {
+  page: Compass,
   prompt: FileText,
   'learning-path': GraduationCap,
+  blog: Newspaper,
   conversation: MessageSquare,
 };
 
 const typeLabels = {
+  page: 'Page',
   prompt: 'Prompt',
   'learning-path': 'Learning Path',
+  blog: 'Article',
   conversation: 'Conversation',
 };
 
 const typeColors = {
+  page: 'bg-primary/10 text-primary',
+  blog: 'bg-amber-500/10 text-amber-500',
   prompt: 'bg-blue-500/10 text-blue-500',
   'learning-path': 'bg-green-500/10 text-green-500',
   conversation: 'bg-purple-500/10 text-purple-500',
 };
 
-type FilterType = 'prompt' | 'learning-path' | 'conversation';
+type FilterType = 'page' | 'prompt' | 'learning-path' | 'blog' | 'conversation';
 
 interface GlobalSearchProps {
   trigger?: React.ReactNode;
+  /** Only one mounted instance should own the global keyboard shortcut. */
+  enableShortcut?: boolean;
 }
 
-const GlobalSearch: React.FC<GlobalSearchProps> = ({ trigger }) => {
+const GlobalSearch: React.FC<GlobalSearchProps> = ({ trigger, enableShortcut = true }) => {
   const [open, setOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<Set<FilterType>>(new Set());
   const { query, setQuery, results } = useGlobalSearch();
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!enableShortcut) return;
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
@@ -54,7 +63,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ trigger }) => {
 
     document.addEventListener('keydown', down);
     return () => document.removeEventListener('keydown', down);
-  }, []);
+  }, [enableShortcut]);
 
   const handleSelect = (result: SearchResult) => {
     setOpen(false);
@@ -106,12 +115,12 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ trigger }) => {
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput
-          placeholder="Search prompts, learning paths, conversations..."
+          placeholder="Search pages, prompts, learning paths, articles..."
           value={query}
           onValueChange={setQuery}
         />
         
-        <div className="flex items-center gap-2 px-3 py-2 border-b">
+        <div className="flex flex-wrap items-center gap-2 px-3 py-2 border-b">
           <span className="text-xs text-muted-foreground">Filter:</span>
           {(Object.keys(typeLabels) as FilterType[]).map((type) => {
             const Icon = typeIcons[type];
