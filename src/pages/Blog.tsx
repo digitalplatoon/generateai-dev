@@ -182,7 +182,7 @@ const Blog = () => {
                         to={`/blog/${post.slug}`}
                         className="flex items-center text-teal hover:text-teal/80 transition-colors text-sm"
                       >
-                        Read the full guide on {post.title}
+                        Read more<span className="sr-only"> about {post.title}</span>
                         <ArrowRight className="w-4 h-4 ml-1" />
                       </Link>
                     </div>
