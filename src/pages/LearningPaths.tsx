@@ -68,7 +68,7 @@ const LearningPaths = () => {
 
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
-                <h3 className="font-display font-semibold mb-4 text-teal">Your Role</h3>
+                <h2 className="font-display font-semibold mb-4 text-teal">Your Role</h2>
                 <div className="flex flex-wrap gap-2">
                   {roleOptions.map((role) => (
                     <Button
@@ -87,7 +87,7 @@ const LearningPaths = () => {
               </div>
 
               <div className="flex-1">
-                <h3 className="font-display font-semibold mb-4 text-teal">Tech Stack</h3>
+                <h2 className="font-display font-semibold mb-4 text-teal">Tech Stack</h2>
                 <div className="flex flex-wrap gap-2">
                   {techStack.map((tech) => (
                     <Button
@@ -196,36 +196,36 @@ const LearningPaths = () => {
 
           {/* Enhanced Features Section */}
           <div className="glass rounded-2xl p-8">
-            <h3 className="text-2xl font-display font-bold mb-6 text-center">
+            <h2 className="text-2xl font-display font-bold mb-6 text-center">
               Track Your Progress & Earn NFT Badges
-            </h3>
+            </h2>
             <div className="grid md:grid-cols-4 gap-6">
               <div className="text-center p-6 bg-muted/40 rounded-xl border border-border">
                 <div className="w-16 h-16 bg-gradient-to-br from-teal to-blue-400 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <Clock className="text-2xl text-navy w-8 h-8" />
                 </div>
-                <h4 className="font-display font-semibold mb-2">Interactive Progress</h4>
+                <h3 className="font-display font-semibold mb-2">Interactive Progress</h3>
                 <p className="text-sm text-light-gray">Real-time tracking with visual milestones</p>
               </div>
               <div className="text-center p-6 bg-muted/40 rounded-xl border border-border">
                 <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <Code className="text-2xl text-white w-8 h-8" />
                 </div>
-                <h4 className="font-display font-semibold mb-2">Live Code Sandboxes</h4>
+                <h3 className="font-display font-semibold mb-2">Live Code Sandboxes</h3>
                 <p className="text-sm text-light-gray">Practice in embedded Replit environments</p>
               </div>
               <div className="text-center p-6 bg-muted/40 rounded-xl border border-border">
                 <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-red-400 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <Trophy className="text-2xl text-white w-8 h-8" />
                 </div>
-                <h4 className="font-display font-semibold mb-2">NFT Certificates</h4>
+                <h3 className="font-display font-semibold mb-2">NFT Certificates</h3>
                 <p className="text-sm text-light-gray">Blockchain-verified achievement badges</p>
               </div>
               <div className="text-center p-6 bg-muted/40 rounded-xl border border-border">
                 <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-blue-400 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <Users className="text-2xl text-white w-8 h-8" />
                 </div>
-                <h4 className="font-display font-semibold mb-2">Community Learning</h4>
+                <h3 className="font-display font-semibold mb-2">Community Learning</h3>
                 <p className="text-sm text-light-gray">Learn with peers and expert mentors</p>
               </div>
             </div>

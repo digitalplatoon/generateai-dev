@@ -13,7 +13,7 @@ const Privacy = () => {
     <>
       <SEOHead
         title="Privacy Policy - GenerateAI.dev"
-        description="Read the GenerateAI.dev privacy policy to understand how we collect, use, and protect your data on our AI development platform."
+        description="How GenerateAI.dev collects, uses, stores, and protects your personal data across our AI development platform, including your GDPR and CCPA rights."
         keywords="privacy policy, data protection, user privacy, GDPR, CCPA"
         canonical="https://generateai.dev/privacy"
       />
