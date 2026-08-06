@@ -109,7 +109,7 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav
-            className="hidden lg:flex items-center gap-1 flex-1 justify-center min-w-0"
+            className="hidden xl:flex items-center gap-1 flex-1 justify-center min-w-0 overflow-hidden"
             aria-label="Primary"
           >
             {navItems.map((item) => {
@@ -156,7 +156,7 @@ const Header = () => {
           </nav>
 
           {/* Right actions */}
-          <div className="hidden lg:flex items-center gap-2 shrink-0">
+          <div className="hidden xl:flex items-center gap-2 shrink-0">
             <GlobalSearch />
             <ThemeToggle />
             {user ? (
@@ -196,7 +196,7 @@ const Header = () => {
           </div>
 
           {/* Mobile controls */}
-          <div className="lg:hidden flex items-center gap-2">
+          <div className="xl:hidden flex items-center gap-2">
             <GlobalSearch enableShortcut={false} />
             <ThemeToggle />
             <button
