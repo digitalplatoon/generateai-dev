@@ -1,0 +1,25 @@
+{
+  "customizations": [
+    { "token": "--navy", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--teal", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--light-gray", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--text-light", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--sidebar-background", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--sidebar-foreground", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--sidebar-primary", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--sidebar-accent", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--sidebar-border", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "--sidebar-ring", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": ".light palette override", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "body radial-gradient background", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "font-display (Space Grotesk)", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "font-body (Inter)", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "animate-glow", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "animate-float", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "animate-slide-up", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "animate-slide-up-fast", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css" },
+    { "token": "glass", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "text-gradient", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "hover-glow", "source": "src/index.css", "reappliedIn": "src/styles.css" }
+  ]
+}
