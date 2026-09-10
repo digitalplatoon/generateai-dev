@@ -1,5 +1,5 @@
 
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link } from '@/lib/router-compat';
 import { featuredPost, blogPosts as allPosts } from '@/data/blogPosts';
 import SEOHead from '@/components/seo/SEOHead';
 import { Calendar, User, ArrowRight, Tag } from "lucide-react";

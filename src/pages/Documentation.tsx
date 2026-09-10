@@ -1,6 +1,6 @@
 
 import { Book, Search, Code, FileText, ChevronRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import SEOHead from "@/components/seo/SEOHead";
 
 const Documentation = () => {

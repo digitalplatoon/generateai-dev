@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Calendar, User, ArrowRight, Tag, Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import SEOHead from "@/components/seo/SEOHead";
 import { featuredPost, blogPosts } from "@/data/blogPosts";
 import { createBreadcrumbSchema } from "@/components/seo/StructuredData";

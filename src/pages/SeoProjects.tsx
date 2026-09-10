@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus, Search, Loader2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/router-compat';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useSeoProjects } from '@/hooks/useSeoProjects';

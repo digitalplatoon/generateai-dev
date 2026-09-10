@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
+import { Navigate } from '@/lib/router-compat';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useStripeIntegration } from '@/hooks/useStripeIntegration';
 import SubscriptionCard from '@/components/subscription/SubscriptionCard';
