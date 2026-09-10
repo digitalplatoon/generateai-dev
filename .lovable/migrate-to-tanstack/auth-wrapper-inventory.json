@@ -1,0 +1,26 @@
+{
+  "library": "supabase",
+  "wrappers": [
+    {
+      "name": "ProtectedRoute",
+      "file": "src/components/ProtectedRoute.tsx",
+      "behavior": "redirects unauthenticated users to /auth",
+      "props": [],
+      "usages": [
+        { "file": "/tmp/migrate-to-tanstack/App.tsx.bak", "line": 83, "openingTag": "<ProtectedRoute>", "props": [], "context": "<Route path=\"/dashboard\" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />" },
+        { "file": "/tmp/migrate-to-tanstack/App.tsx.bak", "line": 84, "openingTag": "<ProtectedRoute>", "props": [], "context": "<Route path=\"/enhanced-ai\" element={<ProtectedRoute><EnhancedAI /></ProtectedRoute>} />" },
+        { "file": "/tmp/migrate-to-tanstack/App.tsx.bak", "line": 88, "openingTag": "<ProtectedRoute>", "props": [], "context": "<Route path=\"/rag-lab\" element={<ProtectedRoute><RagLabFunctional /></ProtectedRoute>} />" },
+        { "file": "/tmp/migrate-to-tanstack/App.tsx.bak", "line": 89, "openingTag": "<ProtectedRoute>", "props": [], "context": "<Route path=\"/agents\" element={<ProtectedRoute><AgentsFunctional /></ProtectedRoute>} />" },
+        { "file": "/tmp/migrate-to-tanstack/App.tsx.bak", "line": 90, "openingTag": "<ProtectedRoute>", "props": [], "context": "<Route path=\"/analytics\" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />" },
+        { "file": "/tmp/migrate-to-tanstack/App.tsx.bak", "line": 91, "openingTag": "<ProtectedRoute>", "props": [], "context": "<Route path=\"/admin\" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />" },
+        { "file": "/tmp/migrate-to-tanstack/App.tsx.bak", "line": 92, "openingTag": "<ProtectedRoute>", "props": [], "context": "<Route path=\"/seo-projects\" element={<ProtectedRoute><SeoProjects /></ProtectedRoute>} />" },
+        { "file": "/tmp/migrate-to-tanstack/App.tsx.bak", "line": 93, "openingTag": "<ProtectedRoute>", "props": [], "context": "<Route path=\"/seo-projects/:id\" element={<ProtectedRoute><SeoProjectDetail /></ProtectedRoute>} />" },
+        { "file": "/tmp/migrate-to-tanstack/App.tsx.bak", "line": 94, "openingTag": "<ProtectedRoute>", "props": [], "context": "<Route path=\"/seo-audit/:scanRunId\" element={<ProtectedRoute><SeoAuditReport /></ProtectedRoute>} />" }
+      ]
+    }
+  ],
+  "notes": [
+    "Auth is Supabase-based via AuthContext; ProtectedRoute is the only auth wrapper.",
+    "All 9 protected route leaves were re-wrapped 1:1 in the generated src/routes files."
+  ]
+}
