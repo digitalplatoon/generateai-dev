@@ -5,7 +5,7 @@ import { MapPin, Clock, Users, Coffee, Heart, Zap, Code, Brain } from 'lucide-re
 import SEOHead from '@/components/seo/SEOHead';
 
 const Careers = () => {
-  const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedJob, setSelectedJob] = useState<any>(null);
 
   const benefits = [
     {
