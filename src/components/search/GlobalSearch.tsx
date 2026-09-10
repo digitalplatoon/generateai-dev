@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/router-compat';
 import { Search, FileText, GraduationCap, MessageSquare, Compass, Newspaper } from 'lucide-react';
 import {
   CommandDialog,

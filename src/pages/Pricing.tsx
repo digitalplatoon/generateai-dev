@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import SEOHead from '@/components/seo/SEOHead';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/router-compat';
 
 const Pricing = () => {
   const plans = [

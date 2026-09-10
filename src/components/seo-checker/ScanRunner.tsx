@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/table';
 import type { SeoScanRun } from '@/types/seo';
 import { format } from 'date-fns';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@/lib/router-compat';
 
 interface ScanRunnerProps {
   projectId: string;

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { useABTest, HERO_CTA_TEST } from "@/hooks/useABTest";
 
 const HeroSection = () => {

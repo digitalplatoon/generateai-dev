@@ -7,7 +7,7 @@ import ABTestResults from '@/components/admin/ABTestResults';
 import WebVitalsDisplay from '@/components/admin/WebVitalsDisplay';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link } from '@/lib/router-compat';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('calendar');
