@@ -67,7 +67,7 @@ const TeamCollaborationPanel = ({ conversationId }: TeamCollaborationPanelProps)
       }
 
       // Get user profiles for the shared users
-      const userIds = shares.map(share => share.shared_with);
+      const userIds = shares.map(share => share.shared_with).filter((id): id is string => Boolean(id));
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('id, full_name, avatar_url')
@@ -76,7 +76,7 @@ const TeamCollaborationPanel = ({ conversationId }: TeamCollaborationPanelProps)
       if (profilesError) throw profilesError;
 
       // Combine the data
-      const members: TeamMember[] = shares.map(share => {
+      const members: TeamMember[] = shares.map((share: any) => {
         const profile = profiles?.find(p => p.id === share.shared_with);
         return {
           id: share.shared_with,
@@ -123,7 +123,7 @@ const TeamCollaborationPanel = ({ conversationId }: TeamCollaborationPanelProps)
           conversation_id: conversationId,
           shared_with: userData.id,
           shared_by: user.id,
-          permission_level: selectedRole,
+          permission_level: selectedRole as string,
           expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
         });
 
