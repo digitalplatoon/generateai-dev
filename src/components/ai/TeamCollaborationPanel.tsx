@@ -76,15 +76,15 @@ const TeamCollaborationPanel = ({ conversationId }: TeamCollaborationPanelProps)
       if (profilesError) throw profilesError;
 
       // Combine the data
-      const members: TeamMember[] = shares.map((share: any) => {
+      const members: TeamMember[] = shares.map((share: any): TeamMember => {
         const profile = profiles?.find(p => p.id === share.shared_with);
         return {
           id: share.shared_with,
           email: profile?.full_name || 'Unknown User',
           role: share.permission_level as 'owner' | 'admin' | 'member' | 'viewer',
           joinedAt: share.created_at,
-          avatar: profile?.avatar_url,
-          name: profile?.full_name
+          avatar: profile?.avatar_url ?? undefined,
+          name: profile?.full_name ?? undefined
         };
       });
 
