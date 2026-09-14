@@ -214,7 +214,7 @@ const Careers = () => {
                         <div>
                           <h3 className="text-lg font-semibold text-white mb-3">Key Responsibilities</h3>
                           <ul className="space-y-2">
-                            {selectedJob.responsibilities.map((resp, index) => (
+                            {selectedJob.responsibilities.map((resp: string, index: number) => (
                               <li key={index} className="text-light-gray flex items-start">
                                 <Code className="w-4 h-4 text-teal mr-2 mt-0.5 flex-shrink-0" />
                                 {resp}
@@ -226,7 +226,7 @@ const Careers = () => {
                         <div>
                           <h3 className="text-lg font-semibold text-white mb-3">Requirements</h3>
                           <ul className="space-y-2">
-                            {selectedJob.requirements.map((req, index) => (
+                            {selectedJob.requirements.map((req: string, index: number) => (
                               <li key={index} className="text-light-gray flex items-start">
                                 <Brain className="w-4 h-4 text-teal mr-2 mt-0.5 flex-shrink-0" />
                                 {req}

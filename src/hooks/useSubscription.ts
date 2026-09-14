@@ -56,7 +56,7 @@ export const useSubscription = () => {
         setCurrentSubscription({
           plan_name: plan.name || 'Starter',
           tier: (plan.tier || 'free') as 'free' | 'basic' | 'premium' | 'enterprise',
-          status: data.status,
+          status: data.status as string,
           limits: typeof plan.limits === 'object' ? plan.limits as Record<string, number> : getDefaultLimits(plan.tier || 'free'),
           features: typeof plan.features === 'object' ? plan.features as Record<string, boolean> : getDefaultFeatures(plan.tier || 'free'),
           expires_at: data.current_period_end
