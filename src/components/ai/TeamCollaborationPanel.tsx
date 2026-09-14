@@ -82,7 +82,7 @@ const TeamCollaborationPanel = ({ conversationId }: TeamCollaborationPanelProps)
           id: share.shared_with,
           email: profile?.full_name || 'Unknown User',
           role: share.permission_level as 'owner' | 'admin' | 'member' | 'viewer',
-          joinedAt: share.created_at,
+          joinedAt: share.created_at ?? '',
           avatar: profile?.avatar_url ?? undefined,
           name: profile?.full_name ?? undefined
         };
@@ -123,9 +123,9 @@ const TeamCollaborationPanel = ({ conversationId }: TeamCollaborationPanelProps)
           conversation_id: conversationId,
           shared_with: userData.id,
           shared_by: user.id,
-          permission_level: selectedRole as string,
-          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
-        });
+          permission_level: selectedRole,
+          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
+        } as any);
 
       if (shareError) throw shareError;
 
