@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { Helmet } from '@/lib/helmet';
 
 // Updated with your actual Google Analytics Measurement ID
 const GA_TRACKING_ID = 'G-68VLBBRJS1';
