@@ -13,7 +13,7 @@ export const messageService = {
     if (error) throw error;
 
     // Type cast the messages to ensure proper role types
-    const typedMessages: ConversationMessage[] = (data || []).map(message => ({
+    const typedMessages: ConversationMessage[] = ((data || []) as any[]).map((message: any) => ({
       ...message,
       role: message.role as 'user' | 'assistant' | 'system',
       metadata: null,
