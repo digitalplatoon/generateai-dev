@@ -10,7 +10,7 @@ export const conversationService = {
       .order('updated_at', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return (data || []) as unknown as Conversation[];
   },
 
   async createConversation(userId: string, title: string = 'New Conversation'): Promise<Conversation> {
@@ -26,7 +26,7 @@ export const conversationService = {
       .single();
 
     if (error) throw error;
-    return data;
+    return data as unknown as Conversation;
   },
 
   async updateConversation(id: string, updates: Partial<Conversation>): Promise<void> {

@@ -36,7 +36,7 @@ export const useAISettings = () => {
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
-      setSettings(data);
+      setSettings(data as any);
     } catch (error) {
       console.error('Error fetching AI settings:', error);
       setSettings(null);
@@ -59,7 +59,7 @@ export const useAISettings = () => {
         .single();
 
       if (error) throw error;
-      setSettings(data);
+      setSettings(data as any);
       
       toast({
         title: "Settings updated",

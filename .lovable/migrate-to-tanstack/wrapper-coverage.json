@@ -1,0 +1,89 @@
+{
+  "wrapper": "ProtectedRoute",
+  "expected": 9,
+  "covered": 9,
+  "allCovered": true,
+  "routes": [
+    {
+      "route": "/dashboard",
+      "file": "src/routes/dashboard.tsx",
+      "exists": true,
+      "wrapper": "ProtectedRoute",
+      "openingTag": "<ProtectedRoute>",
+      "props": [],
+      "wrapped": true
+    },
+    {
+      "route": "/enhanced-ai",
+      "file": "src/routes/enhanced-ai.tsx",
+      "exists": true,
+      "wrapper": "ProtectedRoute",
+      "openingTag": "<ProtectedRoute>",
+      "props": [],
+      "wrapped": true
+    },
+    {
+      "route": "/rag-lab",
+      "file": "src/routes/rag-lab.tsx",
+      "exists": true,
+      "wrapper": "ProtectedRoute",
+      "openingTag": "<ProtectedRoute>",
+      "props": [],
+      "wrapped": true
+    },
+    {
+      "route": "/agents",
+      "file": "src/routes/agents.tsx",
+      "exists": true,
+      "wrapper": "ProtectedRoute",
+      "openingTag": "<ProtectedRoute>",
+      "props": [],
+      "wrapped": true
+    },
+    {
+      "route": "/analytics",
+      "file": "src/routes/analytics.tsx",
+      "exists": true,
+      "wrapper": "ProtectedRoute",
+      "openingTag": "<ProtectedRoute>",
+      "props": [],
+      "wrapped": true
+    },
+    {
+      "route": "/admin",
+      "file": "src/routes/admin.tsx",
+      "exists": true,
+      "wrapper": "ProtectedRoute",
+      "openingTag": "<ProtectedRoute>",
+      "props": [],
+      "wrapped": true
+    },
+    {
+      "route": "/seo-projects",
+      "file": "src/routes/seo-projects/index.tsx",
+      "exists": true,
+      "wrapper": "ProtectedRoute",
+      "openingTag": "<ProtectedRoute>",
+      "props": [],
+      "wrapped": true
+    },
+    {
+      "route": "/seo-projects/$id",
+      "file": "src/routes/seo-projects/$id.tsx",
+      "exists": true,
+      "wrapper": "ProtectedRoute",
+      "openingTag": "<ProtectedRoute>",
+      "props": [],
+      "wrapped": true
+    },
+    {
+      "route": "/seo-audit/$scanRunId",
+      "file": "src/routes/seo-audit/$scanRunId.tsx",
+      "exists": true,
+      "wrapper": "ProtectedRoute",
+      "openingTag": "<ProtectedRoute>",
+      "props": [],
+      "wrapped": true
+    }
+  ]
+}

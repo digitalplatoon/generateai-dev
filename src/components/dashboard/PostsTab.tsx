@@ -35,11 +35,11 @@ const PostsTab = () => {
       const { data, error } = await supabase
         .from('posts')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('user_id', user?.id as string)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPosts(data || []);
+      setPosts((data || []) as Post[]);
     } catch (error) {
       console.error('Error fetching posts:', error);
       toast({
@@ -64,7 +64,7 @@ const PostsTab = () => {
         .insert({
           title,
           content,
-          user_id: user?.id,
+          user_id: user?.id as string,
           published: true
         });
 

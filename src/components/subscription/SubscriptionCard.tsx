@@ -86,7 +86,7 @@ const SubscriptionCard: React.FC<SubscriptionCardProps> = ({
       <CardHeader className="text-center">
         <div className="flex items-center justify-center gap-2 mb-2">
           {getTierIcon()}
-          <Badge className={getTierColor()}>{plan.tier.toUpperCase()}</Badge>
+          <Badge className={getTierColor()}>{(plan.tier ?? 'free').toUpperCase()}</Badge>
         </div>
         <CardTitle className="text-xl">{plan.name}</CardTitle>
         <CardDescription>

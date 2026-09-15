@@ -52,7 +52,7 @@ export const useAuditLog = () => {
       if (error) throw error;
       
       // Type cast the data to ensure proper types
-      const typedLogs: AuditLogEntry[] = (data || []).map(log => ({
+      const typedLogs: AuditLogEntry[] = ((data || []) as any[]).map((log: any) => ({
         ...log,
         conversation_id: log.conversation_id || undefined,
         request_data: log.request_data || undefined,

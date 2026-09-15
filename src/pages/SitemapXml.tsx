@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { generateSitemap } from '@/utils/siteMap';
-import { Helmet } from 'react-helmet-async';
+import { Helmet } from '@/lib/helmet';
 
 const SitemapXml = () => {
   const sitemapContent = generateSitemap();

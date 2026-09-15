@@ -141,7 +141,7 @@ export const useAdminDashboard = () => {
     try {
       const { error } = await supabase
         .from('subscription_plans')
-        .insert(planData);
+        .insert(planData as any);
 
       if (error) throw error;
 
@@ -167,7 +167,7 @@ export const useAdminDashboard = () => {
     try {
       const { error } = await supabase
         .from('subscription_plans')
-        .update(updates)
+        .update(updates as any)
         .eq('id', planId);
 
       if (error) throw error;

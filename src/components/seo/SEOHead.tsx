@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Helmet } from 'react-helmet-async';
+import { Helmet } from '@/lib/helmet';
 
 interface SEOHeadProps {
   title?: string;
