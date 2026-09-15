@@ -1,10 +1,13 @@
 /**
- * react-helmet-async ships CommonJS, which breaks named ESM imports during SSR.
- * Re-export through the default export so both server and client resolve it.
+ * react-helmet-async resolves to CommonJS on the server and ESM in the browser.
+ * A namespace import works for both; unwrap an interop `default` when present.
  */
-import helmetPkg from "react-helmet-async";
+import * as helmetNs from "react-helmet-async";
 
-const pkg = helmetPkg as unknown as typeof import("react-helmet-async");
+type HelmetModule = typeof import("react-helmet-async");
 
-export const Helmet = pkg.Helmet;
-export const HelmetProvider = pkg.HelmetProvider;
+const mod = ((helmetNs as unknown as { default?: HelmetModule }).default ??
+  helmetNs) as HelmetModule;
+
+export const Helmet = mod.Helmet;
+export const HelmetProvider = mod.HelmetProvider;
