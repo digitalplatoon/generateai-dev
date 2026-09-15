@@ -2,17 +2,122 @@
   "generatedAt": "2026-07-21",
   "policy": "Existing Supabase edge functions are retained as-is during the stack migration. No function bodies, secrets, or invocation sites were changed. Classification records which functions are app-internal (candidates for future createServerFn migration) vs external-caller endpoints (must remain HTTP endpoints).",
   "functions": [
-    { "name": "ai-chat", "classification": "app-internal", "callers": ["browser via supabase.functions.invoke"], "action": "retained", "futureCandidate": "createServerFn" },
-    { "name": "check-subscription", "classification": "app-internal", "callers": ["browser via supabase.functions.invoke"], "action": "retained", "futureCandidate": "createServerFn" },
-    { "name": "create-checkout", "classification": "app-internal", "callers": ["browser via supabase.functions.invoke"], "action": "retained", "futureCandidate": "createServerFn" },
-    { "name": "customer-portal", "classification": "app-internal", "callers": ["browser via supabase.functions.invoke"], "action": "retained", "futureCandidate": "createServerFn" },
-    { "name": "generate-insights", "classification": "app-internal", "callers": ["browser via supabase.functions.invoke"], "action": "retained", "futureCandidate": "createServerFn" },
-    { "name": "newsletter-subscribe", "classification": "app-internal", "callers": ["browser via supabase.functions.invoke"], "action": "retained", "futureCandidate": "createServerFn" },
-    { "name": "rag-process-document", "classification": "app-internal", "callers": ["browser via supabase.functions.invoke"], "action": "retained", "futureCandidate": "createServerFn" },
-    { "name": "rag-query", "classification": "app-internal", "callers": ["browser via supabase.functions.invoke"], "action": "retained", "futureCandidate": "createServerFn" },
-    { "name": "seo-discover-urls", "classification": "app-internal", "callers": ["browser via supabase.functions.invoke"], "action": "retained", "futureCandidate": "createServerFn" },
-    { "name": "seo-generate-prompts", "classification": "app-internal", "callers": ["browser via supabase.functions.invoke"], "action": "retained", "futureCandidate": "createServerFn" },
-    { "name": "seo-scan-project", "classification": "app-internal", "callers": ["browser via supabase.functions.invoke", "scheduled scans"], "action": "retained", "futureCandidate": "server route under src/routes/api/public" }
+    {
+      "name": "ai-chat",
+      "classification": "app-internal",
+      "callers": [
+        "browser via supabase.functions.invoke"
+      ],
+      "action": "retained",
+      "futureCandidate": "createServerFn",
+      "outcome": "left"
+    },
+    {
+      "name": "check-subscription",
+      "classification": "app-internal",
+      "callers": [
+        "browser via supabase.functions.invoke"
+      ],
+      "action": "retained",
+      "futureCandidate": "createServerFn",
+      "outcome": "left"
+    },
+    {
+      "name": "create-checkout",
+      "classification": "app-internal",
+      "callers": [
+        "browser via supabase.functions.invoke"
+      ],
+      "action": "retained",
+      "futureCandidate": "createServerFn",
+      "outcome": "left"
+    },
+    {
+      "name": "customer-portal",
+      "classification": "app-internal",
+      "callers": [
+        "browser via supabase.functions.invoke"
+      ],
+      "action": "retained",
+      "futureCandidate": "createServerFn",
+      "outcome": "left"
+    },
+    {
+      "name": "generate-insights",
+      "classification": "app-internal",
+      "callers": [
+        "browser via supabase.functions.invoke"
+      ],
+      "action": "retained",
+      "futureCandidate": "createServerFn",
+      "outcome": "left"
+    },
+    {
+      "name": "newsletter-subscribe",
+      "classification": "app-internal",
+      "callers": [
+        "browser via supabase.functions.invoke"
+      ],
+      "action": "retained",
+      "futureCandidate": "createServerFn",
+      "outcome": "left"
+    },
+    {
+      "name": "rag-process-document",
+      "classification": "app-internal",
+      "callers": [
+        "browser via supabase.functions.invoke"
+      ],
+      "action": "retained",
+      "futureCandidate": "createServerFn",
+      "outcome": "left"
+    },
+    {
+      "name": "rag-query",
+      "classification": "app-internal",
+      "callers": [
+        "browser via supabase.functions.invoke"
+      ],
+      "action": "retained",
+      "futureCandidate": "createServerFn",
+      "outcome": "left"
+    },
+    {
+      "name": "seo-discover-urls",
+      "classification": "app-internal",
+      "callers": [
+        "browser via supabase.functions.invoke"
+      ],
+      "action": "retained",
+      "futureCandidate": "createServerFn",
+      "outcome": "left"
+    },
+    {
+      "name": "seo-generate-prompts",
+      "classification": "app-internal",
+      "callers": [
+        "browser via supabase.functions.invoke"
+      ],
+      "action": "retained",
+      "futureCandidate": "createServerFn",
+      "outcome": "left"
+    },
+    {
+      "name": "seo-scan-project",
+      "classification": "app-internal",
+      "callers": [
+        "browser via supabase.functions.invoke",
+        "scheduled scans"
+      ],
+      "action": "retained",
+      "futureCandidate": "server route under src/routes/api/public",
+      "outcome": "left"
+    }
   ],
-  "totals": { "total": 11, "retained": 11, "migrated": 0, "deleted": 0 }
+  "totals": {
+    "total": 11,
+    "retained": 11,
+    "migrated": 0,
+    "deleted": 0
+  }
 }
