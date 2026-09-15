@@ -1,10 +1,10 @@
 
-import DOMPurify from 'dompurify';
 import { z } from 'zod';
+import { sanitizeHtml as safeSanitize } from '@/lib/sanitize';
 
 // Content sanitization
 export const sanitizeHtml = (content: string): string => {
-  return DOMPurify.sanitize(content, {
+  return safeSanitize(content, {
     ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'a'],
     ALLOWED_ATTR: ['href', 'target'],
     ALLOW_DATA_ATTR: false,
