@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import DOMPurify from 'dompurify';
+import { sanitizeHtml } from '@/lib/sanitize';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -203,7 +203,7 @@ Creates a new user account
                   </div>
                   <div className="text-sm text-light-gray">
                     <div dangerouslySetInnerHTML={{ 
-                      __html: DOMPurify.sanitize(prompt.sampleOutput.substring(0, 150).replace(/\n/g, '<br>')) 
+                      __html: sanitizeHtml(prompt.sampleOutput.substring(0, 150).replace(/\n/g, '<br>')) 
                     }} />...
                   </div>
                 </div>
