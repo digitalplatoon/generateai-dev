@@ -124,22 +124,8 @@ serve(async (req) => {
         logStep("Determined subscription tier", { priceId, amount, subscriptionTier });
       }
 
-      // Update user subscription in database
-      const { error: upsertError } = await supabaseClient.rpc('upsert_user_subscription', {
-        p_user_id: user.id,
-        p_plan_id: subscriptions.data[0]?.metadata?.plan_id || null,
-        p_status: hasActiveSub ? 'active' : 'canceled',
-        p_stripe_subscription_id: hasActiveSub ? subscriptions.data[0].id : null,
-        p_stripe_customer_id: customerId,
-        p_current_period_start: hasActiveSub ? new Date(subscriptions.data[0].current_period_start * 1000).toISOString() : null,
-        p_current_period_end: subscriptionEnd,
-      });
-
-      if (upsertError) {
-        logStep("Database update error", upsertError);
-      }
-
-      logStep("Updated database with subscription info", { subscribed: hasActiveSub, subscriptionTier });
+      // Read-only: entitlement records are written only by a signature-verified payment webhook.
+      logStep("Subscription status resolved", { subscribed: hasActiveSub, subscriptionTier });
       
       return new Response(JSON.stringify({
         subscribed: hasActiveSub || subscriptionTier === "free",
