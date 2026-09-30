@@ -24,9 +24,6 @@ import { useWebVitals } from "@/hooks/useWebVitals";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 import appCss from "../styles.css?url";
 
-const FAVICON_SVG =
-  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojNjRGRkRBIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM2MEE1RkEiIC8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI4IiBmaWxsPSJ1cmwoI2dyYWRpZW50KSIgLz4KICA8cGF0aCBkPSJNMTYgOGMtNC40MTggMC04IDMuNTgyLTggOHMzLjU4MiA4IDggOCA4LTMuNTgyIDgtOC0zLjU4Mi04LTgtOHptMCAyYzMuMzE0IDAgNiAyLjY4NiA2IDZzLTIuNjg2IDYtNiA2LTYtMi42ODYtNi02IDIuNjg2LTYgNi02eiIgZmlsbD0id2hpdGUiIC8+CiAgPGNpcmNsZSBjeD0iMTMiIGN5PSIxMyIgcj0iMiIgZmlsbD0id2hpdGUiIC8+CiAgPGNpcmNsZSBjeD0iMTkiIGN5PSIxMyIgcj0iMiIgZmlsbD0id2hpdGUiIC8+CiAgPHBhdGggZD0iTTEzIDE5YzEuNjU3IDAgMy0xLjM0MyAzLTNoLTZ2MGMwIDEuNjU3IDEuMzQzIDMgMyAzeiIgZmlsbD0id2hpdGUiIC8+Cjwvc3ZnPgo=";
-
 const GOOGLE_FONTS_HREF =
   "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap";
 
@@ -46,8 +43,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", type: "image/svg+xml", href: FAVICON_SVG },
-      { rel: "apple-touch-icon", sizes: "180x180", href: FAVICON_SVG },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "apple-touch-icon", href: "/favicon.svg" },
       { rel: "dns-prefetch", href: "//fonts.googleapis.com" },
       { rel: "dns-prefetch", href: "//fonts.gstatic.com" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },

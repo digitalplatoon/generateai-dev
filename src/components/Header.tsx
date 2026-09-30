@@ -101,8 +101,8 @@ const Header = () => {
         <div className="flex items-center justify-between h-16 gap-4">
           <Link
             to="/"
-            className="flex items-center shrink-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label="GenerateAI home"
+            className="group flex items-center shrink-0 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label="GenerateAI.dev home"
           >
             <EnhancedLogo size="md" showText={true} />
           </Link>
