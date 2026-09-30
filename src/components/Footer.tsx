@@ -1,6 +1,7 @@
 
 import { Code } from "lucide-react";
 import { Link } from "@/lib/router-compat";
+import EnhancedLogo from "@/components/ui/EnhancedLogo";
 
 const Footer = () => {
   const footerLinks = {
@@ -30,13 +31,12 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8 mb-12">
           {/* Brand */}
           <div className="col-span-1">
-            <Link to="/" className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">G</span>
-              </div>
-              <span className="text-xl font-display font-bold text-gradient">
-                GenerateAI.dev
-              </span>
+            <Link
+              to="/"
+              className="group inline-flex items-center mb-4 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="GenerateAI.dev home"
+            >
+              <EnhancedLogo size="md" />
             </Link>
             <p className="text-muted-foreground text-sm mb-4">
               Your AI copilot for mastering generative AI development with interactive learning and production-ready tools.
