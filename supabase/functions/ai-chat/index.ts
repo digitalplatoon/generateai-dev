@@ -104,7 +104,7 @@ serve(async (req) => {
 
     const { messages: rawMessages, settings = {}, conversationId, stream = true } = await req.json()
 
-    // Only allow user/assistant roles from the client; system role is server-controlled
+    // Client history is untrusted: never let callers create assistant/system turns.
     if (!Array.isArray(rawMessages) || rawMessages.length === 0 || rawMessages.length > 50) {
       return new Response(
         JSON.stringify({ error: 'Invalid messages' }),
@@ -112,8 +112,8 @@ serve(async (req) => {
       )
     }
     const messages = rawMessages
-      .filter((m: any) => m && typeof m.content === 'string' && (m.role === 'user' || m.role === 'assistant'))
-      .map((m: any) => ({ role: m.role as 'user' | 'assistant', content: m.content.slice(0, 10000) }))
+      .filter((m: any) => m && m.role === 'user' && typeof m.content === 'string')
+      .map((m: any) => ({ role: 'user' as const, content: m.content.slice(0, 10000) }))
     if (messages.length === 0) {
       return new Response(
         JSON.stringify({ error: 'Invalid messages' }),
