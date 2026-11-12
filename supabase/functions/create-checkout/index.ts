@@ -28,6 +28,24 @@ const checkoutRequestSchema = z.object({
   billingPeriod: z.enum(['monthly', 'yearly']).default('monthly'),
 });
 
+async function getOrCreateStripeCustomer(stripe: Stripe, userId: string): Promise<Stripe.Customer> {
+  const matches = await stripe.customers.search({
+    query: `metadata['supabase_user_id']:'${userId}'`,
+    limit: 2,
+  });
+
+  if (matches.data.length > 1) {
+    throw new Error("Multiple Stripe customers are linked to this account");
+  }
+
+  if (matches.data[0]) return matches.data[0];
+
+  return stripe.customers.create(
+    { metadata: { supabase_user_id: userId } },
+    { idempotencyKey: `generateai-customer-${userId}` },
+  );
+}
+
 function validateOrigin(origin: string | null): string {
   if (!origin) return ALLOWED_ORIGINS[0];
   if (ALLOWED_ORIGINS.includes(origin)) return origin;
@@ -72,7 +90,7 @@ serve(async (req) => {
     if (userError) throw new Error(`Authentication error: ${userError.message}`);
     
     const user = userData.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
+    if (!user?.id) throw new Error("User not authenticated");
     logStep("User authenticated", { userId: user.id });
 
     const rawBody = await req.json();
@@ -102,24 +120,17 @@ serve(async (req) => {
     }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
-    
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-      logStep("Found existing customer", { customerId });
-    } else {
-      logStep("Creating new customer");
-    }
 
     const price = billingPeriod === 'monthly' ? plan.price_monthly : plan.price_yearly;
     if (!price || price === 0) {
       throw new Error("Invalid plan pricing");
     }
 
+    const customer = await getOrCreateStripeCustomer(stripe, user.id);
+    logStep("Using account-linked Stripe customer", { customerId: customer.id });
+
     const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      customer_email: customerId ? undefined : user.email,
+      customer: customer.id,
       line_items: [
         {
           price_data: {

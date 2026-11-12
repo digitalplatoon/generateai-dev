@@ -35,6 +35,19 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CUSTOMER-PORTAL] ${step}${detailsStr}`);
 };
 
+async function findStripeCustomerForUser(stripe: Stripe, userId: string): Promise<Stripe.Customer | null> {
+  const matches = await stripe.customers.search({
+    query: `metadata['supabase_user_id']:'${userId}'`,
+    limit: 2,
+  });
+
+  if (matches.data.length > 1) {
+    throw new Error("Multiple Stripe customers are linked to this account");
+  }
+
+  return matches.data[0] ?? null;
+}
+
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
 
@@ -67,22 +80,19 @@ serve(async (req) => {
     if (userError) throw new Error(`Authentication error: ${userError.message}`);
     
     const user = userData.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
+    if (!user?.id) throw new Error("User not authenticated");
     logStep("User authenticated", { userId: user.id });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const customer = await findStripeCustomerForUser(stripe, user.id);
     
-    if (customers.data.length === 0) {
-      throw new Error("No Stripe customer found for this user");
-    }
+    if (!customer) throw new Error("No Stripe customer linked to this account");
     
-    const customerId = customers.data[0].id;
-    logStep("Found Stripe customer", { customerId });
+    logStep("Found account-linked Stripe customer", { customerId: customer.id });
 
     const origin = validateOrigin(req.headers.get("origin"));
     const portalSession = await stripe.billingPortal.sessions.create({
-      customer: customerId,
+      customer: customer.id,
       return_url: `${origin}/subscription`,
     });
     
