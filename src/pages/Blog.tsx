@@ -25,7 +25,7 @@ const Blog = () => {
     
     const result = emailSchema.safeParse(email);
     if (!result.success) {
-      toast.error(result.error.errors[0].message);
+      toast.error(result.error.issues[0]?.message ?? "Please enter a valid email address.");
       return;
     }
 
